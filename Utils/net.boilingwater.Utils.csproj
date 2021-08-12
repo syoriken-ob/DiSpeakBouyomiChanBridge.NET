@@ -1,0 +1,10 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>net.boilingwater.Utils</RootNamespace>
+    <StartupObject />
+    <AssemblyName>net.boilingwater.Utils</AssemblyName>
+  </PropertyGroup>
+
+</Project>

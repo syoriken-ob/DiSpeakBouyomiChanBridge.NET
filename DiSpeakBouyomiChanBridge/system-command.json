@@ -1,0 +1,4 @@
+{
+  "bridgerestart\\(\\)": "ReloadCommand",
+  "killall\\(\\)": "ShutdownCommand"
+}

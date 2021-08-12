@@ -1,0 +1,41 @@
+{
+  "test": {
+    "immediate": false,
+    "regex": "test\\((?<path>.*?)\\)",
+    "replacePattern": [ "path" ],
+    "runCommand": [
+      "C:\\Users\\hoge\\Desktop\\Yomiage\\run.bat",
+      "\"__path__\""
+    ],
+    "env": {
+      "PATH": "C:\\Windows\\System32\\;C:\\Windows\\"
+    },
+    "path": "C:\\Users\\hoge\\Desktop\\Yomiage",
+    "stdInOut": {
+      "hoge": "ほげ",
+      "fuga": "ふが",
+      "piyo": "ぴよ"
+    },
+    "executionComment": "testを実行します",
+    "completeComment": "testの実行を完了しました"
+  },
+  "test_im": {
+    "immediate": true,
+    "regex": "testim\\((?<path>.*?)\\)",
+    "replacePattern": [ "path" ],
+    "runCommand": [
+      "\"C:\\Users\\hoge\\Desktop\\Yomiage\\run2.bat\"",
+      "__path__"
+    ],
+    "env": {
+      "PATH": "C:\\windows\\system32"
+    },
+    "path": "C:\\Users\\hoge\\Desktop\\Yomiage",
+    "stdInOut": {
+      "割り込み": "まじ？",
+      "何か": "まじ？"
+    },
+    "executionComment": "test_imを実行します",
+    "completeComment": "test_imの実行を完了しました"
+  }
+}
