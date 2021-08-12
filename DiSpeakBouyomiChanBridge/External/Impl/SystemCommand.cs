@@ -1,4 +1,5 @@
 ﻿using net.boilingwater.DiSpeakBouyomiChanBridge.Config;
+using net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl.Factory;
 using net.boilingwater.DiSpeakBouyomiChanBridge.Http;
 using net.boilingwater.DiSpeakBouyomiChanBridge.Log;
 
@@ -17,6 +18,8 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl
         {
             HttpClientForBouyomiChan.Instance.SendToBouyomiChan(MessageSetting.AsString("ReloadConfig"));
             LoggerPool.Logger.Info("Reload SystemConfig...");
+            CommandFactory.Factory.Reload();
+            SystemCommandFactory.Factory.Reload();
             HttpServerForBouyomiChan.Instance.Init(false);
         }
     }
