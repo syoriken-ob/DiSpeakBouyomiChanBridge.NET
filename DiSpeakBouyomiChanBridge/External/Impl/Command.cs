@@ -7,7 +7,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 
 namespace net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl
 {
@@ -54,8 +53,8 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl
                 //StandardInputEncoding = Encoding.GetEncoding(Setting.Get("ShellEncoding")),
                 UseShellExecute = false,
                 CreateNoWindow = false,
-                FileName = Setting.AsString("ShellPath"),
-                Arguments = $"{Setting.AsString("ShellOption")} \"{string.Join(" ", RunCommand)}\""
+                FileName = Setting.Instance.AsString("ShellPath"),
+                Arguments = $"{Setting.Instance.AsString("ShellOption")} \"{string.Join(" ", RunCommand)}\""
             };
 
             //環境変数設定
@@ -73,7 +72,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl
 
             try
             {
-                using var p = Process.Start(info);
+                using Process p = Process.Start(info);
 
                 lock (((ICollection)ExecuteProcesses).SyncRoot)
                 {
@@ -92,8 +91,8 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl
                 p.ErrorDataReceived += (sender, e) => LoggerPool.Logger.Debug($"{CommandTitle}({p.ProcessName}-{p.Id}) -> {e.Data}");
                 p.BeginErrorReadLine();
 
-                using var pOutput = p.StandardOutput;
-                using var pInput = p.StandardInput;
+                using System.IO.StreamReader pOutput = p.StandardOutput;
+                using System.IO.StreamWriter pInput = p.StandardInput;
                 pInput.AutoFlush = true;
 
                 string pOut = null;
@@ -130,12 +129,12 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl
             catch (InvalidOperationException e)
             {
                 LoggerPool.Logger.Info($"\"{CommandTitle}\" Command has been Killed.", e);
-                HttpClientForBouyomiChan.Instance.SendToBouyomiChan(MessageSetting.AsString("ErrorOccurrence"));
+                HttpClientForBouyomiChan.Instance.SendToBouyomiChan(MessageSetting.Instance.AsString("ErrorOccurrence"));
             }
             catch (Exception e)
             {
                 LoggerPool.Logger.Error($"Couldn't run \"{CommandTitle}\" Command", e);
-                HttpClientForBouyomiChan.Instance.SendToBouyomiChan(MessageSetting.AsString("ErrorOccurrence"));
+                HttpClientForBouyomiChan.Instance.SendToBouyomiChan(MessageSetting.Instance.AsString("ErrorOccurrence"));
             }
         }
 

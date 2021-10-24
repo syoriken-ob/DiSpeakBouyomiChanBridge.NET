@@ -26,16 +26,19 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http
 
         public void SendToBouyomiChan(string text)
         {
-            var sendMessage = text.Trim();
-            if (string.IsNullOrEmpty(sendMessage)) return;
+            string sendMessage = text.Trim();
+            if (string.IsNullOrEmpty(sendMessage))
+            {
+                return;
+            }
 
-            var retryCount = 0L;
-            var isValid = false;
+            long retryCount = 0L;
+            bool isValid = false;
             while (true)
             {
                 try
                 {
-                    var responseMessage = _client.Send(CreateBouyomiChanHttpRequest(sendMessage));
+                    HttpResponseMessage responseMessage = _client.Send(CreateBouyomiChanHttpRequest(sendMessage));
                     if (responseMessage.StatusCode == HttpStatusCode.OK)
                     {
                         LoggerPool.Logger.Debug($"Send:{sendMessage}");
@@ -44,13 +47,16 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http
                 }
                 catch (Exception) { isValid = false; }
 
-                if (isValid) return;
-
-                LoggerPool.Logger.Fatal($"Fail to Send Message to BouyomiChan(http://{Setting.AsString("BouyomiChanHost")}:{Setting.AsString("BouyomiChanPort")}) : {sendMessage}");
-                if (string.IsNullOrEmpty(Setting.Get("RetryCount")) || retryCount++ < Setting.AsLong("RetryCount"))
+                if (isValid)
                 {
-                    LoggerPool.Logger.DebugFormat("Retry Connect:{0}/{1}", retryCount, Setting.AsLong("RetryCount"));
-                    Thread.Sleep(Setting.AsInteger("RetrySleepTime.Milliseconds"));
+                    return;
+                }
+
+                LoggerPool.Logger.Fatal($"Fail to Send Message to BouyomiChan(http://{Setting.Instance.AsString("BouyomiChanHost")}:{Setting.Instance.AsString("BouyomiChanPort")}) : {sendMessage}");
+                if (string.IsNullOrEmpty(Setting.Instance.Get("RetryCount")) || retryCount++ < Setting.Instance.AsLong("RetryCount"))
+                {
+                    LoggerPool.Logger.DebugFormat("Retry Connect:{0}/{1}", retryCount, Setting.Instance.AsLong("RetryCount"));
+                    Thread.Sleep(Setting.Instance.AsInteger("RetrySleepTime.Milliseconds"));
                 }
                 else
                 {
@@ -59,14 +65,17 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http
             }
         }
 
-        void IDisposable.Dispose() => _client.Dispose();
+        void IDisposable.Dispose()
+        {
+            _client.Dispose();
+        }
 
         private static HttpRequestMessage CreateBouyomiChanHttpRequest(string text)
         {
             return new HttpRequestMessage()
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri($"http://{Setting.AsString("BouyomiChanHost")}:{Setting.AsString("BouyomiChanPort")}/talk?text={Uri.EscapeUriString(text)}")
+                RequestUri = new Uri($"http://{Setting.Instance.AsString("BouyomiChanHost")}:{Setting.Instance.AsString("BouyomiChanPort")}/talk?text={Uri.EscapeUriString(text)}")
             };
         }
     }

@@ -1,5 +1,5 @@
-﻿using System;
-using Microsoft.VisualBasic;
+﻿using Microsoft.VisualBasic;
+using System;
 using System.Text.Json;
 
 namespace net.boilingwater.Utils
@@ -8,7 +8,10 @@ namespace net.boilingwater.Utils
     {
         public static int ToInteger(object obj)
         {
-            if (obj is int @int) return @int;
+            if (obj is int @int)
+            {
+                return @int;
+            }
 
             try
             {
@@ -21,7 +24,10 @@ namespace net.boilingwater.Utils
 
         public static long ToLong(object obj)
         {
-            if (obj is long @long) return @long;
+            if (obj is long @long)
+            {
+                return @long;
+            }
 
             try
             {
@@ -34,7 +40,10 @@ namespace net.boilingwater.Utils
 
         public static double ToDouble(object obj)
         {
-            if (obj is double @double) return @double;
+            if (obj is double @double)
+            {
+                return @double;
+            }
 
             try
             {
@@ -47,7 +56,10 @@ namespace net.boilingwater.Utils
 
         public static decimal ToDecimal(object obj)
         {
-            if (obj is decimal @decimal) return @decimal;
+            if (obj is decimal @decimal)
+            {
+                return @decimal;
+            }
 
             try
             {
@@ -60,7 +72,10 @@ namespace net.boilingwater.Utils
 
         public static bool ToBoolean(object obj)
         {
-            if (obj is bool @bool) return @bool;
+            if (obj is bool @bool)
+            {
+                return @bool;
+            }
 
             try
             {
@@ -73,9 +88,15 @@ namespace net.boilingwater.Utils
 
         public static string ToString(object obj)
         {
-            if (obj == null) return "";
+            if (obj == null)
+            {
+                return "";
+            }
 
-            if (obj is string @string) return @string;
+            if (obj is string @string)
+            {
+                return @string;
+            }
 
             if (Information.IsNumeric(obj))
             {
@@ -92,7 +113,11 @@ namespace net.boilingwater.Utils
 
         public static T ToObject<T>(object obj)
         {
-            if (obj is T @t) return @t;
+            if (obj is T @t)
+            {
+                return @t;
+            }
+
             return default;
         }
     }

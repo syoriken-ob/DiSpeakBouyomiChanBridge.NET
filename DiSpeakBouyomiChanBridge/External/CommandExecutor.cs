@@ -27,7 +27,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.External
         {
             _thread = new Thread(() =>
             {
-                foreach (var Task in _tasks.GetConsumingEnumerable())
+                foreach (Task Task in _tasks.GetConsumingEnumerable())
                 {
                     try
                     {
@@ -52,7 +52,11 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.External
 
         protected override bool TryExecuteTaskInline(Task task, bool taskWasPreviouslyQueued)
         {
-            if (Thread.CurrentThread != _thread) return false;
+            if (Thread.CurrentThread != _thread)
+            {
+                return false;
+            }
+
             return TryExecuteTask(task);
         }
 

@@ -29,21 +29,21 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl.Factory
 
         public override IEnumerable<ExecutableCommand> CreateExecutableCommands(ref string input)
         {
-            var SystemCommandTypes = Assembly.GetExecutingAssembly().GetTypes().Where(type => type.IsSubclassOf(typeof(SystemCommand)));
-            var list = new List<SystemCommand>();
+            IEnumerable<Type> SystemCommandTypes = Assembly.GetExecutingAssembly().GetTypes().Where(type => type.IsSubclassOf(typeof(SystemCommand)));
+            List<SystemCommand> list = new List<SystemCommand>();
 
-            var regex = $"({string.Join("|", Dic.Keys)})";
-            var matches = Regex.Matches(input, regex);
+            string regex = $"({string.Join("|", Dic.Keys)})";
+            MatchCollection matches = Regex.Matches(input, regex);
 
             foreach (Match match in matches)
             {
-                var key = Regex.Escape(match.Value);
+                string key = Regex.Escape(match.Value);
                 if (Dic.ContainsKey(key))
                 {
                     input = input.Replace(match.Value, "");
                     input = input.Replace(match.Value, "");
-                    var className = Dic[key];
-                    var type = SystemCommandTypes.Where(type => type.Name == className).FirstOrDefault();
+                    string className = Dic[key];
+                    Type type = SystemCommandTypes.Where(type => type.Name == className).FirstOrDefault();
                     if (type != null)
                     {
                         list.Add((SystemCommand)Activator.CreateInstance(type));
@@ -63,17 +63,17 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl.Factory
                     Dic.Clear();
 
                     //読み込み
-                    var option = new JsonSerializerOptions()
+                    JsonSerializerOptions option = new JsonSerializerOptions()
                     {
                         Encoder = JavaScriptEncoder.Default,
                         AllowTrailingCommas = true,
                         PropertyNameCaseInsensitive = true,
                         WriteIndented = true
                     };
-                    var dic = JsonSerializer.Deserialize<Dictionary<string, string>>(
-                        File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), Setting.AsString("SystemCommandFile"))),
+                    Dictionary<string, string> dic = JsonSerializer.Deserialize<Dictionary<string, string>>(
+                        File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), Setting.Instance.AsString("SystemCommandFile"))),
                         option);
-                    foreach (var pair in dic)
+                    foreach (KeyValuePair<string, string> pair in dic)
                     {
                         Dic.Add(pair.Key, pair.Value);
                     }

@@ -1,5 +1,4 @@
 ﻿using net.boilingwater.DiSpeakBouyomiChanBridge.Config;
-using net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl.Factory;
 using net.boilingwater.DiSpeakBouyomiChanBridge.Http;
 using net.boilingwater.DiSpeakBouyomiChanBridge.Log;
 
@@ -16,11 +15,9 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl
     {
         public override void Execute()
         {
-            HttpClientForBouyomiChan.Instance.SendToBouyomiChan(MessageSetting.AsString("ReloadConfig"));
+            HttpClientForBouyomiChan.Instance.SendToBouyomiChan(MessageSetting.Instance.AsString("ReloadConfig"));
             LoggerPool.Logger.Info("Reload SystemConfig...");
-            CommandFactory.Factory.Reload();
-            SystemCommandFactory.Factory.Reload();
-            HttpServerForBouyomiChan.Instance.Init(false);
+            ApplicationInitializer.CommandInitialize();
         }
     }
 
@@ -28,7 +25,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl
     {
         public override void Execute()
         {
-            HttpClientForBouyomiChan.Instance.SendToBouyomiChan(MessageSetting.AsString("DeleteAllExecutionQueues"));
+            HttpClientForBouyomiChan.Instance.SendToBouyomiChan(MessageSetting.Instance.AsString("DeleteAllExecutionQueues"));
             LoggerPool.Logger.Info("Shutdown CommandThreads...");
             CommandExecutor.ShutdownThreads();
         }

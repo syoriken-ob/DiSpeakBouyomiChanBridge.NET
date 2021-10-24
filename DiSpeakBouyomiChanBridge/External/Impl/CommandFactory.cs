@@ -29,18 +29,18 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl.Factory
 
         public override IEnumerable<ExecutableCommand> CreateExecutableCommands(ref string input)
         {
-            var list = new List<Command>();
+            List<Command> list = new List<Command>();
 
-            var regex = $"({string.Join("|", Dic.Values.Select(c => c.Regex))})";
-            var matches = Regex.Matches(input, regex);
+            string regex = $"({string.Join("|", Dic.Values.Select(c => c.Regex))})";
+            MatchCollection matches = Regex.Matches(input, regex);
 
             foreach (Match match in matches)
             {
-                foreach (var command in Dic.Values)
+                foreach (Command command in Dic.Values)
                 {
                     if (Regex.IsMatch(match.Value, command.Regex))
                     {
-                        var generateCommand = (Command)command.Clone();
+                        Command generateCommand = (Command)command.Clone();
                         input = input.Replace(match.Value, "");
                         ReplaceCommand(match, generateCommand);
                         list.Add(generateCommand);
@@ -56,7 +56,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl.Factory
         {
             foreach (string replace in command.ReplacePattern)
             {
-                var group = match.Groups.Values.Where(group => group.Name == replace).FirstOrDefault();
+                Group group = match.Groups.Values.Where(group => group.Name == replace).FirstOrDefault();
                 if (group != null)
                 {
                     for (int i = 0; i < command.RunCommand.Length; i++)
@@ -77,7 +77,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl.Factory
                     Dic.Clear();
 
                     //読み込み
-                    var option = new JsonSerializerOptions()
+                    JsonSerializerOptions option = new JsonSerializerOptions()
                     {
                         Encoder = JavaScriptEncoder.Default,
                         AllowTrailingCommas = true,
@@ -85,11 +85,11 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl.Factory
                         WriteIndented = true,
                         //DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
                     };
-                    var dic = JsonSerializer.Deserialize<Dictionary<string, Command>>(
-                        File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), Setting.AsString("CommandFile"))),
+                    Dictionary<string, Command> dic = JsonSerializer.Deserialize<Dictionary<string, Command>>(
+                        File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), Setting.Instance.AsString("CommandFile"))),
                         option
                         );
-                    foreach (var pair in dic)
+                    foreach (KeyValuePair<string, Command> pair in dic)
                     {
                         pair.Value.CommandTitle = pair.Key;
                         Dic.Add(pair.Key, pair.Value);
