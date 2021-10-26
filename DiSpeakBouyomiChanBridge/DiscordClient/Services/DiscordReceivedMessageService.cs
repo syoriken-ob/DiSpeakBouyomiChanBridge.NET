@@ -1,12 +1,14 @@
-﻿using Discord.Commands;
-using Discord.WebSocket;
-using net.boilingwater.DiSpeakBouyomiChanBridge.Config;
-using net.boilingwater.Utils;
-using net.boilingwater.Utils.Extention;
-using System.Collections.Specialized;
+﻿using System.Collections.Specialized;
 using System.Configuration;
 using System.Linq;
 using System.Text.RegularExpressions;
+
+using Discord.Commands;
+using Discord.WebSocket;
+
+using net.boilingwater.DiSpeakBouyomiChanBridge.Config;
+using net.boilingwater.Utils;
+using net.boilingwater.Utils.Extention;
 
 namespace net.boilingwater.DiSpeakBouyomiChanBridge.DiscordClient.Services
 {
@@ -15,37 +17,22 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.DiscordClient.Services
 
         internal static bool IsPrivateMessage(CommandContext context)
         {
-            if (context.Message.Channel is not SocketGuildChannel guildChannel)
-            {
-                return true;
-            }
+            if (context.Message.Channel is not SocketGuildChannel guildChannel) return true;
 
-            if (guildChannel == null)
-            {
-                return true;
-            }
+            if (guildChannel == null) return true;
 
-            if (guildChannel.Guild == null)
-            {
-                return true;
-            }
+            if (guildChannel.Guild == null) return true;
 
             return false;
         }
 
         internal static bool IsReadOutTargetGuild(CommandContext context)
         {
-            if (context.Message.Channel is not SocketGuildChannel guildChannel)
-            {
-                return false;
-            }
+            if (context.Message.Channel is not SocketGuildChannel guildChannel) return false;
 
-            if (guildChannel == null)
-            {
-                return false;
-            }
+            if (guildChannel == null) return false;
 
-            if (DiscordSetting.Instance.AsStringList("List.ReadOutTargetGuild").Contains(Cast.ToString(guildChannel.Guild.Id)))
+            if (DiscordSetting.Instance.AsStringList("List.ReadOutTarget.Guild").Contains(Cast.ToString(guildChannel.Guild.Id)))
             {
                 return true;
             }
@@ -55,22 +42,26 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.DiscordClient.Services
 
         internal static bool IsReadOutTargetGuildChannel(CommandContext context)
         {
-            if (context.Message.Channel is not SocketGuildChannel guildChannel)
+            if (context.Message.Channel is not SocketGuildChannel guildChannel) return false;
+
+            if (guildChannel == null) return false;
+
+            if (DiscordSetting.Instance.AsStringList("List.ReadOutTarget.GuildChannel.Text").Contains(Cast.ToString(guildChannel.Id)))
             {
+                if (DiscordSetting.Instance.AsBoolean("Use.ReadOutTarget.GuildChannel.Text.WhiteList"))
+                {
+                    return true;
+                }
                 return false;
             }
-
-            if (guildChannel == null)
+            else
             {
-                return false;
-            }
-
-            if (DiscordSetting.Instance.AsStringList("List.ReadOutTargetGuildChannel").Contains(Cast.ToString(guildChannel.Id)))
-            {
+                if (DiscordSetting.Instance.AsBoolean("Use.ReadOutTarget.GuildChannel.Text.WhiteList"))
+                {
+                    return false;
+                }
                 return true;
             }
-
-            return false;
         }
 
         internal static string GetFormattedMessage(CommandContext context)
@@ -130,7 +121,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.DiscordClient.Services
 
             if (format.Contains(DiscordSetting.Instance.AsString("ReplaceKey.DiscordMessage.Message")))
             {
-                string mes = Regex.Replace(
+                var mes = Regex.Replace(
                     context.Message.Content,
                     DiscordSetting.Instance.AsString("RegularExpression.URLShorter"),
                     MessageSetting.Instance.AsString("URLShorter")
@@ -146,11 +137,10 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.DiscordClient.Services
 
         private static string ReplaceEmojiSettings(string input)
         {
-            NameValueCollection emojiReplaceSettings = (NameValueCollection)ConfigurationManager.GetSection("EmojiReplaceSettings");
-            if (emojiReplaceSettings == null)
-            {
-                return input;
-            }
+            if (!DiscordSetting.Instance.AsBoolean("Use.ReadOutReplace.Emoji")) return input;
+
+            var emojiReplaceSettings = (NameValueCollection)ConfigurationManager.GetSection("EmojiReplaceSettings");
+            if (emojiReplaceSettings == null) return input;
 
             emojiReplaceSettings.AllKeys.ForEach(key => input = input.Replace(key, emojiReplaceSettings[key]));
             return input;
@@ -158,13 +148,13 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.DiscordClient.Services
 
         private static string GetPlainMessage(CommandContext context)
         {
-            string format = DiscordSetting.Instance.AsString("Format.DiscordMessage.PostPlainMessage");
+            var format = DiscordSetting.Instance.AsString("Format.DiscordMessage.PostPlainMessage");
             return ReplaceCommonReceivedInfo(format, context);
         }
 
         private static string GetMessageWithFile(CommandContext context)
         {
-            string format = DiscordSetting.Instance.AsString("Format.DiscordMessage.PostMessageWithFile");
+            var format = DiscordSetting.Instance.AsString("Format.DiscordMessage.PostMessageWithFile");
 
             if (format.Contains(DiscordSetting.Instance.AsString("ReplaceKey.DiscordMessage.FileCount")))
             {

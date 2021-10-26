@@ -1,10 +1,11 @@
-﻿using net.boilingwater.DiSpeakBouyomiChanBridge.Config;
-using net.boilingwater.DiSpeakBouyomiChanBridge.External;
-using net.boilingwater.DiSpeakBouyomiChanBridge.Log;
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
+
+using net.boilingwater.DiSpeakBouyomiChanBridge.Config;
+using net.boilingwater.DiSpeakBouyomiChanBridge.External;
+using net.boilingwater.DiSpeakBouyomiChanBridge.Log;
 
 namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http
 {
@@ -12,10 +13,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http
     {
         public static HttpServerForBouyomiChan Instance { get; private set; }
 
-        static HttpServerForBouyomiChan()
-        {
-            Instance = new();
-        }
+        static HttpServerForBouyomiChan() => Instance = new();
 
         private HttpListener _listener;
 
@@ -28,8 +26,8 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http
 
             if (refreshHttpListener)
             {
-                long retryCount = 0L;
-                bool isValid = false;
+                var retryCount = 0L;
+                var isValid = false;
                 do
                 {
                     try
@@ -53,8 +51,8 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http
                         LoggerPool.Logger.DebugFormat("Retry Connect:{0}/{1} !", retryCount, Setting.Instance.AsLong("RetryCount"));
                         Thread.Sleep(Setting.Instance.AsInteger("RetrySleepTime.Milliseconds"));
                     }
-
                 } while (string.IsNullOrEmpty(Setting.Instance.AsString("RetryCount")) || retryCount++ < Setting.Instance.AsInteger("RetryCount"));
+
                 if (!isValid)
                 {
                     LoggerPool.Logger.FatalFormat("Exit Program!");
@@ -74,15 +72,14 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http
             while (true)
             {
                 // Listening処理
-                HttpListenerContext context = _listener.GetContext();
-                HttpListenerRequest request = context.Request;
-                string message = "";
-                using (HttpListenerResponse response = context.Response)
+                var context = _listener.GetContext();
+                var request = context.Request;
+                var message = "";
+                using (var response = context.Response)
                 {
                     if (request.HttpMethod != HttpMethod.Get.Method)
-                    {
                         continue;
-                    }
+
                     message = request.GetDiscordMessage();
                     response.StatusCode = 200;
                 }
@@ -96,9 +93,6 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http
 
     internal static class RequestExtention
     {
-        public static string GetDiscordMessage(this HttpListenerRequest request)
-        {
-            return request.QueryString["text"];
-        }
+        public static string GetDiscordMessage(this HttpListenerRequest request) => request.QueryString["text"];
     }
 }

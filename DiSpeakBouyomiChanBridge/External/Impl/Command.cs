@@ -1,12 +1,13 @@
-﻿using net.boilingwater.DiSpeakBouyomiChanBridge.Config;
-using net.boilingwater.DiSpeakBouyomiChanBridge.Http;
-using net.boilingwater.DiSpeakBouyomiChanBridge.Log;
-using net.boilingwater.Utils.Extention;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+
+using net.boilingwater.DiSpeakBouyomiChanBridge.Config;
+using net.boilingwater.DiSpeakBouyomiChanBridge.Http;
+using net.boilingwater.DiSpeakBouyomiChanBridge.Log;
+using net.boilingwater.Utils.Extention;
 
 namespace net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl
 {
@@ -24,22 +25,19 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl
         public string ExecutionComment { get; set; }
         public string CompleteComment { get; set; }
 
-        public object Clone()
+        public object Clone() => new Command()
         {
-            return new Command()
-            {
-                Immediate = Immediate,
-                CommandTitle = CommandTitle,
-                Regex = new(Regex),
-                ReplacePattern = (string[])ReplacePattern.Clone(),
-                RunCommand = (string[])RunCommand.Clone(),
-                Env = new Dictionary<string, string>(Env),
-                Path = new(Path),
-                StdInOut = new Dictionary<string, string>(StdInOut),
-                ExecutionComment = new(ExecutionComment),
-                CompleteComment = new(CompleteComment)
-            };
-        }
+            Immediate = Immediate,
+            CommandTitle = CommandTitle,
+            Regex = new(Regex),
+            ReplacePattern = (string[])ReplacePattern.Clone(),
+            RunCommand = (string[])RunCommand.Clone(),
+            Env = new Dictionary<string, string>(Env),
+            Path = new(Path),
+            StdInOut = new Dictionary<string, string>(StdInOut),
+            ExecutionComment = new(ExecutionComment),
+            CompleteComment = new(CompleteComment)
+        };
 
         public override void Execute()
         {
@@ -72,7 +70,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl
 
             try
             {
-                using Process p = Process.Start(info);
+                using var p = Process.Start(info);
 
                 lock (((ICollection)ExecuteProcesses).SyncRoot)
                 {
@@ -91,8 +89,8 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl
                 p.ErrorDataReceived += (sender, e) => LoggerPool.Logger.Debug($"{CommandTitle}({p.ProcessName}-{p.Id}) -> {e.Data}");
                 p.BeginErrorReadLine();
 
-                using System.IO.StreamReader pOutput = p.StandardOutput;
-                using System.IO.StreamWriter pInput = p.StandardInput;
+                using var pOutput = p.StandardOutput;
+                using var pInput = p.StandardInput;
                 pInput.AutoFlush = true;
 
                 string pOut = null;

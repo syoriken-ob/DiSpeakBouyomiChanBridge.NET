@@ -9,17 +9,17 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Config
 {
     public class Setting
     {
-        public static SettingProvider Instance = new SettingProvider("AppSettings");
+        public static SettingProvider Instance = new ("AppSettings");
     }
 
     public class MessageSetting
     {
-        public static SettingProvider Instance = new SettingProvider("MessageSettings");
+        public static SettingProvider Instance = new ("MessageSettings");
     }
 
     public class DiscordSetting
     {
-        public static SettingProvider Instance = new SettingProvider("DiscordSettings");
+        public static SettingProvider Instance = new ("DiscordSettings");
     }
 
     public class SettingProvider
@@ -79,7 +79,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Config
             List<string> list = new List<string>();
             try
             {
-                IEnumerable<string> original = Get(key).Split(splitKey).Select(str => str.Trim());
+                var original = Get(key).Split(splitKey).Select(str => str.Trim());
                 list.AddRange(original.ToList());
             }
             catch (Exception) { }

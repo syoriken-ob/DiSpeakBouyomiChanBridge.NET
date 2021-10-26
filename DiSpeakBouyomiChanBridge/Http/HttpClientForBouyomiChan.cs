@@ -1,9 +1,10 @@
-﻿using net.boilingwater.DiSpeakBouyomiChanBridge.Config;
-using net.boilingwater.DiSpeakBouyomiChanBridge.Log;
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
+
+using net.boilingwater.DiSpeakBouyomiChanBridge.Config;
+using net.boilingwater.DiSpeakBouyomiChanBridge.Log;
 
 namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http
 {
@@ -13,10 +14,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http
 
         private HttpClient _client;
 
-        private HttpClientForBouyomiChan()
-        {
-            _client = new();
-        }
+        private HttpClientForBouyomiChan() => _client = new();
 
         public void RenewHttpClient()
         {
@@ -26,19 +24,19 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http
 
         public void SendToBouyomiChan(string text)
         {
-            string sendMessage = text.Trim();
+            var sendMessage = text.Trim();
             if (string.IsNullOrEmpty(sendMessage))
             {
                 return;
             }
 
-            long retryCount = 0L;
-            bool isValid = false;
+            var retryCount = 0L;
+            var isValid = false;
             while (true)
             {
                 try
                 {
-                    HttpResponseMessage responseMessage = _client.Send(CreateBouyomiChanHttpRequest(sendMessage));
+                    var responseMessage = _client.Send(CreateBouyomiChanHttpRequest(sendMessage));
                     if (responseMessage.StatusCode == HttpStatusCode.OK)
                     {
                         LoggerPool.Logger.Debug($"Send:{sendMessage}");
@@ -65,18 +63,12 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http
             }
         }
 
-        void IDisposable.Dispose()
-        {
-            _client.Dispose();
-        }
+        void IDisposable.Dispose() => _client.Dispose();
 
-        private static HttpRequestMessage CreateBouyomiChanHttpRequest(string text)
+        private static HttpRequestMessage CreateBouyomiChanHttpRequest(string text) => new HttpRequestMessage()
         {
-            return new HttpRequestMessage()
-            {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri($"http://{Setting.Instance.AsString("BouyomiChanHost")}:{Setting.Instance.AsString("BouyomiChanPort")}/talk?text={Uri.EscapeUriString(text)}")
-            };
-        }
+            Method = HttpMethod.Get,
+            RequestUri = new Uri($"http://{Setting.Instance.AsString("BouyomiChanHost")}:{Setting.Instance.AsString("BouyomiChanPort")}/talk?text={Uri.EscapeUriString(text)}")
+        };
     }
 }

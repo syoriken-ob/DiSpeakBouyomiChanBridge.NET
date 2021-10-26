@@ -1,15 +1,18 @@
-﻿using Discord;
+﻿using System;
+using System.Reflection;
+using System.Threading.Tasks;
+
+using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+
 using Microsoft.Extensions.DependencyInjection;
+
 using net.boilingwater.DiSpeakBouyomiChanBridge.Config;
 using net.boilingwater.DiSpeakBouyomiChanBridge.DiscordClient.Services;
 using net.boilingwater.DiSpeakBouyomiChanBridge.External;
 using net.boilingwater.DiSpeakBouyomiChanBridge.Http;
 using net.boilingwater.DiSpeakBouyomiChanBridge.Log;
-using System;
-using System.Reflection;
-using System.Threading.Tasks;
 
 namespace net.boilingwater.DiSpeakBouyomiChanBridge.DiscordClient
 {
@@ -28,8 +31,16 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.DiscordClient
             client.Log += Log;
             commands = new CommandService();
             services = new ServiceCollection().BuildServiceProvider();
-            client.MessageReceived += MessageReceived;
-            client.UserVoiceStateUpdated += UserVoiceStatusUpdated;
+
+            if (DiscordSetting.Instance.AsBoolean("Use.ReadOut.GuildChannel.Text"))
+            {
+                client.MessageReceived += MessageReceived;
+            }
+            if (DiscordSetting.Instance.AsBoolean("Use.ReadOut.GuildChannel.Voice"))
+            {
+                client.UserVoiceStateUpdated += UserVoiceStatusUpdated;
+            }
+
             await commands.AddModulesAsync(Assembly.GetEntryAssembly(), services);
             LoggerPool.Logger.Info("Try login to Discord...");
             await client.LoginAsync(TokenType.Bot, DiscordSetting.Instance.AsString("DiscordToken"));
@@ -70,40 +81,19 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.DiscordClient
 
         private static async Task MessageReceived(SocketMessage rawMessage)
         {
-            if (rawMessage is not SocketUserMessage message)
-            {
-                return;
-            }
+            if (!DiscordSetting.Instance.AsBoolean("Use.ReadOut.GuildChannel.Text")) return;
 
-            CommandContext context = new CommandContext(client, message);
+            if (rawMessage is not SocketUserMessage message) return;
 
-            if (DiscordReceivedMessageService.IsPrivateMessage(context))
-            {
-                return;
-            }
+            var context = new CommandContext(client, message);
 
-            if (!DiscordReceivedMessageService.IsReadOutTargetGuild(context))
-            {
-                return;
-            }
+            if (DiscordReceivedMessageService.IsPrivateMessage(context)) return;
 
-            bool isContainsChannelList = DiscordReceivedMessageService.IsReadOutTargetGuildChannel(context);
-            if (DiscordSetting.Instance.AsBoolean("Use.GuildChannelWhiteList"))
-            {
-                if (!isContainsChannelList)
-                {
-                    return;
-                }
-            }
-            else
-            {
-                if (isContainsChannelList)
-                {
-                    return;
-                }
-            }
+            if (!DiscordReceivedMessageService.IsReadOutTargetGuild(context)) return;
 
-            string formattedMessage = DiscordReceivedMessageService.GetFormattedMessage(context);
+            if (!DiscordReceivedMessageService.IsReadOutTargetGuildChannel(context)) return;
+
+            var formattedMessage = DiscordReceivedMessageService.GetFormattedMessage(context);
 
             CommandHandlingService.Handle(formattedMessage);
 
@@ -114,12 +104,15 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.DiscordClient
 
         private static async Task UserVoiceStatusUpdated(SocketUser user, SocketVoiceState sourceVoiceState, SocketVoiceState targetVoiceState)
         {
-            if (user is not SocketGuildUser guildUser)
-            {
-                return;
-            }
+            if (!DiscordSetting.Instance.AsBoolean("Use.ReadOut.GuildChannel.Voice")) return;
 
-            DiscordUserVoiceStateUpdatedService.VoiceState state = DiscordUserVoiceStateUpdatedService.DetectVoiceStateUpdate(sourceVoiceState, targetVoiceState);
+            if (user is not SocketGuildUser guildUser) return;
+
+            if (!DiscordUserVoiceStateUpdatedService.IsReadOutTargetGuild(sourceVoiceState, targetVoiceState)) return;
+
+            if (!DiscordUserVoiceStateUpdatedService.IsReadOutTargetGuildChannel(sourceVoiceState, targetVoiceState)) return;
+
+            var state = DiscordUserVoiceStateUpdatedService.DetectVoiceStateUpdate(sourceVoiceState, targetVoiceState);
 
             switch (state)
             {

@@ -13,9 +13,9 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge
             RuntimeHelpers.RunClassConstructor(typeof(CommandFactory).TypeHandle);
             RuntimeHelpers.RunClassConstructor(typeof(SystemCommandFactory).TypeHandle);
 
-            ApplicationInitializer.Initialize(Setting.Instance.AsBoolean("Use.DiscordClient"));
+            ApplicationInitializer.Initialize(Setting.Instance.AsBoolean("Use.InternalDiscordClient"));
 
-            if (Setting.Instance.AsBoolean("Use.DiscordClient"))
+            if (Setting.Instance.AsBoolean("Use.InternalDiscordClient"))
             {
                 Client.StartAsync().GetAwaiter().GetResult();
             }

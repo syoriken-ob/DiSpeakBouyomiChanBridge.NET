@@ -1,9 +1,9 @@
-﻿using net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl;
+﻿using System.Threading.Tasks;
+
+using net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl;
 using net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl.Factory;
 using net.boilingwater.DiSpeakBouyomiChanBridge.Http;
 using net.boilingwater.Utils.Extention;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace net.boilingwater.DiSpeakBouyomiChanBridge.External
 {
@@ -13,9 +13,9 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.External
         {
 
             //システムコマンド検出
-            IEnumerable<ExecutableCommand> systemCmds = SystemCommandFactory.Factory.CreateExecutableCommands(ref message);
+            var systemCmds = SystemCommandFactory.Factory.CreateExecutableCommands(ref message);
             //コマンド検出
-            IEnumerable<ExecutableCommand> cmds = CommandFactory.Factory.CreateExecutableCommands(ref message);
+            var cmds = CommandFactory.Factory.CreateExecutableCommands(ref message);
             //棒読みちゃんに送信
             HttpClientForBouyomiChan.Instance.SendToBouyomiChan(message);
 

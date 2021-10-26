@@ -1,6 +1,4 @@
-﻿using net.boilingwater.DiSpeakBouyomiChanBridge.Config;
-using net.boilingwater.DiSpeakBouyomiChanBridge.Log;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -10,6 +8,9 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
+using net.boilingwater.DiSpeakBouyomiChanBridge.Config;
+using net.boilingwater.DiSpeakBouyomiChanBridge.Log;
+
 namespace net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl.Factory
 {
     public class SystemCommandFactory : ExecutableCommandFactory
@@ -17,10 +18,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl.Factory
         public static new SystemCommandFactory Factory { get; protected set; }
         public Dictionary<string, string> Dic { get; private set; } = new();
 
-        static SystemCommandFactory()
-        {
-            Factory = new SystemCommandFactory();
-        }
+        static SystemCommandFactory() => Factory = new SystemCommandFactory();
 
         private SystemCommandFactory()
         {
@@ -29,21 +27,21 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl.Factory
 
         public override IEnumerable<ExecutableCommand> CreateExecutableCommands(ref string input)
         {
-            IEnumerable<Type> SystemCommandTypes = Assembly.GetExecutingAssembly().GetTypes().Where(type => type.IsSubclassOf(typeof(SystemCommand)));
-            List<SystemCommand> list = new List<SystemCommand>();
+            var SystemCommandTypes = Assembly.GetExecutingAssembly().GetTypes().Where(type => type.IsSubclassOf(typeof(SystemCommand)));
+            var list = new List<SystemCommand>();
 
-            string regex = $"({string.Join("|", Dic.Keys)})";
-            MatchCollection matches = Regex.Matches(input, regex);
+            var regex = $"({string.Join("|", Dic.Keys)})";
+            var matches = Regex.Matches(input, regex);
 
             foreach (Match match in matches)
             {
-                string key = Regex.Escape(match.Value);
+                var key = Regex.Escape(match.Value);
                 if (Dic.ContainsKey(key))
                 {
                     input = input.Replace(match.Value, "");
                     input = input.Replace(match.Value, "");
-                    string className = Dic[key];
-                    Type type = SystemCommandTypes.Where(type => type.Name == className).FirstOrDefault();
+                    var className = Dic[key];
+                    var type = SystemCommandTypes.Where(type => type.Name == className).FirstOrDefault();
                     if (type != null)
                     {
                         list.Add((SystemCommand)Activator.CreateInstance(type));
@@ -63,17 +61,17 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl.Factory
                     Dic.Clear();
 
                     //読み込み
-                    JsonSerializerOptions option = new JsonSerializerOptions()
+                    var option = new JsonSerializerOptions()
                     {
                         Encoder = JavaScriptEncoder.Default,
                         AllowTrailingCommas = true,
                         PropertyNameCaseInsensitive = true,
                         WriteIndented = true
                     };
-                    Dictionary<string, string> dic = JsonSerializer.Deserialize<Dictionary<string, string>>(
+                    var dic = JsonSerializer.Deserialize<Dictionary<string, string>>(
                         File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), Setting.Instance.AsString("SystemCommandFile"))),
                         option);
-                    foreach (KeyValuePair<string, string> pair in dic)
+                    foreach (var pair in dic)
                     {
                         Dic.Add(pair.Key, pair.Value);
                     }

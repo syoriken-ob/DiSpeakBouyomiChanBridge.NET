@@ -12,7 +12,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Log
             {
                 const int callerFrameIndex = 1;
                 StackFrame callerFrame = new(callerFrameIndex);
-                MethodBase callerMethod = callerFrame.GetMethod();
+                var callerMethod = callerFrame.GetMethod();
                 return LogManager.GetLogger(callerMethod.DeclaringType);
             }
         }

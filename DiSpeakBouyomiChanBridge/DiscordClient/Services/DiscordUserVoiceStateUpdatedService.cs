@@ -1,5 +1,9 @@
-﻿using Discord.WebSocket;
+﻿using System.Linq;
+
+using Discord.WebSocket;
+
 using net.boilingwater.DiSpeakBouyomiChanBridge.Config;
+using net.boilingwater.Utils;
 
 namespace net.boilingwater.DiSpeakBouyomiChanBridge.DiscordClient.Services
 {
@@ -8,6 +12,54 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.DiscordClient.Services
         internal enum VoiceState
         {
             JOIN, LEAVE, MOVE, START_STREAMING, END_STREAMING, UNKNOWN
+        }
+        
+        internal static bool IsReadOutTargetGuild(SocketVoiceState sourceVoiceState, SocketVoiceState targetVoiceState)
+        {
+            if (sourceVoiceState.VoiceChannel == null && targetVoiceState.VoiceChannel == null)
+            {
+                return false;
+            }
+
+            if (sourceVoiceState.VoiceChannel != null && 
+                !DiscordSetting.Instance.AsStringList("List.ReadOutTarget.Guild").Contains(Cast.ToString(sourceVoiceState.VoiceChannel.Guild.Id)))
+            {
+                return false;
+            }
+            if (targetVoiceState.VoiceChannel != null && 
+                !DiscordSetting.Instance.AsStringList("List.ReadOutTarget.Guild").Contains(Cast.ToString(targetVoiceState.VoiceChannel.Guild.Id)))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        internal static bool IsReadOutTargetGuildChannel(SocketVoiceState sourceVoiceState, SocketVoiceState targetVoiceState)
+        {
+            if (sourceVoiceState.VoiceChannel == null && targetVoiceState.VoiceChannel == null)
+            {
+                return false;
+            }
+
+            if (sourceVoiceState.VoiceChannel != null &&
+                !DiscordSetting.Instance.AsStringList("List.ReadOutTarget.GuildChannel.Voice").Contains(Cast.ToString(sourceVoiceState.VoiceChannel.Id)))
+            {
+                if (!DiscordSetting.Instance.AsBoolean("Use.ReadOutTarget.GuildChannel.Voice.WhiteList"))
+                {
+                    return false;
+                }
+            }
+            if (targetVoiceState.VoiceChannel != null &&
+                !DiscordSetting.Instance.AsStringList("List.ReadOutTarget.GuildChannel.Voice").Contains(Cast.ToString(targetVoiceState.VoiceChannel.Id)))
+            {
+                if (!DiscordSetting.Instance.AsBoolean("Use.ReadOutTarget.GuildChannel.Voice.WhiteList"))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         internal static VoiceState DetectVoiceStateUpdate(SocketVoiceState sourceVoiceState, SocketVoiceState targetVoiceState)
@@ -89,31 +141,31 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.DiscordClient.Services
 
         internal static string GetJoinVoiceChannelMessage(SocketGuildUser guildUser, SocketVoiceState sourceVoiceState, SocketVoiceState targetVoiceState)
         {
-            string format = DiscordSetting.Instance.AsString("Format.DiscordMessage.JoinVoiceChannleMessage");
+            var format = DiscordSetting.Instance.AsString("Format.DiscordMessage.JoinVoiceChannleMessage");
             return ReplaceCommonVoiceStateInfo(format, guildUser, sourceVoiceState, targetVoiceState);
         }
 
         internal static string GetLeaveVoiceChannelMessage(SocketGuildUser guildUser, SocketVoiceState sourceVoiceState, SocketVoiceState targetVoiceState)
         {
-            string format = DiscordSetting.Instance.AsString("Format.DiscordMessage.LeaveVoiceChannleMessage");
+            var format = DiscordSetting.Instance.AsString("Format.DiscordMessage.LeaveVoiceChannleMessage");
             return ReplaceCommonVoiceStateInfo(format, guildUser, sourceVoiceState, targetVoiceState);
         }
 
         internal static string GetMoveVoiceChannelMessage(SocketGuildUser guildUser, SocketVoiceState sourceVoiceState, SocketVoiceState targetVoiceState)
         {
-            string format = DiscordSetting.Instance.AsString("Format.DiscordMessage.MoveVoiceChannleMessage");
+            var format = DiscordSetting.Instance.AsString("Format.DiscordMessage.MoveVoiceChannleMessage");
             return ReplaceCommonVoiceStateInfo(format, guildUser, sourceVoiceState, targetVoiceState);
         }
 
         internal static string GetStartStreamingVoiceChannelMessage(SocketGuildUser guildUser, SocketVoiceState sourceVoiceState, SocketVoiceState targetVoiceState)
         {
-            string format = DiscordSetting.Instance.AsString("Format.DiscordMessage.StartStreamingVoiceChannleMessage");
+            var format = DiscordSetting.Instance.AsString("Format.DiscordMessage.StartStreamingVoiceChannleMessage");
             return ReplaceCommonVoiceStateInfo(format, guildUser, sourceVoiceState, targetVoiceState);
         }
 
         internal static string GetEndStreamingVoiceChannelMessage(SocketGuildUser guildUser, SocketVoiceState sourceVoiceState, SocketVoiceState targetVoiceState)
         {
-            string format = DiscordSetting.Instance.AsString("Format.DiscordMessage.EndStreamingVoiceChannleMessage");
+            var format = DiscordSetting.Instance.AsString("Format.DiscordMessage.EndStreamingVoiceChannleMessage");
             return ReplaceCommonVoiceStateInfo(format, guildUser, sourceVoiceState, targetVoiceState);
         }
     }
