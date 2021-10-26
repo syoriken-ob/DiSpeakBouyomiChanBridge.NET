@@ -47,10 +47,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.External
 
         protected override bool TryExecuteTaskInline(Task task, bool taskWasPreviouslyQueued)
         {
-            if (Thread.CurrentThread != _thread)
-            {
-                return false;
-            }
+            if (Thread.CurrentThread != _thread) return false;
 
             return TryExecuteTask(task);
         }
@@ -78,10 +75,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.External
 
         public void ClearTask()
         {
-            if (_tasks == null)
-            {
-                return;
-            }
+            if (_tasks == null) return;
 
             while (_tasks.Count > 0)
             {
