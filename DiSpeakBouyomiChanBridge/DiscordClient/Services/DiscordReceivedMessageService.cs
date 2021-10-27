@@ -121,28 +121,126 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.DiscordClient.Services
 
             if (format.Contains(DiscordSetting.Instance.AsString("ReplaceKey.DiscordMessage.Message")))
             {
-                var mes = Regex.Replace(
-                    context.Message.Content,
-                    DiscordSetting.Instance.AsString("RegularExpression.URLShorter"),
-                    MessageSetting.Instance.AsString("URLShorter")
-                );
+                var mes = context.Message.Content;
+
+                if (DiscordSetting.Instance.AsBoolean("Use.ReadOutReplace.URLShortener"))
+                {
+                    mes = Regex.Replace(
+                        mes,
+                        DiscordSetting.Instance.AsString("RegularExpression.URLShortener"),
+                        DiscordSetting.Instance.AsString("Format.Replace.URLShortener")
+                    );
+                }
+
+                if (DiscordSetting.Instance.AsBoolean("Use.ReadOutReplace.Spoiler"))
+                {
+                    mes = Regex.Replace(
+                        mes,
+                        DiscordSetting.Instance.AsString("RegularExpression.Spoiler"),
+                        DiscordSetting.Instance.AsString("Format.Replace.Spoiler")
+                    );
+                }
+
+                if (DiscordSetting.Instance.AsBoolean("Use.ReadOutReplace.Emoji"))
+                {
+                    mes = ReplaceEmojiSettings(mes);
+                }
+
+                mes = ReplaceMention(mes, context);
 
                 format = format.Replace(
                     DiscordSetting.Instance.AsString("ReplaceKey.DiscordMessage.Message"),
                     mes
                 );
             }
-            return ReplaceEmojiSettings(format);
+            return format;
         }
 
         private static string ReplaceEmojiSettings(string input)
         {
-            if (!DiscordSetting.Instance.AsBoolean("Use.ReadOutReplace.Emoji")) return input;
-
             var emojiReplaceSettings = (NameValueCollection)ConfigurationManager.GetSection("EmojiReplaceSettings");
             if (emojiReplaceSettings == null) return input;
 
             emojiReplaceSettings.AllKeys.ForEach(key => input = input.Replace(key, emojiReplaceSettings[key]));
+            return input;
+        }
+
+        private static string ReplaceMention(string input, CommandContext context)
+        {
+            if (context.Message.MentionedEveryone)
+            {
+                input = Regex.Replace(
+                    input,
+                    DiscordSetting.Instance.AsString("ReplaceKey.System.Mention.EveryOne"),
+                    DiscordSetting.Instance.AsString("Format.Replace.Mention.EveryOne")
+                );
+            }
+
+            if (input.Contains(DiscordSetting.Instance.AsString("ReplaceKey.System.Mention.Here")))
+            {
+                input = Regex.Replace(
+                    input,
+                    DiscordSetting.Instance.AsString("ReplaceKey.System.Mention.Here"),
+                    DiscordSetting.Instance.AsString("Format.Replace.Mention.Here")
+                );
+            }
+
+            if (context.Message.MentionedChannelIds.Any())
+            {
+                var replaceKey = DiscordSetting.Instance.AsString("ReplaceKey.System.Mention.ChannelId");
+                var channelKey = DiscordSetting.Instance.AsString("ReplaceKey.DiscordMessage.ChannelId");
+                var format = DiscordSetting.Instance.AsString("Format.Replace.Mention.Channel");
+                var channelNameKey = DiscordSetting.Instance.AsString("ReplaceKey.DiscordMessage.Channel");
+                context.Message.MentionedChannelIds
+                    .ForEach(channelId =>
+                {
+                    var channel = replaceKey.Replace(channelKey, Cast.ToString(channelId));
+                    var channelName = context.Guild.GetChannelAsync(channelId).GetAwaiter().GetResult().Name;
+                    input = input.Replace(channel, format.Replace(channelNameKey, channelName));
+                });
+            }
+
+            if (context.Message.MentionedRoleIds.Any())
+            {
+                var replaceKey = DiscordSetting.Instance.AsString("ReplaceKey.System.Mention.RoleId");
+                var roleKey = DiscordSetting.Instance.AsString("ReplaceKey.DiscordMessage.RoleId");
+                var format = DiscordSetting.Instance.AsString("Format.Replace.Mention.Role");
+                var roleNameKey = DiscordSetting.Instance.AsString("ReplaceKey.DiscordMessage.Role");
+                context.Message.MentionedRoleIds
+                    .ForEach(roleId =>
+                    {
+                        var role = replaceKey.Replace(roleKey, Cast.ToString(roleId));
+                        var roleName = context.Guild.GetRole(roleId).Name;
+                        input = input.Replace(role, format.Replace(roleNameKey, roleName));
+                    });
+            }
+
+            if (context.Message.MentionedUserIds.Any())
+            {
+                var replaceKey = DiscordSetting.Instance.AsString("ReplaceKey.System.Mention.UserId");
+                var userKey = DiscordSetting.Instance.AsString("ReplaceKey.DiscordMessage.UserId");
+                var nickNameKey = DiscordSetting.Instance.AsString("ReplaceKey.DiscordMessage.NickName");
+                var format = DiscordSetting.Instance.AsString("Format.Replace.Mention.NickName");
+                context.Message.MentionedUserIds
+                    .ForEach(userId =>
+                    {
+                        var user = replaceKey.Replace(userKey, Cast.ToString(userId));
+                        var guildUser = context.Guild.GetUserAsync(userId).GetAwaiter().GetResult();
+                        string name;
+                        if (guildUser.Nickname != null)
+                        {
+                            name = guildUser.Nickname;
+                        }
+                        else
+                        {
+                            name = guildUser.Username;
+                        }
+
+                        input = input.Replace(user, format.Replace(nickNameKey, name));
+                    }
+                );
+            }
+
             return input;
         }
 
