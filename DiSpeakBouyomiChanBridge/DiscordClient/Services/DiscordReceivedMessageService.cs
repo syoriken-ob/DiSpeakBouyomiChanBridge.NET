@@ -123,29 +123,6 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.DiscordClient.Services
             {
                 var mes = context.Message.Content;
 
-                if (DiscordSetting.Instance.AsBoolean("Use.ReadOutReplace.URLShortener"))
-                {
-                    mes = Regex.Replace(
-                        mes,
-                        DiscordSetting.Instance.AsString("RegularExpression.URLShortener"),
-                        DiscordSetting.Instance.AsString("Format.Replace.URLShortener")
-                    );
-                }
-
-                if (DiscordSetting.Instance.AsBoolean("Use.ReadOutReplace.Spoiler"))
-                {
-                    mes = Regex.Replace(
-                        mes,
-                        DiscordSetting.Instance.AsString("RegularExpression.Spoiler"),
-                        DiscordSetting.Instance.AsString("Format.Replace.Spoiler")
-                    );
-                }
-
-                if (DiscordSetting.Instance.AsBoolean("Use.ReadOutReplace.Emoji"))
-                {
-                    mes = ReplaceEmojiSettings(mes);
-                }
-
                 mes = ReplaceMention(mes, context);
 
                 format = format.Replace(
@@ -154,6 +131,34 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.DiscordClient.Services
                 );
             }
             return format;
+        }
+
+        internal static void ReplaceCommonReceivedInfoAfter(ref string mes)
+        {
+            if (!Setting.Instance.AsBoolean("Use.InternalDiscordClient")) return;
+
+            if (DiscordSetting.Instance.AsBoolean("Use.ReadOutReplace.URLShortener"))
+            {
+                mes = Regex.Replace(
+                    mes,
+                    DiscordSetting.Instance.AsString("RegularExpression.URLShortener"),
+                    DiscordSetting.Instance.AsString("Format.Replace.URLShortener")
+                );
+            }
+
+            if (DiscordSetting.Instance.AsBoolean("Use.ReadOutReplace.Spoiler"))
+            {
+                mes = Regex.Replace(
+                    mes,
+                    DiscordSetting.Instance.AsString("RegularExpression.Spoiler"),
+                    DiscordSetting.Instance.AsString("Format.Replace.Spoiler")
+                );
+            }
+
+            if (DiscordSetting.Instance.AsBoolean("Use.ReadOutReplace.Emoji"))
+            {
+                mes = ReplaceEmojiSettings(mes);
+            }
         }
 
         private static string ReplaceEmojiSettings(string input)

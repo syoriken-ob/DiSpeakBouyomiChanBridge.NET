@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 
+using net.boilingwater.DiSpeakBouyomiChanBridge.DiscordClient.Services;
 using net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl;
 using net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl.Factory;
 using net.boilingwater.DiSpeakBouyomiChanBridge.Http;
@@ -16,6 +17,10 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.External
             var systemCmds = SystemCommandFactory.Factory.CreateExecutableCommands(ref message);
             //コマンド検出
             var cmds = CommandFactory.Factory.CreateExecutableCommands(ref message);
+
+            //URL省略などの処理
+            DiscordReceivedMessageService.ReplaceCommonReceivedInfoAfter(ref message);
+
             //棒読みちゃんに送信
             HttpClientForBouyomiChan.Instance.SendToBouyomiChan(message);
 

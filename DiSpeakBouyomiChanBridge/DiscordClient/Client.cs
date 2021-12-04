@@ -19,8 +19,8 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.DiscordClient
     public class Client
     {
         private static DiscordSocketClient client;
-        public static CommandService commands;
-        public static IServiceProvider services;
+        internal static CommandService commands;
+        internal static IServiceProvider services;
 
         public static async Task InitializeAsync()
         {
