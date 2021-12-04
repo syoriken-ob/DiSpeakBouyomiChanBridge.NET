@@ -1,13 +1,13 @@
-﻿using net.boilingwater.DiSpeakBouyomiChanBridge.Config;
-using net.boilingwater.DiSpeakBouyomiChanBridge.Http;
-using net.boilingwater.DiSpeakBouyomiChanBridge.Log;
-using net.boilingwater.Utils.Extention;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
+
+using net.boilingwater.DiSpeakBouyomiChanBridge.Config;
+using net.boilingwater.DiSpeakBouyomiChanBridge.Http;
+using net.boilingwater.DiSpeakBouyomiChanBridge.Log;
+using net.boilingwater.Utils.Extention;
 
 namespace net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl
 {
@@ -25,22 +25,19 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl
         public string ExecutionComment { get; set; }
         public string CompleteComment { get; set; }
 
-        public object Clone()
+        public object Clone() => new Command()
         {
-            return new Command()
-            {
-                Immediate = Immediate,
-                CommandTitle = CommandTitle,
-                Regex = new(Regex),
-                ReplacePattern = (string[])ReplacePattern.Clone(),
-                RunCommand = (string[])RunCommand.Clone(),
-                Env = new Dictionary<string, string>(Env),
-                Path = new(Path),
-                StdInOut = new Dictionary<string, string>(StdInOut),
-                ExecutionComment = new(ExecutionComment),
-                CompleteComment = new(CompleteComment)
-            };
-        }
+            Immediate = Immediate,
+            CommandTitle = CommandTitle,
+            Regex = new(Regex),
+            ReplacePattern = (string[])ReplacePattern.Clone(),
+            RunCommand = (string[])RunCommand.Clone(),
+            Env = new Dictionary<string, string>(Env),
+            Path = new(Path),
+            StdInOut = new Dictionary<string, string>(StdInOut),
+            ExecutionComment = new(ExecutionComment),
+            CompleteComment = new(CompleteComment)
+        };
 
         public override void Execute()
         {
@@ -54,8 +51,8 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl
                 //StandardInputEncoding = Encoding.GetEncoding(Setting.Get("ShellEncoding")),
                 UseShellExecute = false,
                 CreateNoWindow = false,
-                FileName = Setting.AsString("ShellPath"),
-                Arguments = $"{Setting.AsString("ShellOption")} \"{string.Join(" ", RunCommand)}\""
+                FileName = Setting.Instance.AsString("ShellPath"),
+                Arguments = $"{Setting.Instance.AsString("ShellOption")} \"{string.Join(" ", RunCommand)}\""
             };
 
             //環境変数設定
@@ -130,12 +127,12 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl
             catch (InvalidOperationException e)
             {
                 LoggerPool.Logger.Info($"\"{CommandTitle}\" Command has been Killed.", e);
-                HttpClientForBouyomiChan.Instance.SendToBouyomiChan(MessageSetting.AsString("ErrorOccurrence"));
+                HttpClientForBouyomiChan.Instance.SendToBouyomiChan(MessageSetting.Instance.AsString("ErrorOccurrence"));
             }
             catch (Exception e)
             {
                 LoggerPool.Logger.Error($"Couldn't run \"{CommandTitle}\" Command", e);
-                HttpClientForBouyomiChan.Instance.SendToBouyomiChan(MessageSetting.AsString("ErrorOccurrence"));
+                HttpClientForBouyomiChan.Instance.SendToBouyomiChan(MessageSetting.Instance.AsString("ErrorOccurrence"));
             }
         }
 

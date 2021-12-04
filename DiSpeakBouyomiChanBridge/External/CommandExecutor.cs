@@ -1,10 +1,11 @@
-﻿using net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl;
-using net.boilingwater.DiSpeakBouyomiChanBridge.Log;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+
+using net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl;
+using net.boilingwater.DiSpeakBouyomiChanBridge.Log;
 
 namespace net.boilingwater.DiSpeakBouyomiChanBridge.External
 {
@@ -18,10 +19,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.External
         private BlockingCollection<Task> _tasks = new();
         private Thread _thread;
 
-        public CommandExecutor()
-        {
-            DoTask();
-        }
+        public CommandExecutor() => DoTask();
 
         private void DoTask()
         {
@@ -45,23 +43,18 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.External
             _thread.Start();
         }
 
-        protected override void QueueTask(Task task)
-        {
-            _tasks.Add(task);
-        }
+        protected override void QueueTask(Task task) => _tasks.Add(task);
 
         protected override bool TryExecuteTaskInline(Task task, bool taskWasPreviouslyQueued)
         {
             if (Thread.CurrentThread != _thread) return false;
+
             return TryExecuteTask(task);
         }
 
         public override int MaximumConcurrencyLevel => 1;
 
-        protected override IEnumerable<Task> GetScheduledTasks()
-        {
-            return _tasks.ToArray();
-        }
+        protected override IEnumerable<Task> GetScheduledTasks() => _tasks.ToArray();
 
         public void Dispose()
         {
@@ -82,10 +75,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.External
 
         public void ClearTask()
         {
-            if (_tasks == null)
-            {
-                return;
-            }
+            if (_tasks == null) return;
 
             while (_tasks.Count > 0)
             {

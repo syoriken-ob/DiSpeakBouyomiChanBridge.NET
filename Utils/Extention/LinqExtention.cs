@@ -9,13 +9,10 @@ namespace net.boilingwater.Utils.Extention
         {
             foreach (var item in sequence) action(item);
         }
+
         public static void ForEach<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, Action<KeyValuePair<TKey, TValue>> action)
         {
             foreach (var item in dictionary) action(item);
-        }
-        public static void ForEach<T>(this IEnumerable<T> sequence, Func<T> func)
-        {
-            foreach (var item in sequence) func.DynamicInvoke(item);
         }
     }
 }

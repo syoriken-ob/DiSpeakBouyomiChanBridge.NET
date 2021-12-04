@@ -1,6 +1,4 @@
-﻿using net.boilingwater.DiSpeakBouyomiChanBridge.Config;
-using net.boilingwater.DiSpeakBouyomiChanBridge.Log;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -8,6 +6,9 @@ using System.Linq;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+
+using net.boilingwater.DiSpeakBouyomiChanBridge.Config;
+using net.boilingwater.DiSpeakBouyomiChanBridge.Log;
 
 namespace net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl.Factory
 {
@@ -17,10 +18,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl.Factory
 
         public Dictionary<string, Command> Dic { get; private set; } = new();
 
-        static CommandFactory()
-        {
-            Factory = new CommandFactory();
-        }
+        static CommandFactory() => Factory = new CommandFactory();
 
         private CommandFactory()
         {
@@ -54,12 +52,12 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl.Factory
 
         private static void ReplaceCommand(Match match, Command command)
         {
-            foreach (string replace in command.ReplacePattern)
+            foreach (var replace in command.ReplacePattern)
             {
                 var group = match.Groups.Values.Where(group => group.Name == replace).FirstOrDefault();
                 if (group != null)
                 {
-                    for (int i = 0; i < command.RunCommand.Length; i++)
+                    for (var i = 0; i < command.RunCommand.Length; i++)
                     {
                         command.RunCommand[i] = command.RunCommand[i].Replace($"__{replace}__", group.Value);
                     }
@@ -85,15 +83,18 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl.Factory
                         WriteIndented = true,
                         //DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
                     };
+
                     var dic = JsonSerializer.Deserialize<Dictionary<string, Command>>(
-                        File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), Setting.AsString("CommandFile"))),
+                        File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), Setting.Instance.AsString("CommandFile"))),
                         option
-                        );
+                    );
+                    
                     foreach (var pair in dic)
                     {
                         pair.Value.CommandTitle = pair.Key;
                         Dic.Add(pair.Key, pair.Value);
                     }
+                    
                     LoggerPool.Logger.Info("Load successfully CommandFile!");
                 }
                 catch (Exception e)

@@ -1,6 +1,4 @@
-﻿using net.boilingwater.DiSpeakBouyomiChanBridge.Config;
-using net.boilingwater.DiSpeakBouyomiChanBridge.Log;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -10,6 +8,9 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
+using net.boilingwater.DiSpeakBouyomiChanBridge.Config;
+using net.boilingwater.DiSpeakBouyomiChanBridge.Log;
+
 namespace net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl.Factory
 {
     public class SystemCommandFactory : ExecutableCommandFactory
@@ -17,10 +18,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl.Factory
         public static new SystemCommandFactory Factory { get; protected set; }
         public Dictionary<string, string> Dic { get; private set; } = new();
 
-        static SystemCommandFactory()
-        {
-            Factory = new SystemCommandFactory();
-        }
+        static SystemCommandFactory() => Factory = new SystemCommandFactory();
 
         private SystemCommandFactory()
         {
@@ -71,7 +69,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl.Factory
                         WriteIndented = true
                     };
                     var dic = JsonSerializer.Deserialize<Dictionary<string, string>>(
-                        File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), Setting.AsString("SystemCommandFile"))),
+                        File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), Setting.Instance.AsString("SystemCommandFile"))),
                         option);
                     foreach (var pair in dic)
                     {

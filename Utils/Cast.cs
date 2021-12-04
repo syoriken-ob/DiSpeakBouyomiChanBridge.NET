@@ -1,5 +1,7 @@
-﻿using System;
-using Microsoft.VisualBasic;
+﻿using Microsoft.VisualBasic;
+
+using System;
+using System.ComponentModel;
 using System.Text.Json;
 
 namespace net.boilingwater.Utils
@@ -10,50 +12,28 @@ namespace net.boilingwater.Utils
         {
             if (obj is int @int) return @int;
 
-            try
-            {
-                return (int)decimal.Parse(ToString(obj));
-            }
-            catch (Exception) { }
-
-            return default;
+            return (int)ToDecimal(obj);
         }
 
         public static long ToLong(object obj)
         {
             if (obj is long @long) return @long;
 
-            try
-            {
-                return (long)decimal.Parse(ToString(obj));
-            }
-            catch (Exception) { }
-
-            return default;
+            return (long)ToDecimal(obj);
         }
 
         public static double ToDouble(object obj)
         {
             if (obj is double @double) return @double;
 
-            try
-            {
-                return (double)decimal.Parse(ToString(obj));
-            }
-            catch (Exception) { }
-
-            return default;
+            return (double)ToDecimal(obj);
         }
 
         public static decimal ToDecimal(object obj)
         {
             if (obj is decimal @decimal) return @decimal;
 
-            try
-            {
-                return decimal.Parse(ToString(obj));
-            }
-            catch (Exception) { }
+            if(decimal.TryParse(ToString(obj), out var @result)) return @result;
 
             return default;
         }
@@ -62,30 +42,20 @@ namespace net.boilingwater.Utils
         {
             if (obj is bool @bool) return @bool;
 
-            try
-            {
-                return bool.Parse(ToString(obj));
-            }
-            catch (Exception) { }
+            if (bool.TryParse(ToString(obj), out var @result)) return result;
 
             return default;
         }
 
         public static string ToString(object obj)
         {
-            if (obj == null) return "";
+            if (obj == null) return string.Empty;
 
             if (obj is string @string) return @string;
 
-            if (Information.IsNumeric(obj))
-            {
-                return obj.ToString();
-            }
+            if (Information.IsNumeric(obj)) return obj.ToString();
 
-            if (!Information.IsReference(obj))
-            {
-                return obj.ToString();
-            }
+            if (!Information.IsReference(obj)) return obj.ToString();
 
             return JsonSerializer.Serialize(obj);
         }
@@ -93,7 +63,19 @@ namespace net.boilingwater.Utils
         public static T ToObject<T>(object obj)
         {
             if (obj is T @t) return @t;
-            return default;
+
+            try
+            {
+                var converter = TypeDescriptor.GetConverter(typeof(T));
+
+                if(converter != null)
+                {
+                    return (T)converter.ConvertFrom(obj);
+                }
+            }
+            catch (Exception) {}
+
+            return default(T);
         }
     }
 }
