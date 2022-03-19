@@ -5,7 +5,9 @@ VisualStudioVersion = 17.0.31717.71
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiSpeakBouyomiChanBridge", "DiSpeakBouyomiChanBridge\DiSpeakBouyomiChanBridge.csproj", "{20023D4C-8073-4387-AA2E-1BF3A447B7F0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "net.boilingwater.Utils", "Utils\net.boilingwater.Utils.csproj", "{5407CE29-CBB2-4B5B-AD31-0E2F2BE2C5A2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "net.boilingwater.Application.Common", "net.boilingwater.Application.Common\net.boilingwater.Application.Common.csproj", "{5407CE29-CBB2-4B5B-AD31-0E2F2BE2C5A2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "net.boilingwater.DiSpeakBouyomiChanBridge.external.DiscordClient", "net.boilingwater.DiSpeakBouyomiChanBridge.external.DiscordClient\net.boilingwater.DiSpeakBouyomiChanBridge.external.DiscordClient.csproj", "{F05A67B4-CB26-4E56-B1B6-28D5D5D82EE1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{5407CE29-CBB2-4B5B-AD31-0E2F2BE2C5A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5407CE29-CBB2-4B5B-AD31-0E2F2BE2C5A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5407CE29-CBB2-4B5B-AD31-0E2F2BE2C5A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F05A67B4-CB26-4E56-B1B6-28D5D5D82EE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F05A67B4-CB26-4E56-B1B6-28D5D5D82EE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F05A67B4-CB26-4E56-B1B6-28D5D5D82EE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F05A67B4-CB26-4E56-B1B6-28D5D5D82EE1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

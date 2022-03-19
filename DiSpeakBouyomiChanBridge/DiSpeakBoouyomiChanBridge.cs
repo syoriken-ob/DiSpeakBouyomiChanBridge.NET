@@ -1,27 +1,30 @@
-﻿using net.boilingwater.DiSpeakBouyomiChanBridge.Config;
-using net.boilingwater.DiSpeakBouyomiChanBridge.DiscordClient;
-using net.boilingwater.DiSpeakBouyomiChanBridge.External.Impl.Factory;
-using net.boilingwater.DiSpeakBouyomiChanBridge.Http;
-using System.Runtime.CompilerServices;
+﻿using System;
+
+using net.boilingwater.Application.Common.Logging;
 
 namespace net.boilingwater.DiSpeakBouyomiChanBridge
 {
+    /// <summary>
+    /// エントリーポイントのクラス
+    /// </summary>
     public class DiSpeakBoouyomiChanBridge
     {
-        public static void Main(string[] args)
+        /// <summary>
+        /// アプリケーションを実行します
+        /// </summary>
+        /// <param name="args">実行時引数</param>
+        public static int Main(string[] args)
         {
-            RuntimeHelpers.RunClassConstructor(typeof(CommandFactory).TypeHandle);
-            RuntimeHelpers.RunClassConstructor(typeof(SystemCommandFactory).TypeHandle);
-
-            ApplicationInitializer.Initialize(Setting.Instance.AsBoolean("Use.InternalDiscordClient"));
-
-            if (Setting.Instance.AsBoolean("Use.InternalDiscordClient"))
+            try
             {
-                Client.StartAsync().GetAwaiter().GetResult();
+                ApplicationInitializer.Initialize();
+                ApplicationInitializer.Start();
+                return 0;
             }
-            else
+            catch (Exception e)
             {
-                HttpServerForBouyomiChan.Instance.Start();
+                Log.Logger.Fatal("エラーが発生したため、実行を終了します。", e);
+                return -1;
             }
         }
     }
