@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    =========================================
+    == 内部簡易Discordクライアント機能設定 ==
+    =========================================
+-->
+<Settings>
+  <!--
+      ####################
+      ## 各種機能ON/OFF ##
+      ####################
+  -->
+
+  <!-- Discord.Netのログ出力をリダイレクトする(True:する,False:しない) -->
+  <Item key="Use.RedirectLogDiscord.Net"    value="False" />
+
+  <!-- サーバーのテキストチャンネルの読み上げ機能を利用する(True:利用する,False:利用しない) -->
+  <Item key="Use.ReadOut.GuildChannel.Text"    value="True" />
+  <!-- サーバーのボイスチャンネルの読み上げ機能を利用する(True:利用する,False:利用しない) -->
+  <Item key="Use.ReadOut.GuildChannel.Voice"   value="True" />
+
+  <!-- 絵文字の読み上げ置換機能を利用する(True:利用する,False:利用しない) -->
+  <!-- 利用する場合EmojiReplaceSettings内に置換設定を指定してください -->
+  <!-- 現時点では未実装となります -->
+  <Item key="Use.ReadOutReplace.Emoji"         value="False" />
+
+  <!-- メッセージ中のURL省略機能を利用する(True:利用する,False:利用しない) -->
+  <Item key="Use.ReadOutReplace.URLShortener"  value="True" />
+    
+  <!-- メッセージ中のスポイラー読み上げ省略機能を利用する(True:利用する,False:利用しない) -->
+  <Item key="Use.ReadOutReplace.Spoiler"       value="True" />
+
+  <!-- List.ReadOutTarget.GuildChannel.Textの指定をホワイトリスト方式とする(True:ホワイトリスト,False:ブラックリスト) -->
+  <Item key="Use.ReadOutTarget.GuildChannel.Text.WhiteList"     value="True" />
+  <!-- List.ReadOutTarget.GuildChannel.Voiceの指定をホワイトリスト方式とする(True:ホワイトリスト,False:ブラックリスト) -->
+  <Item key="Use.ReadOutTarget.GuildChannel.Voice.WhiteList"    value="True" />
+
+  <!--
+      ##################
+      ## 読み上げ設定 ##
+      ##################
+  -->
+  <!-- メッセージ監視用DiscordBOTトークン（BOTが読み上げさせたいサーバーに参加している必要があります） -->
+  <Item key="DiscordToken"                           value="{DISCORD_TOKEN}" />
+  <!-- 読み上げさせたいサーバーID（カンマ区切りで複数設定可,カンマ前後のスペースはトリムされます） -->
+  <Item key="List.ReadOutTarget.Guild"               value="{DISCORD_READOUT_GUILD_LIST}" />
+  <!-- 対象とするサーバーのテキストチャンネルID（カンマ区切りで複数設定可,カンマ前後のスペースはトリムされます） -->
+  <Item key="List.ReadOutTarget.GuildChannel.Text"   value="{DISCORD_READOUT_GUILD_TEXT_CHANNEL_LIST}" />
+  <!-- 対象とするサーバーのボイスチャンネルID（カンマ区切りで複数設定可,カンマ前後のスペースはトリムされます） -->
+  <Item key="List.ReadOutTarget.GuildChannel.Voice"  value="{DISCORD_READOUT_GUILD_VOICE_CHANNEL_LIST}" />
+
+</Settings>
