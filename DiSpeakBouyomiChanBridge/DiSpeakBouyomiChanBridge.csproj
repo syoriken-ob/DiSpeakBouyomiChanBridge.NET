@@ -27,10 +27,10 @@
     <None Update="settings\command\command.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="settings\config\DiscordClinet-Application-Setting.xml">
+    <None Update="settings\config\DiscordClient-Application-Setting.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="settings\config\DiscordClinet-Definition-Setting.xml">
+    <None Update="settings\config\DiscordClient-Definition-Setting.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="settings\config\EnvironmentSetting.xml">
