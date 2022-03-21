@@ -15,24 +15,24 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.external.DiscordClient
     /// </summary>
     public class DiscordDotNetClient
     {
-        public static DiscordSocketClient? Client { get; private set; }
-        internal static CommandService? commands;
-        internal static IServiceProvider? services;
+        public DiscordSocketClient? Client { get; private set; }
+        internal CommandService? commands;
+        internal IServiceProvider? services;
 
         /// <summary>
         /// 読み上げ対象のサーバー
         /// </summary>
-        public static IEnumerable<string>? TargetGuild { private get; set; }
+        public IEnumerable<string>? TargetGuild { private get; set; }
 
-        public static Func<SocketMessage, Task>? MessageReceived { private get; set; }
-        public static Func<SocketUser, SocketVoiceState, SocketVoiceState, Task>? UserVoiceStatusUpdated { private get; set; }
-        public static Func<LogMessage, Task>? Logging { private get; set; }
+        public Func<SocketMessage, Task>? MessageReceived { private get; set; }
+        public Func<SocketUser, SocketVoiceState, SocketVoiceState, Task>? UserVoiceStatusUpdated { private get; set; }
+        public Func<LogMessage, Task>? Logging { private get; set; }
 
         /// <summary>
         /// 非同期で初期化処理を行います
         /// </summary>
         /// <returns></returns>
-        public static async Task InitializeAsync()
+        public async Task InitializeAsync()
         {
             Client = new DiscordSocketClient(new DiscordSocketConfig
             {
@@ -53,7 +53,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.external.DiscordClient
         /// <param name="token"></param>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
-        public static async Task StartAsync(string token)
+        public async Task StartAsync(string token)
         {
             if (Client == null)
             {

@@ -19,6 +19,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge
 {
     internal class ApplicationInitializer
     {
+        private static DiscordDotNetClient? _client;
         /// <summary>
         /// システムの初期化を行います
         /// </summary>
@@ -33,13 +34,14 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge
             {
                 HttpClientForBouyomiChan.Instance.SendToBouyomiChan(Settings.AsString("Message.TryLoginToDiscord"));
 
-                DiscordDotNetClient.InitializeAsync().GetAwaiter().GetResult();
+                _client = new();
+                _client.InitializeAsync().GetAwaiter().GetResult();
 
-                var discordEventHandler = new DiscordEventHandler(DiscordDotNetClient.Client);
+                var discordEventHandler = new DiscordEventHandler(_client.Client);
 
                 if (Settings.AsBoolean("Use.RedirectLogDiscord.Net"))
                 {
-                    DiscordDotNetClient.Logging = discordEventHandler.Logging;
+                    _client.Logging = discordEventHandler.Logging;
                 }
 
                 var guilds = Settings.AsStringList("List.ReadOutTarget.Guild");
@@ -54,12 +56,12 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge
 
                 if (Settings.AsBoolean("Use.ReadOut.GuildChannel.Text"))
                 {
-                    DiscordDotNetClient.MessageReceived = discordEventHandler.MessageReceived;
+                    _client.MessageReceived = discordEventHandler.MessageReceived;
                 }
 
                 if (Settings.AsBoolean("Use.ReadOut.GuildChannel.Voice"))
                 {
-                    DiscordDotNetClient.UserVoiceStatusUpdated = discordEventHandler.UserVoiceStatusUpdated;
+                    _client.UserVoiceStatusUpdated = discordEventHandler.UserVoiceStatusUpdated;
                 }
 
                 CommandHandlingService.Initialize(new InternalDiscordClientCommandHandler());
@@ -92,7 +94,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge
         {
             if (Settings.AsBoolean("Use.InternalDiscordClient"))
             {
-                DiscordDotNetClient.StartAsync(Settings.Get("DiscordToken")).GetAwaiter().GetResult();
+                _client.StartAsync(Settings.Get("DiscordToken")).GetAwaiter().GetResult();
             }
             else
             {
