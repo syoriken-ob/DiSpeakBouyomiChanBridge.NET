@@ -28,6 +28,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl
             HttpClientForBouyomiChan.Instance.SendToBouyomiChan(Settings.AsString("Message.ReloadConfig"));
             Log.Logger.Info("Reload SystemConfig...");
             ApplicationInitializer.CommandInitialize();
+            SettingHolder.Initialize();
         }
     }
 
