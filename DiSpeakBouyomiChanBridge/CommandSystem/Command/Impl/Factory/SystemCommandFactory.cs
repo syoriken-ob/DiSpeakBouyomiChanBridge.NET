@@ -76,9 +76,11 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl.Factory
                         PropertyNameCaseInsensitive = true,
                         WriteIndented = true
                     };
-                    var dic = JsonSerializer.Deserialize<Dictionary<string, string>>(
-                        File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), Settings.AsString("SystemCommandFile"))),
-                        option);
+
+                    var commandFilePath = Path.Combine(Directory.GetCurrentDirectory(), Settings.GetAppConfig("CommandFileFolder"), Settings.AsString("SystemCommandFile"));
+                    var dic = JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(commandFilePath), option);
+                    Log.Logger.Debug($"読み込み：{commandFilePath}");
+
                     if (dic != null)
                     {
                         var SystemCommandTypes = Assembly.GetExecutingAssembly().GetTypes().Where(type => type.IsSubclassOf(typeof(SystemCommand)));

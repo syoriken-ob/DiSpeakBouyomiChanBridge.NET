@@ -7,6 +7,8 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
+using Discord;
+
 using net.boilingwater.Application.Common.Extentions;
 using net.boilingwater.Application.Common.Logging;
 using net.boilingwater.Application.Common.Settings;
@@ -79,17 +81,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl.Factory
                     //コマンド辞書初期化
                     Dic.Clear();
 
-                    //読み込み
-                    var options = new JsonSerializerOptions()
-                    {
-                        Encoder = JavaScriptEncoder.Default,
-                        AllowTrailingCommas = true,
-                        PropertyNameCaseInsensitive = true,
-                        WriteIndented = true
-                    };
-                    var dic = JsonSerializer.Deserialize<Dictionary<string, Command>>(
-                        File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), Settings.AsString("CommandFile"))),
-                        options);
+                    var dic = LoadCommandDic();
 
                     if (dic != null)
                     {
@@ -99,15 +91,62 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl.Factory
                             Dic.Add(pair.Key, pair.Value);
                             Log.Logger.DebugFormat("コマンド登録：{0}", pair.Key);
                         }
+                        Log.Logger.Info("コマンドファイルの読み込みが完了しました。");
                     }
-                    Log.Logger.Info("コマンドファイルの読み込みが完了しました。");
+                    else
+                    {
+                        Log.Logger.Info($"コマンドファイルが存在しないため読み込みをスキップしました。");
+                    }
                 }
                 catch (Exception ex)
                 {
                     Log.Logger.Fatal($"コマンドファイルの読み込みに失敗しました。{Settings.AsString("CommandFile")}を確認してください。", ex);
-                    throw;
                 }
             }
+        }
+
+        /// <summary>
+        /// コマンドのJSONファイルから辞書を取得します。
+        /// </summary>
+        /// <returns></returns>
+        private Dictionary<string, Command> LoadCommandDic()
+        {
+            //読み込み
+            var options = new JsonSerializerOptions()
+            {
+                Encoder = JavaScriptEncoder.Default,
+                AllowTrailingCommas = true,
+                PropertyNameCaseInsensitive = true,
+                WriteIndented = true
+            };
+
+            Dictionary<string, Command>? commandDic = null;
+            var commandFilePath = Path.Combine(Directory.GetCurrentDirectory(), Settings.GetAppConfig("OverrideFileFolder"), Settings.AsString("CommandFile"));
+
+            if (File.Exists(commandFilePath))
+            {
+                commandDic = JsonSerializer.Deserialize<Dictionary<string, Command>>(File.ReadAllText(commandFilePath));
+                Log.Logger.Debug($"読み込み：{commandFilePath}");
+            }
+            else
+            {
+                commandFilePath = Path.Combine(Directory.GetCurrentDirectory(), Settings.GetAppConfig("CommandFileFolder"), Settings.AsString("CommandFile"));
+                if (File.Exists(commandFilePath))
+                {
+                    commandDic = JsonSerializer.Deserialize<Dictionary<string, Command>>(File.ReadAllText(commandFilePath), options);
+                    Log.Logger.Debug($"読み込み：{commandFilePath}");
+                }
+            }
+
+            var dic = new Dictionary<string, Command>();
+            if (commandDic != null)
+            {
+                foreach (var item in commandDic)
+                {
+                    dic.Add(item.Key, item.Value);
+                }
+            }
+            return dic;
         }
     }
 }

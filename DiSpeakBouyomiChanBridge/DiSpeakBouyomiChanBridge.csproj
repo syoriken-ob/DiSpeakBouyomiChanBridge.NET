@@ -33,7 +33,7 @@
     <None Update="settings\config\DiscordClient-Definition-Setting.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="settings\config\EnvironmentSetting.xml">
+    <None Update="settings\_override\EnvironmentSetting.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="settings\config\System-Application-Setting.xml">

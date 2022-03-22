@@ -83,7 +83,6 @@ namespace net.boilingwater.Application.Common.Settings
             catch (Exception ex)
             {
                 Log.Logger.Fatal("環境設定上書きファイルの読み込みに失敗しました。", ex);
-                throw;
             }
         }
 
@@ -102,7 +101,7 @@ namespace net.boilingwater.Application.Common.Settings
 
         private static string GetEnvironmentSettingFile()
         {
-            return Directory.GetFiles(ConfigurationManager.AppSettings["SettingFileFolder"], ConfigurationManager.AppSettings["EnvironmentSettingFile"], SearchOption.AllDirectories)
+            return Directory.GetFiles(ConfigurationManager.AppSettings["OverrideFileFolder"], ConfigurationManager.AppSettings["EnvironmentSettingFile"], SearchOption.AllDirectories)
                 .Select(path => Path.GetFullPath(path))
                 .FirstOrDefault();
         }
