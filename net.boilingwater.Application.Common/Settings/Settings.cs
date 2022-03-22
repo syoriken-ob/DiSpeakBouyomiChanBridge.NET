@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 
 using net.boilingwater.Application.Common.Utils;
@@ -80,6 +81,24 @@ namespace net.boilingwater.Application.Common.Settings
             _listCache.Add($"{key}#{splitKey}", list);
 
             return list;
+        }
+
+        /// <summary>
+        /// AppSettingsの設定値を取得します<br/>
+        /// 存在しない場合は、空文字を返却します。
+        /// </summary>
+        /// <param name="key">設定キー</param>
+        /// <returns>アプリケーション設定値</returns>
+        public static string GetAppConfig(string key)
+        {
+            try
+            {
+                return CastUtil.ToString(ConfigurationManager.AppSettings[key]);
+            }
+            catch (Exception)
+            {
+                return "";
+            }
         }
     }
 }

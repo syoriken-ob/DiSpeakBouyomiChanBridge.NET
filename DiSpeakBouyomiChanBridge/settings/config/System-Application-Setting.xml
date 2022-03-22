@@ -15,8 +15,8 @@
   <Item key="ShellPath"                      value="C:\Windows\System32\cmd.exe"/>
   <Item key="ShellOption"                    value="/C"/>
 
-  <Item key="CommandFile"                    value="settings/command/command.json" />
-  <Item key="SystemCommandFile"              value="settings/command/system-command.json" />
+  <Item key="CommandFile"                    value="command.json" />
+  <Item key="SystemCommandFile"              value="system-command.json" />
 
   <!-- DiSpeakを利用せず、内部簡易Discordクライアント機能を利用する(True:利用する,False:利用しない) -->
   <!-- 利用する場合DiscordSettingsセクションの設定が必要です -->
