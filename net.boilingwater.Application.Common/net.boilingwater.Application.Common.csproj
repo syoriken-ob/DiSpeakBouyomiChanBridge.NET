@@ -6,6 +6,7 @@
     <StartupObject />
     <AssemblyName>net.boilingwater.Application.Common</AssemblyName>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <Version>6.6.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
