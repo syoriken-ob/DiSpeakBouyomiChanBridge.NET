@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-
-using Discord.WebSocket;
 
 using net.boilingwater.Application.Common.Logging;
 using net.boilingwater.Application.Common.Settings;
@@ -26,7 +22,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge
         /// <exception cref="ApplicationException"></exception>
         internal static void Initialize()
         {
-            Log.Logger.Info("Start Application Initialization!");
+            Log.Logger.Info("アプリケーションの初期化処理を開始します。");
             SettingHolder.Initialize();
             CommandInitialize();
 
@@ -74,7 +70,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge
             }
 
             HttpClientForBouyomiChan.Instance.SendToBouyomiChan(Settings.AsString("Message.FinishInitialize"));
-            Log.Logger.Info("Finish Application Initialization!");
+            Log.Logger.Info("アプリケーションの初期化処理が完了しました。");
             HttpClientForBouyomiChan.Instance.SendToBouyomiChan(Settings.AsString("Message.Welcome"));
         }
 
