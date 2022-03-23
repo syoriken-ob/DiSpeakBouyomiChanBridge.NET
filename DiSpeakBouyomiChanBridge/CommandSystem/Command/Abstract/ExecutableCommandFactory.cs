@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 
+using net.boilingwater.Application.Common;
+
 namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem
 {
     /// <summary>
@@ -10,7 +12,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem
         /// <summary>
         /// コマンドを保持する辞書
         /// </summary>
-        public Dictionary<string, ExecutableCommand> Dic { get; protected set; } = new();
+        public SimpleDic<ExecutableCommand> Dic { get; protected set; } = new();
 
         /// <summary>
         /// コマンドファクトリの初期化を行います

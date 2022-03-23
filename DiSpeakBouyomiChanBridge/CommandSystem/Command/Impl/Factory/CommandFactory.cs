@@ -7,9 +7,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
-using Discord;
-
-using net.boilingwater.Application.Common.Extentions;
+using net.boilingwater.Application.Common;
 using net.boilingwater.Application.Common.Logging;
 using net.boilingwater.Application.Common.Settings;
 using net.boilingwater.Application.Common.Utils;
@@ -38,7 +36,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl.Factory
         public override IEnumerable<ExecutableCommand> CreateExecutableCommands(ref string input)
         {
             var executableCommands = new List<Command>();
-            var pattern = "(" + string.Join("|", Dic.Values.Select(c => ((Command)c).Regex)) + ")";
+            var pattern = $"({string.Join("|", Dic.Values.Select(c => ((Command)c).Regex))})";
             foreach (Match match in Regex.Matches(input, pattern))
             {
                 foreach (Command command1 in Dic.Values)
@@ -60,11 +58,13 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl.Factory
             foreach (var str in command.ReplacePattern)
             {
                 var replace = str;
-                var group1 = match.Groups.Values.Where(group => group.Name == replace).FirstOrDefault();
-                if (group1 != null)
+                var group = match.Groups.Values.Where(group => group.Name == replace).FirstOrDefault();
+                if (group != null)
                 {
                     for (var index = 0; index < command.RunCommand.Length; ++index)
-                        command.RunCommand[index] = command.RunCommand[index].Replace("__" + replace + "__", group1.Value);
+                    {
+                        command.RunCommand[index] = command.RunCommand[index].Replace($"__{replace}__", group.Value);
+                    }
                 }
             }
         }
@@ -89,7 +89,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl.Factory
                         {
                             pair.Value.CommandTitle = pair.Key;
                             Dic.Add(pair.Key, pair.Value);
-                            Log.Logger.DebugFormat("コマンド登録：{0}", pair.Key);
+                            Log.Logger.Debug($"コマンド登録：{pair.Key}");
                         }
                         Log.Logger.Info("コマンドファイルの読み込みが完了しました。");
                     }
@@ -109,41 +109,43 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl.Factory
         /// コマンドのJSONファイルから辞書を取得します。
         /// </summary>
         /// <returns></returns>
-        private Dictionary<string, Command> LoadCommandDic()
+        private SimpleDic<Command> LoadCommandDic()
         {
-            //読み込み
-            var options = new JsonSerializerOptions()
-            {
-                Encoder = JavaScriptEncoder.Default,
-                AllowTrailingCommas = true,
-                PropertyNameCaseInsensitive = true,
-                WriteIndented = true
-            };
-
-            Dictionary<string, Command>? commandDic = null;
             var commandFilePath = Path.Combine(Directory.GetCurrentDirectory(), Settings.GetAppConfig("OverrideFileFolder"), Settings.AsString("CommandFile"));
+            string? content = null;
 
             if (File.Exists(commandFilePath))
             {
-                commandDic = JsonSerializer.Deserialize<Dictionary<string, Command>>(File.ReadAllText(commandFilePath));
-                Log.Logger.Debug($"読み込み：{commandFilePath}");
+                content = File.ReadAllText(commandFilePath);
             }
             else
             {
                 commandFilePath = Path.Combine(Directory.GetCurrentDirectory(), Settings.GetAppConfig("CommandFileFolder"), Settings.AsString("CommandFile"));
                 if (File.Exists(commandFilePath))
                 {
-                    commandDic = JsonSerializer.Deserialize<Dictionary<string, Command>>(File.ReadAllText(commandFilePath), options);
-                    Log.Logger.Debug($"読み込み：{commandFilePath}");
+                    content = File.ReadAllText(commandFilePath);
                 }
             }
 
-            var dic = new Dictionary<string, Command>();
+            SimpleDic<Command>? commandDic = null;
+            if (content != null)
+            {
+                commandDic = JsonSerializer.Deserialize<SimpleDic<Command>>(content, new JsonSerializerOptions()
+                {
+                    Encoder = JavaScriptEncoder.Default,
+                    AllowTrailingCommas = true,
+                    PropertyNameCaseInsensitive = true,
+                    WriteIndented = true
+                });
+                Log.Logger.Debug($"読み込み：{commandFilePath}");
+            }
+
+            var dic = new SimpleDic<Command>();
             if (commandDic != null)
             {
                 foreach (var item in commandDic)
                 {
-                    dic.Add(item.Key, item.Value);
+                    dic[item.Key] = item.Value;
                 }
             }
             return dic;
