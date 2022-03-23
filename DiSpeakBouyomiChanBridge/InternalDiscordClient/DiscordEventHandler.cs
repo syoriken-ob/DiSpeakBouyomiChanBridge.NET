@@ -28,13 +28,19 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.InternalDiscordClient
             var context = new CommandContext(client, message);
 
             if (DiscordReceivedMessageService.IsPrivateMessage(context))
+            {
                 return;
+            }
 
             if (!DiscordReceivedMessageService.IsReadOutTargetGuild(context))
+            {
                 return;
+            }
 
             if (!DiscordReceivedMessageService.IsReadOutTargetGuildChannel(context))
+            {
                 return;
+            }
 
             var formattedMessage = DiscordReceivedMessageService.GetFormattedMessage(context);
 
@@ -46,16 +52,24 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.InternalDiscordClient
         internal async Task UserVoiceStatusUpdated(SocketUser user, SocketVoiceState sourceVoiceState, SocketVoiceState targetVoiceState)
         {
             if (!Settings.AsBoolean("Use.ReadOut.GuildChannel.Voice"))
+            {
                 return;
+            }
 
             if (user is not SocketGuildUser guildUser)
+            {
                 return;
+            }
 
             if (!DiscordUserVoiceStateUpdatedService.IsReadOutTargetGuild(sourceVoiceState, targetVoiceState))
+            {
                 return;
+            }
 
             if (!DiscordUserVoiceStateUpdatedService.IsReadOutTargetGuildChannel(sourceVoiceState, targetVoiceState))
+            {
                 return;
+            }
 
             var state = DiscordUserVoiceStateUpdatedService.DetectVoiceStateUpdate(sourceVoiceState, targetVoiceState);
 

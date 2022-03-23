@@ -156,7 +156,9 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.InternalDiscordClient.Servic
         internal static void ReplaceCommonReceivedInfoAfter(ref string message)
         {
             if (!Settings.AsBoolean("Use.InternalDiscordClient"))
+            {
                 return;
+            }
 
             if (Settings.AsBoolean("Use.ReadOutReplace.URLShortener"))
             {

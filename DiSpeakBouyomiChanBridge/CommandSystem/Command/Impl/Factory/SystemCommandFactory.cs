@@ -92,8 +92,8 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl.Factory
                                 var instance = Activator.CreateInstance(type);
                                 if (instance != null)
                                 {
-                                    Dic.Add(pair.Key, (SystemCommand)instance);
-                                    Log.Logger.DebugFormat("システムコマンド登録：{0}", pair.Value);
+                                    Dic[pair.Key] = (SystemCommand)instance;
+                                    Log.Logger.Debug($"システムコマンド登録：{pair.Value}");
                                 }
                             }
                         }
