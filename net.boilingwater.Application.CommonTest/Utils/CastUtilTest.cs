@@ -11,12 +11,13 @@ namespace net.boilingwater.Application.CommonTest
     {
         /// <summary>
         /// ToDecimal Test
-        /// case of:
+        /// <para>case of:
         ///     is decimal
         ///     is int number
         ///     is string plus number
         ///     is string minus number
         ///     is failed cast
+        ///     is 1000 separator
         /// </summary>
         /// <param name="obj">cast target</param>
         /// <returns>cast result</returns>
@@ -32,6 +33,7 @@ namespace net.boilingwater.Application.CommonTest
             new TestCaseData("1.1").Returns(1.1m).SetName("Decimal parse plus"),
             new TestCaseData("-1.1").Returns(-1.1m).SetName("Decimal parse minus"),
             new TestCaseData("a").Returns(default(decimal)).SetName("Decimal default"),
+            new TestCaseData("100,000").Returns(100000m).SetName("Decimal 1000 separator"),
         };
 
         /// <summary>
@@ -98,7 +100,7 @@ namespace net.boilingwater.Application.CommonTest
         };
 
         /// <summary>
-        /// ToUnsignedILong Test
+        /// ToUnsignedLong Test
         /// case of:
         ///     is ulong
         ///     is string plus number
@@ -167,7 +169,8 @@ namespace net.boilingwater.Application.CommonTest
         /// case of:
         ///     is null
         ///     is string
-        ///     is num
+        ///     is not ref obj(num)
+        ///     is enum
         ///     is other ref obj
         /// </summary>
         /// <param name="obj">cast target</param>
@@ -182,11 +185,13 @@ namespace net.boilingwater.Application.CommonTest
             new TestCaseData(null).Returns(string.Empty).SetName("String null"),
             new TestCaseData("sample").Returns("sample").SetName("String cast"),
             new TestCaseData(1).Returns("1").SetName("String num"),
-            // FIX: Not ref のケースが思いつかない。ある？？？
+            new TestCaseData(ToStringTestEnum.HOGE).Returns("HOGE").SetName("String enum"),
             new TestCaseData(new { a = "test" }).Returns("{\"a\":\"test\"}").SetName("String ref"),
         };
 
         // TODO: Write ToObjectTest
         // テストケース考えるのが面倒くさい
+
+        public enum ToStringTestEnum { HOGE }
     }
 }

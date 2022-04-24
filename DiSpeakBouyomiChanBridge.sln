@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "net.boilingwater.Applicatio
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "net.boilingwater.DiSpeakBouyomiChanBridge.external.DiscordClient", "net.boilingwater.DiSpeakBouyomiChanBridge.external.DiscordClient\net.boilingwater.DiSpeakBouyomiChanBridge.external.DiscordClient.csproj", "{F05A67B4-CB26-4E56-B1B6-28D5D5D82EE1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "net.boilingwater.Application.CommonTest", "net.boilingwater.Application.CommonTest\net.boilingwater.Application.CommonTest.csproj", "{91A54929-3B85-421D-AA61-61624A8E6911}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "net.boilingwater.Application.CommonTest", "net.boilingwater.Application.CommonTest\net.boilingwater.Application.CommonTest.csproj", "{91A54929-3B85-421D-AA61-61624A8E6911}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{38F94AA7-0023-46E4-9F98-E82056DB0923}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,6 +38,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{91A54929-3B85-421D-AA61-61624A8E6911} = {38F94AA7-0023-46E4-9F98-E82056DB0923}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BF8194DE-BD5B-4F65-B2FD-00B5834586DC}

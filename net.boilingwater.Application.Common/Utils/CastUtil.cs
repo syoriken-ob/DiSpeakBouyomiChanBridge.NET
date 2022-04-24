@@ -27,10 +27,13 @@ namespace net.boilingwater.Application.Common.Utils
         }
 
         /// <summary>
-        /// <paramref name="obj"/>を<see cref="uint"/>型に変換します
+        /// <paramref name="obj"/>を<see cref="uint"/>型に変換します。
         /// </summary>
         /// <param name="obj">変換する値</param>
-        /// <returns><see cref="uint"/>型に変換した引数</returns>
+        /// <returns>
+        /// <see cref="uint"/>型に変換した引数
+        /// <para>引数が負数の場合、既定値を返却します。</para>
+        /// </returns>
         public static uint ToUnsignedInteger(object obj)
         {
             if (obj is uint @int)
@@ -38,7 +41,14 @@ namespace net.boilingwater.Application.Common.Utils
                 return @int;
             }
 
-            return (uint)ToDecimal(obj);
+            var dec = ToDecimal(obj);
+
+            if (dec < 0)
+            {
+                return default(uint);
+            }
+
+            return (uint)dec;
         }
 
         /// <summary>
@@ -60,12 +70,22 @@ namespace net.boilingwater.Application.Common.Utils
         /// <paramref name="obj"/>を<see cref="ulong"/>型に変換します
         /// </summary>
         /// <param name="obj">変換する値</param>
-        /// <returns><see cref="ulong"/>型に変換した<paramref name="obj"/></returns>
+        /// <returns>
+        ///     <see cref="ulong"/>型に変換した<paramref name="obj"/>
+        ///     <para>引数が負数の場合、既定値を返却します。</para>
+        /// </returns>
         public static ulong ToUnsignedLong(object obj)
         {
             if (obj is ulong @long)
             {
                 return @long;
+            }
+
+            var dec = ToDecimal(obj);
+
+            if (dec < 0)
+            {
+                return default(ulong);
             }
 
             return (ulong)ToDecimal(obj);
@@ -131,8 +151,8 @@ namespace net.boilingwater.Application.Common.Utils
         /// </summary>
         /// <param name="obj">変換する値</param>
         /// <returns>
-        ///     <see cref="string"/>型に変換した<paramref name="obj"/><br/>
-        ///     ※objectはJSONに変換します。
+        ///     <see cref="string"/>型に変換した<paramref name="obj"/>
+        ///     <para>※objectはJSONに変換します。</para>
         /// </returns>
         public static string ToString(object obj)
         {
@@ -144,11 +164,6 @@ namespace net.boilingwater.Application.Common.Utils
             if (obj is string @string)
             {
                 return @string;
-            }
-
-            if (Information.IsNumeric(obj))
-            {
-                return obj.ToString();
             }
 
             if (!Information.IsReference(obj))
