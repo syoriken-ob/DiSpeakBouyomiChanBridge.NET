@@ -6,36 +6,19 @@ using System.Threading;
 using net.boilingwater.Application.Common.Logging;
 using net.boilingwater.Application.Common.Settings;
 
-namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http
+namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http.Impl
 {
     /// <summary>
     /// 棒読みちゃんにメッセージを送信するHttpClient
     /// </summary>
-    public class HttpClientForBouyomiChan : IDisposable
+    public class HttpClientForBouyomiChan : HttpClientForReadOut
     {
-        /// <summary>
-        /// シングルトンインスタンス
-        /// </summary>
-        public static HttpClientForBouyomiChan Instance { get; } = new();
-
-        private HttpClient _client;
-
-        private HttpClientForBouyomiChan() => _client = new();
-
-        /// <summary>
-        /// 内部Httpクライアントを再生成します。
-        /// </summary>
-        public void RenewHttpClient()
-        {
-            ((IDisposable)this).Dispose();
-            _client = new();
-        }
 
         /// <summary>
         /// 棒読みちゃんにメッセージを送信します。
         /// </summary>
         /// <param name="text">送信するメッセージ</param>
-        public void SendToBouyomiChan(string text)
+        public override void ReadOut(string text)
         {
             var sendMessage = text.Trim();
             if (string.IsNullOrEmpty(sendMessage))
@@ -49,7 +32,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http
             {
                 try
                 {
-                    var responseMessage = _client.Send(CreateBouyomiChanHttpRequest(sendMessage));
+                    var responseMessage = client_.Send(CreateBouyomiChanHttpRequest(sendMessage));
                     if (responseMessage.StatusCode == HttpStatusCode.OK)
                     {
                         Log.Logger.Debug($"Send:{sendMessage}");
@@ -77,15 +60,6 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http
                     return;
                 }
             }
-        }
-
-        /// <summary>
-        /// リソースを解放します
-        /// </summary>
-        public void Dispose()
-        {
-            _client.Dispose();
-            GC.SuppressFinalize(this);
         }
 
         private static HttpRequestMessage CreateBouyomiChanHttpRequest(string text) => new HttpRequestMessage()

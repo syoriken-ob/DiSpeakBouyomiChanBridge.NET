@@ -47,7 +47,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http
                         _listener.Prefixes.Add($"http://localhost:{Settings.AsString("ListeningPort")}/");
 
                         _listener.Start();
-                        HttpClientForBouyomiChan.Instance.SendToBouyomiChan(Settings.AsString("Message.Connecting"));
+                        HttpClientForReadOut.Instance?.ReadOut(Settings.AsString("Message.Connecting"));
                         isValid = true;
                         _listener.Stop();
                         break;

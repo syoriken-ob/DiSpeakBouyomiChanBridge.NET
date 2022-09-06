@@ -148,7 +148,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl
                 if (!string.IsNullOrEmpty(ExecutionComment))
                 {
                     Log.Logger.Info($"{CommandTitle} - {ExecutionComment}");
-                    HttpClientForBouyomiChan.Instance.SendToBouyomiChan(ExecutionComment);
+                    HttpClientForReadOut.Instance?.ReadOut(ExecutionComment);
                 }
 
                 p.ErrorDataReceived += ErrorDataReceivedHandler;
@@ -184,19 +184,19 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl
 
                 if (!string.IsNullOrEmpty(CompleteComment))
                 {
-                    HttpClientForBouyomiChan.Instance.SendToBouyomiChan(CompleteComment);
+                    HttpClientForReadOut.Instance?.ReadOut(CompleteComment);
                 }
                 ExecuteProcess = null;
             }
             catch (InvalidOperationException e)
             {
                 Log.Logger.Info($"\"{CommandTitle}\" Command has been Killed.", e);
-                HttpClientForBouyomiChan.Instance.SendToBouyomiChan(Settings.AsString("Message.ErrorOccurrence"));
+                HttpClientForReadOut.Instance?.ReadOut(Settings.AsString("Message.ErrorOccurrence"));
             }
             catch (Exception e)
             {
                 Log.Logger.Error($"Couldn't run \"{CommandTitle}\" Command", e);
-                HttpClientForBouyomiChan.Instance.SendToBouyomiChan(Settings.AsString("Message.ErrorOccurrence"));
+                HttpClientForReadOut.Instance?.ReadOut(Settings.AsString("Message.ErrorOccurrence"));
             }
         }
 

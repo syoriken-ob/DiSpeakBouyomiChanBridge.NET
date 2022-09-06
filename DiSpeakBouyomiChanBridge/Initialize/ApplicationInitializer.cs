@@ -9,6 +9,7 @@ using net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Handle.Impl;
 using net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl.Factory;
 using net.boilingwater.DiSpeakBouyomiChanBridge.external.DiscordClient;
 using net.boilingwater.DiSpeakBouyomiChanBridge.Http;
+using net.boilingwater.DiSpeakBouyomiChanBridge.Http.Impl;
 using net.boilingwater.DiSpeakBouyomiChanBridge.InternalDiscordClient;
 
 namespace net.boilingwater.DiSpeakBouyomiChanBridge
@@ -25,10 +26,11 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge
             Log.Logger.Info("アプリケーションの初期化処理を開始します。");
             SettingHolder.Initialize();
             CommandInitialize();
+            ReadOutServiceInitialize();
 
             if (Settings.AsBoolean("Use.InternalDiscordClient"))
             {
-                HttpClientForBouyomiChan.Instance.SendToBouyomiChan(Settings.AsString("Message.TryLoginToDiscord"));
+                HttpClientForReadOut.Instance?.ReadOut(Settings.AsString("Message.TryLoginToDiscord"));
 
                 _client = new();
                 _client.InitializeAsync().GetAwaiter().GetResult();
@@ -61,7 +63,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge
                 }
 
                 CommandHandlingService.Initialize(new InternalDiscordClientCommandHandler());
-                HttpClientForBouyomiChan.Instance.SendToBouyomiChan(Settings.AsString("Message.SuccessLoginToDiscord"));
+                HttpClientForReadOut.Instance?.ReadOut(Settings.AsString("Message.SuccessLoginToDiscord"));
             }
             else
             {
@@ -69,9 +71,9 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge
                 HttpServerForDiSpeak.Instance.Initialize();
             }
 
-            HttpClientForBouyomiChan.Instance.SendToBouyomiChan(Settings.AsString("Message.FinishInitialize"));
+            HttpClientForReadOut.Instance?.ReadOut(Settings.AsString("Message.FinishInitialize"));
             Log.Logger.Info("アプリケーションの初期化処理が完了しました。");
-            HttpClientForBouyomiChan.Instance.SendToBouyomiChan(Settings.AsString("Message.Welcome"));
+            HttpClientForReadOut.Instance?.ReadOut(Settings.AsString("Message.Welcome"));
         }
 
         /// <summary>
@@ -81,6 +83,21 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge
         {
             CommandFactory.Factory.Initialize();
             SystemCommandFactory.Factory.Initialize();
+        }
+
+        /// <summary>
+        /// 読み上げサービスを初期化します
+        /// </summary>
+        internal static void ReadOutServiceInitialize()
+        {
+            if (Settings.AsBoolean("Use.VoiceVox"))
+            {
+                HttpClientForReadOut.Initialize<HttpClientForVoiceVox>();
+            }
+            else
+            {
+                HttpClientForReadOut.Initialize<HttpClientForBouyomiChan>();
+            }
         }
 
         /// <summary>

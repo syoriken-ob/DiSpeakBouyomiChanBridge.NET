@@ -25,7 +25,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl
         /// </summary>
         public override void Execute()
         {
-            HttpClientForBouyomiChan.Instance.SendToBouyomiChan(Settings.AsString("Message.ReloadConfig"));
+            HttpClientForReadOut.Instance?.ReadOut(Settings.AsString("Message.ReloadConfig"));
             Log.Logger.Info("Reload SystemConfig...");
             ApplicationInitializer.CommandInitialize();
             SettingHolder.Initialize();
@@ -42,7 +42,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl
         /// </summary>
         public override void Execute()
         {
-            HttpClientForBouyomiChan.Instance.SendToBouyomiChan(Settings.AsString("Message.DeleteAllExecutionQueues"));
+            HttpClientForReadOut.Instance?.ReadOut(Settings.AsString("Message.DeleteAllExecutionQueues"));
             Log.Logger.Info("Shutdown CommandThreads...");
             CommandExecuteManager.Instance.ShutdownThreads();
         }
@@ -59,10 +59,10 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl
         public override void Execute()
         {
             var commands = CommandExecuteManager.Instance.GetCommandsInQueue();
-            HttpClientForBouyomiChan.Instance.SendToBouyomiChan(string.Format(Settings.AsString("Message.CommandsCount"), commands.Count));
+            HttpClientForReadOut.Instance?.ReadOut(string.Format(Settings.AsString("Message.CommandsCount"), commands.Count));
             for (var i = 0; i < commands.Count; i++)
             {
-                HttpClientForBouyomiChan.Instance.SendToBouyomiChan(
+                HttpClientForReadOut.Instance?.ReadOut(
                     string.Format(
                         Settings.AsString("Message.CommandDetail"),
                         i,

@@ -44,7 +44,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Handle
             DiscordReceivedMessageService.ReplaceCommonReceivedInfoAfter(ref message);
 
             //棒読みちゃんに送信
-            HttpClientForBouyomiChan.Instance.SendToBouyomiChan(message);
+            HttpClientForReadOut.Instance?.ReadOut(message);
         }
     }
 }

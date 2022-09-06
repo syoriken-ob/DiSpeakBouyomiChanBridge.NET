@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "net.boilingwater.Applicatio
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{38F94AA7-0023-46E4-9F98-E82056DB0923}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "net.boilingwater.DiSpeakBouyomiChanBridge.external.AudioPlay", "net.boilingwater.DiSpeakBouyomiChanBridge.external.AudioPlay\net.boilingwater.DiSpeakBouyomiChanBridge.external.AudioPlay.csproj", "{EA03E293-2CAF-436F-8765-C4CBF99300EC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,10 @@ Global
 		{91A54929-3B85-421D-AA61-61624A8E6911}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{91A54929-3B85-421D-AA61-61624A8E6911}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{91A54929-3B85-421D-AA61-61624A8E6911}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA03E293-2CAF-436F-8765-C4CBF99300EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA03E293-2CAF-436F-8765-C4CBF99300EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA03E293-2CAF-436F-8765-C4CBF99300EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA03E293-2CAF-436F-8765-C4CBF99300EC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
