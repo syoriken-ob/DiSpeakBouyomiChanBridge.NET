@@ -90,6 +90,10 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge
         {
             if (Settings.AsBoolean("Use.InternalDiscordClient"))
             {
+                if (_client == null)
+                {
+                    throw new InvalidOperationException("先にアプリケーションの初期化処理を行ってください。");
+                }
                 _client.StartAsync(Settings.Get("DiscordToken")).GetAwaiter().GetResult();
             }
             else
