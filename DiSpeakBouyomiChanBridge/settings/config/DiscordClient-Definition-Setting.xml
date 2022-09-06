@@ -49,7 +49,7 @@
   <Item key="ReplaceKey.System.Mention.Here"               value="@here"/>
   <Item key="ReplaceKey.System.Mention.ChannelId"          value="&lt;#{CHANNEL_ID}&gt;"/>
   <Item key="ReplaceKey.System.Mention.RoleId"             value="&lt;@&amp;{ROLE_ID}&gt;"/>
-  <Item key="ReplaceKey.System.Mention.UserId"             value="&lt;@!{USER_ID}&gt;"/>
+  <Item key="ReplaceKey.System.Mention.UserId"             value="&lt;@{USER_ID}&gt;"/>
 
   <!--
       ############################
