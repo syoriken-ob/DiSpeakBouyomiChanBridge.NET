@@ -12,7 +12,7 @@
   -->
 
   <!-- Discord.Netのログ出力をリダイレクトする(True:する,False:しない) -->
-  <Item key="Use.RedirectLogDiscord.Net"    value="False" />
+  <Item key="Use.RedirectLogDiscord.Net"       value="False" />
 
   <!-- サーバーのテキストチャンネルの読み上げ機能を利用する(True:利用する,False:利用しない) -->
   <Item key="Use.ReadOut.GuildChannel.Text"    value="True" />

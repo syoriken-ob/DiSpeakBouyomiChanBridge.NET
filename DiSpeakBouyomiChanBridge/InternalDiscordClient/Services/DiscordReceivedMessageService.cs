@@ -262,7 +262,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.InternalDiscordClient.Servic
                 context.Message.MentionedUserIds.ForEach(userId =>
                     {
                         var user = replaceKey.Replace(userKey, CastUtil.ToString(userId));
-                        var guildUser = context.Guild.GetUserAsync(userId).GetAwaiter().GetResult();
+                        var guildUser = context.Guild.GetUserAsync(userId, Discord.CacheMode.AllowDownload, Discord.RequestOptions.Default).GetAwaiter().GetResult();
 
                         string? name = null;
                         if (guildUser.Nickname != null)
