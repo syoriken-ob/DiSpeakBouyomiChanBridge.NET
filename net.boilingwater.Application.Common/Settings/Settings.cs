@@ -13,6 +13,7 @@ namespace net.boilingwater.Application.Common.Settings
     public class Settings
     {
         private static readonly Dictionary<string, List<string>> _listCache = new();
+        private static readonly SimpleDic<MultiDic> _dicCache = new();
 
         /// <summary>
         /// <paramref name="key"/>に紐づくアプリケーション設定値を取得します
@@ -81,6 +82,46 @@ namespace net.boilingwater.Application.Common.Settings
             _listCache.Add($"{key}#{splitKey}", list);
 
             return list;
+        }
+
+        /// <summary>
+        /// <paramref name="key"/>に紐づくアプリケーション設定値を<paramref name="listSplitKey"/>と<paramref name="pairSplitKey"/>で分割した<see cref="MultiDic"/>を取得します
+        /// </summary>
+        /// <param name="key">設定キー</param>
+        /// <param name="listSplitKey">分割するキー  ※初期値は,（カンマ）</param>
+        /// <param name="pairSplitKey">さらに分割するキー  ※初期値は;（セミコロン）</param>
+        /// <returns>アプリケーション設定値を<paramref name="listSplitKey"/>と<paramref name="pairSplitKey"/>で分割して取得</returns>
+        /// <remarks>一度分割した設定値は<paramref name="key"/>と<paramref name="listSplitKey"/>と<paramref name="pairSplitKey"/>の組み合わせでキャッシュされます</remarks>
+        public static MultiDic AsMultiDic(string key, string listSplitKey = ",", string pairSplitKey = ";")
+        {
+            if (_dicCache.ContainsKey($"{key}#{listSplitKey}#{pairSplitKey}"))
+            {
+                return _dicCache[$"{key}#{listSplitKey}#{pairSplitKey}"];
+            }
+
+            var dic = new MultiDic();
+            try
+            {
+                var original = Get(key).Split(listSplitKey)
+                    .Select(keyValue =>
+                    {
+                        var split = keyValue.Split(pairSplitKey);
+                        if (split.Length > 1)
+                        {
+                            return new KeyValuePair<string, object>(split[0], split[1]);
+                        }
+                        else
+                        {
+                            return new KeyValuePair<string, object>(split[0], "");
+                        }
+                    });
+                dic = new MultiDic(original);
+            }
+            catch (Exception) { }
+
+            _dicCache.Add($"{key}#{listSplitKey}#{pairSplitKey}", dic);
+
+            return dic;
         }
 
         /// <summary>

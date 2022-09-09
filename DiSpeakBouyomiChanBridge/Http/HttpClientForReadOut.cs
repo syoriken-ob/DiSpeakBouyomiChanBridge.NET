@@ -38,9 +38,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http
         /// <param name="text"></param>
         public abstract void ReadOut(string text);
 
-        /// <summary>
-        /// リソースを解放します
-        /// </summary>
+        ///<inheritdoc/>
         public void Dispose()
         {
             client_.Dispose();
@@ -48,7 +46,8 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http
         }
 
         /// <summary>
-        /// 
+        /// 初期化処理
+        /// <para><typeparamref name="T"/>によって読み上げ先が変わります。</para>
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>

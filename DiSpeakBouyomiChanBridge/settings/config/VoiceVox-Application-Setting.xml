@@ -10,12 +10,13 @@
   <Item key="VoiceVox.Application.Host"                       value="localhost" />
   <Item key="VoiceVox.Application.Scheme"                     value="http" />
   <Item key="VoiceVox.Application.Port"                       value="50021" />
-  
-  <Item key="VoiceVox.Speaker"                                value="3" />
+
+  <Item key="VoiceVox.Speaker"                                value="3" /> <!--ずんだもん（ノーマル）-->
 
   <Item key="VoiceVox.Request.AudioQuery.Path"                value="/audio_query" />
   <Item key="VoiceVox.Request.AudioQuery.ParamName.Text"      value="text" />
   <Item key="VoiceVox.Request.AudioQuery.ParamName.Speaker"   value="speaker" />
+  <Item key="VoiceVox.Request.AudioQuery.ReplaceJsonParam"    value="outputSamplingRate;48000/int,outputStereo;true/bool,speedScale;1.1/double,intonationScale;1.4/double,volumeScale;1.5/double" />
 
   <Item key="VoiceVox.Request.Synthesis.Path"                 value="/synthesis" />
   <Item key="VoiceVox.Request.Synthesis.ParamName.Speaker"    value="speaker" />

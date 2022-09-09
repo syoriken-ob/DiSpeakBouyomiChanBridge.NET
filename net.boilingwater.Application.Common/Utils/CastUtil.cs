@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 
 using Microsoft.VisualBasic;
@@ -171,7 +172,11 @@ namespace net.boilingwater.Application.Common.Utils
                 return obj.ToString();
             }
 
-            return JsonSerializer.Serialize(obj);
+            return JsonSerializer.Serialize(obj, new JsonSerializerOptions()
+            {
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                ReadCommentHandling = JsonCommentHandling.Skip
+            });
         }
 
         /// <summary>
@@ -202,6 +207,28 @@ namespace net.boilingwater.Application.Common.Utils
             catch (Exception) { }
 
             return default(T);
+        }
+
+        /// <summary>
+        /// JSON文字列を<see cref="MultiDic"/>型にデシリアライズして取得します。
+        /// </summary>
+        /// <param name="json">JSON文字列</param>
+        /// <returns></returns>
+        public static MultiDic JsonToMultiDic(string json)
+        {
+            if (string.IsNullOrEmpty(json) || string.IsNullOrWhiteSpace(json))
+            {
+                return new MultiDic();
+            }
+
+            try
+            {
+                return JsonSerializer.Deserialize<MultiDic>(json);
+            }
+            catch
+            {
+                return new MultiDic();
+            }
         }
     }
 }
