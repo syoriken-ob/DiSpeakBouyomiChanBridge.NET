@@ -1,15 +1,20 @@
 ﻿using System;
+using System.Data;
 using System.Linq;
+using System.Reflection;
 
+using net.boilingwater.Application.Common.Extensions;
+using net.boilingwater.Application.Common.Extentions;
 using net.boilingwater.Application.Common.Logging;
 using net.boilingwater.Application.Common.Settings;
+using net.boilingwater.Application.Common.SQLite;
 using net.boilingwater.Application.Common.Utils;
-using net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem;
-using net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Handle.Impl;
+using net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.HttpClients;
+using net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.HttpClients.Impl;
 using net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl.Factory;
+using net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Service;
 using net.boilingwater.DiSpeakBouyomiChanBridge.external.DiscordClient;
 using net.boilingwater.DiSpeakBouyomiChanBridge.Http;
-using net.boilingwater.DiSpeakBouyomiChanBridge.Http.Impl;
 using net.boilingwater.DiSpeakBouyomiChanBridge.InternalDiscordClient;
 
 namespace net.boilingwater.DiSpeakBouyomiChanBridge
@@ -17,6 +22,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge
     internal class ApplicationInitializer
     {
         private static DiscordDotNetClient? _client;
+
         /// <summary>
         /// システムの初期化を行います
         /// </summary>
@@ -24,10 +30,64 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge
         internal static void Initialize()
         {
             Log.Logger.Info("アプリケーションの初期化処理を開始します。");
-            SettingHolder.Initialize();
+
+            Settings.Initialize();
+            DBInitialize();
             CommandInitialize();
             ReadOutServiceInitialize();
+            HttpServerInitialize();
+            CommandHandlingService.Initialize();
 
+            HttpClientForReadOut.Instance?.ReadOut(Settings.AsString("Message.FinishInitialize"));
+            Log.Logger.Info("アプリケーションの初期化処理が完了しました。");
+            HttpClientForReadOut.Instance?.ReadOut(Settings.AsString("Message.Welcome"));
+        }
+
+        /// <summary>
+        /// DB処理の初期化を行います
+        /// </summary>
+        private static void DBInitialize()
+        {
+            SQLiteDBDao.CreateDataBase();
+
+            Assembly.GetExecutingAssembly()
+                    .CollectReferencedAssemblies(assemblyName => assemblyName.Name != null && assemblyName.Name.StartsWith("net.boilingwater"))
+                    .ForEach(assembly => assembly?.GetTypes()
+                                                  .Where(t => t.IsSubclassOf(typeof(SQLiteDBDao)) && !t.IsAbstract)
+                                                  .Select(type => (SQLiteDBDao?)Activator.CreateInstance(type))
+                                                  .ForEach(dao => dao?.InitializeTable()));
+        }
+
+        /// <summary>
+        /// コマンドの初期化を行います
+        /// </summary>
+        public static void CommandInitialize()
+        {
+            CommandFactory.Factory.Initialize();
+            SystemCommandFactory.Factory.Initialize();
+        }
+
+        /// <summary>
+        /// 読み上げサービスを初期化します
+        /// </summary>
+        private static void ReadOutServiceInitialize()
+        {
+            if (Settings.AsBoolean("Use.VoiceVox"))
+            {
+                HttpClientForReadOut.Initialize<HttpClientForVoiceVox>();
+            }
+            else
+            {
+                HttpClientForReadOut.Initialize<HttpClientForBouyomiChan>();
+            }
+        }
+
+        /// <summary>
+        /// HttpServerの初期化します
+        /// </summary>
+        /// <exception cref="ApplicationException"></exception>
+        private static void HttpServerInitialize()
+        {
             if (Settings.AsBoolean("Use.InternalDiscordClient"))
             {
                 HttpClientForReadOut.Instance?.ReadOut(Settings.AsString("Message.TryLoginToDiscord"));
@@ -62,41 +122,11 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge
                     _client.UserVoiceStatusUpdated = discordEventHandler.UserVoiceStatusUpdated;
                 }
 
-                CommandHandlingService.Initialize(new InternalDiscordClientCommandHandler());
                 HttpClientForReadOut.Instance?.ReadOut(Settings.AsString("Message.SuccessLoginToDiscord"));
             }
             else
             {
-                CommandHandlingService.Initialize(new DiSpeakCommandHandler());
                 HttpServerForDiSpeak.Instance.Initialize();
-            }
-
-            HttpClientForReadOut.Instance?.ReadOut(Settings.AsString("Message.FinishInitialize"));
-            Log.Logger.Info("アプリケーションの初期化処理が完了しました。");
-            HttpClientForReadOut.Instance?.ReadOut(Settings.AsString("Message.Welcome"));
-        }
-
-        /// <summary>
-        /// コマンドの初期化を行います
-        /// </summary>
-        public static void CommandInitialize()
-        {
-            CommandFactory.Factory.Initialize();
-            SystemCommandFactory.Factory.Initialize();
-        }
-
-        /// <summary>
-        /// 読み上げサービスを初期化します
-        /// </summary>
-        internal static void ReadOutServiceInitialize()
-        {
-            if (Settings.AsBoolean("Use.VoiceVox"))
-            {
-                HttpClientForReadOut.Initialize<HttpClientForVoiceVox>();
-            }
-            else
-            {
-                HttpClientForReadOut.Initialize<HttpClientForBouyomiChan>();
             }
         }
 

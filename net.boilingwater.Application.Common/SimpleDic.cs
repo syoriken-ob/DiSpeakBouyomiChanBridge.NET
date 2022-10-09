@@ -14,17 +14,7 @@ namespace net.boilingwater.Application.Common
         /// <returns></returns>
         public new T this[string key]
         {
-            get
-            {
-                if (TryGetValue(key, out var value))
-                {
-                    return value;
-                }
-                else
-                {
-                    return default(T);
-                }
-            }
+            get => TryGetValue(key, out var value) ? value : default;
             set
             {
                 if (ContainsKey(key))

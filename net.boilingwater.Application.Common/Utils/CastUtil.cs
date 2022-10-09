@@ -46,7 +46,7 @@ namespace net.boilingwater.Application.Common.Utils
 
             if (dec < 0)
             {
-                return default(uint);
+                return default;
             }
 
             return (uint)dec;
@@ -86,7 +86,7 @@ namespace net.boilingwater.Application.Common.Utils
 
             if (dec < 0)
             {
-                return default(ulong);
+                return default;
             }
 
             return (ulong)ToDecimal(obj);
@@ -175,7 +175,7 @@ namespace net.boilingwater.Application.Common.Utils
             return JsonSerializer.Serialize(obj, new JsonSerializerOptions()
             {
                 Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-                ReadCommentHandling = JsonCommentHandling.Skip
+                ReadCommentHandling = JsonCommentHandling.Skip,
             });
         }
 
@@ -206,29 +206,7 @@ namespace net.boilingwater.Application.Common.Utils
             }
             catch (Exception) { }
 
-            return default(T);
-        }
-
-        /// <summary>
-        /// JSON文字列を<see cref="MultiDic"/>型にデシリアライズして取得します。
-        /// </summary>
-        /// <param name="json">JSON文字列</param>
-        /// <returns></returns>
-        public static MultiDic JsonToMultiDic(string json)
-        {
-            if (string.IsNullOrEmpty(json) || string.IsNullOrWhiteSpace(json))
-            {
-                return new MultiDic();
-            }
-
-            try
-            {
-                return JsonSerializer.Deserialize<MultiDic>(json);
-            }
-            catch
-            {
-                return new MultiDic();
-            }
+            return default;
         }
     }
 }

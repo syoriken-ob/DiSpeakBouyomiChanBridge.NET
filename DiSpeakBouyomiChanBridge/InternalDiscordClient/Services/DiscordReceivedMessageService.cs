@@ -155,51 +155,16 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.InternalDiscordClient.Servic
 
         internal static void ReplaceCommonReceivedInfoAfter(ref string message)
         {
-            if (!Settings.AsBoolean("Use.InternalDiscordClient"))
-            {
-                return;
-            }
-
-            if (Settings.AsBoolean("Use.ReadOutReplace.URLShortener"))
-            {
-                message = Regex.Replace(
-                    message,
-                    Settings.AsString("RegularExpression.URLShortener"),
-                    Settings.AsString("Format.Replace.URLShortener")
-                );
-            }
-
             if (Settings.AsBoolean("Use.ReadOutReplace.Spoiler"))
             {
                 message = Regex.Replace(
                     message,
                     Settings.AsString("RegularExpression.Spoiler"),
-                    Settings.AsString("Format.Replace.Spoiler")
+                    Settings.AsString("Format.Replace.Spoiler"),
+                    RegexOptions.Singleline
                 );
             }
-
-            if (Settings.AsBoolean("Use.ReadOutReplace.Emoji"))
-            {
-                message = ReplaceEmojiSettings(message);
-            }
         }
-
-        private static string ReplaceEmojiSettings(string input) =>
-            //var emojiReplaceSettings = (NameValueCollection)ConfigurationManager.GetSection("EmojiReplaceSettings");
-            //if (emojiReplaceSettings == null)
-            //{
-            //    return input;
-            //}
-
-            //emojiReplaceSettings.AllKeys.ForEach(key =>
-            //    {
-            //        if (key != null)
-            //        {
-            //            input = input.Replace(key, emojiReplaceSettings[key]);
-            //        }
-            //    }
-            //);
-            input;
 
         private static string ReplaceMention(string input, CommandContext context)
         {

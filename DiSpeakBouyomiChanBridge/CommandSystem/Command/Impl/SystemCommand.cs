@@ -1,7 +1,7 @@
 ﻿using net.boilingwater.Application.Common.Logging;
 using net.boilingwater.Application.Common.Settings;
+using net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.HttpClients;
 using net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.PipeLine;
-using net.boilingwater.DiSpeakBouyomiChanBridge.Http;
 
 namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem
 {
@@ -25,10 +25,10 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl
         /// </summary>
         public override void Execute()
         {
-            HttpClientForReadOut.Instance?.ReadOut(Settings.AsString("Message.ReloadConfig"));
-            Log.Logger.Info("Reload SystemConfig...");
+            Settings.Initialize();
             ApplicationInitializer.CommandInitialize();
-            SettingHolder.Initialize();
+            Log.Logger.Info("Reload SystemConfig...");
+            HttpClientForReadOut.Instance?.ReadOut(Settings.AsString("Message.ReloadConfig"));
         }
     }
 
@@ -42,9 +42,9 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl
         /// </summary>
         public override void Execute()
         {
-            HttpClientForReadOut.Instance?.ReadOut(Settings.AsString("Message.DeleteAllExecutionQueues"));
-            Log.Logger.Info("Shutdown CommandThreads...");
             CommandExecuteManager.Instance.ShutdownThreads();
+            Log.Logger.Info("Shutdown CommandThreads...");
+            HttpClientForReadOut.Instance?.ReadOut(Settings.AsString("Message.DeleteAllExecutionQueues"));
         }
     }
 

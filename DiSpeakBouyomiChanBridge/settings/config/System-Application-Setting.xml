@@ -9,17 +9,20 @@
   <Item key="BouyomiChanPort"                value="50080" />
   <Item key="BouyomiChanHost"                value="localhost" />
 
-  <Item key="RetryCount"                     value=""/>
-  <Item key="RetrySleepTime.Milliseconds"    value="5000"/>
+  <Item key="RetryCount"                     value="5" />
+  <Item key="RetrySleepTime.Milliseconds"    value="5000" />
 
-  <Item key="ShellPath"                      value="C:\Windows\System32\cmd.exe"/>
-  <Item key="ShellOption"                    value="/C"/>
+  <Item key="ShellPath"                      value="C:\Windows\System32\cmd.exe" />
+  <Item key="ShellOption"                    value="/C" />
 
-  <Item key="CommandFile"                    value="command.json" />
-  <Item key="SystemCommandFile"              value="system-command.json" />
+  <Item key="CommandFile"                    value="command.yaml" />
+  <Item key="SystemCommandFile"              value="system-command.yaml" />
+
+  <!-- SQLiteのDBファイルパス -->
+  <Item key="SQLite3.DBFilePath"             value="./bridge.db" />
 
   <!-- DiSpeakを利用せず、内部簡易Discordクライアント機能を利用する(True:利用する,False:利用しない) -->
-  <!-- 利用する場合DiscordSettingsセクションの設定が必要です -->
+  <!-- 利用する場合 DiscordClient-XXX-Setting.xmlの設定が必要です -->
   <Item key="Use.InternalDiscordClient"      value="True" />
 
   <!-- 棒読みちゃんを利用せず、VOICEVOXで読み上げする(True:利用する,False:利用しない) -->

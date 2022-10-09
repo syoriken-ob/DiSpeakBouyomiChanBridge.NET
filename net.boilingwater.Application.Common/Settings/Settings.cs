@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 
+using net.boilingwater.Application.Common.Logging;
 using net.boilingwater.Application.Common.Utils;
 
 namespace net.boilingwater.Application.Common.Settings
@@ -14,13 +15,24 @@ namespace net.boilingwater.Application.Common.Settings
     {
         private static readonly Dictionary<string, List<string>> _listCache = new();
         private static readonly SimpleDic<MultiDic> _dicCache = new();
+        private static SettingHolder SettingHolderInstance { get; set; }
+
+        /// <summary>
+        /// アプリケーション設定値を読み込みます。
+        /// </summary>
+        public static void Initialize()
+        {
+            SettingHolderInstance = new SettingHolder();
+            _dicCache.Clear();
+            _listCache.Clear();
+        }
 
         /// <summary>
         /// <paramref name="key"/>に紐づくアプリケーション設定値を取得します
         /// </summary>
         /// <param name="key">設定キー</param>
         /// <returns>アプリケーション設定値</returns>
-        public static string Get(string key) => SettingHolder.Instance[key];
+        public static string Get(string key) => SettingHolderInstance[key];
 
         /// <summary>
         /// <see cref="string"/>型で<paramref name="key"/>に紐づくアプリケーション設定値を取得します<br/>
@@ -102,22 +114,20 @@ namespace net.boilingwater.Application.Common.Settings
             var dic = new MultiDic();
             try
             {
-                var original = Get(key).Split(listSplitKey)
-                    .Select(keyValue =>
+                foreach (var keyValue in Get(key).Split(listSplitKey))
+                {
+                    var split = keyValue.Split(pairSplitKey);
+                    if (!split.Any() || split[0] == null || dic.ContainsKey(split[0]))
                     {
-                        var split = keyValue.Split(pairSplitKey);
-                        if (split.Length > 1)
-                        {
-                            return new KeyValuePair<string, object>(split[0], split[1]);
-                        }
-                        else
-                        {
-                            return new KeyValuePair<string, object>(split[0], "");
-                        }
-                    });
-                dic = new MultiDic(original);
+                        continue;
+                    }
+                    dic[split[0].Trim()] = split.Length > 1 ? split[1].Trim() : (object)"";
+                }
             }
-            catch (Exception) { }
+            catch (Exception ex)
+            {
+                Log.Logger.Warn(ex);
+            }
 
             _dicCache.Add($"{key}#{listSplitKey}#{pairSplitKey}", dic);
 

@@ -1,36 +1,77 @@
-﻿using System;
-using System.IO;
-using System.Linq;
+﻿using System.Collections.Concurrent;
 using System.Net;
-using System.Net.Http;
 using System.Text;
-using System.Threading;
+using System.Web;
 
 using net.boilingwater.Application.Common;
+using net.boilingwater.Application.Common.Extensions;
 using net.boilingwater.Application.Common.Logging;
 using net.boilingwater.Application.Common.Settings;
 using net.boilingwater.Application.Common.Utils;
-using net.boilingwater.DiSpeakBouyomiChanBridge.Voice;
+using net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadOut.VoiceExecutor;
 
-namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http.Impl
+namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.HttpClients.Impl
 {
     /// <summary>
     /// VOICEVOX用の読み上げクライアント
     /// </summary>
     public class HttpClientForVoiceVox : HttpClientForReadOut
     {
+        private readonly Thread _thread;
+        private readonly BlockingCollection<string> _receivedMessages = new();
+
+        public HttpClientForVoiceVox()
+        {
+            _thread = new Thread(() =>
+            {
+                foreach (var voiceStreamByteArr in _receivedMessages.GetConsumingEnumerable())
+                {
+                    try
+                    {
+                        ExecuteReadOut(voiceStreamByteArr);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Logger.Error(ex);
+                    }
+                }
+            })
+            {
+                IsBackground = true
+            };
+            _thread.Start();
+        }
+
         /// <summary>
         /// メッセージを読み上げます
+        /// <para>読み上げ処理に時間がかかるため、受付以降のVOICEVOXとの通信・メッセージ生成処理・再生処理は別スレッドで実行します。</para>
         /// </summary>
-        /// <param name="text"></param>
+        /// <param name="text">読み上げたいテキスト</param>
         public override void ReadOut(string text)
         {
             var message = text.Trim();
-            if (string.IsNullOrEmpty(message))
+            if (message.HasValue())
             {
-                return;
+                _receivedMessages.Add(message);
             }
+        }
 
+        /// <summary>
+        /// 読み上げメッセージの事前処理を行います。
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        private string PrepareReadOutMessage(string message)
+        {
+            return message;
+        }
+
+        /// <summary>
+        /// VOICEVOXと通信して処理
+        /// </summary>
+        /// <param name="message">VOICEVOXに読み上げるメッセージ</param>
+        private void ExecuteReadOut(string message)
+        {
             var retryCount = 0L;
             while (true)
             {
@@ -70,7 +111,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http.Impl
                 }
 
                 Log.Logger.Debug($"ReadOut Message: {message}");
-                VoiceVoxReadOutExecutor.Instance.AddQueue(synthesisResult.GetAsObject<byte[]>("voice"));
+                VoiceVoxReadOutAudioPlayExecutor.Instance.AddQueue(synthesisResult.GetAsObject<byte[]>("voice"));
                 return;
             }
         }
@@ -92,10 +133,8 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http.Impl
                     {
                         return result;
                     }
-                    using (var reader = new StreamReader(audioQueryResponse.Content.ReadAsStream(), Encoding.UTF8))
-                    {
-                        result["audioQuery"] = CastUtil.JsonToMultiDic(reader.ReadToEnd());
-                    }
+                    using var reader = new StreamReader(audioQueryResponse.Content.ReadAsStream(), Encoding.UTF8);
+                    result["audioQuery"] = SerializeUtil.JsonToMultiDic(reader.ReadToEnd());
                 }
                 return result;
             }
@@ -108,13 +147,9 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http.Impl
                 }
                 else
                 {
-                    using (var error = ex.Response.GetResponseStream())
-                    {
-                        using (var streamReader = new StreamReader(error))
-                        {
-                            Log.Logger.Error(streamReader.ReadToEnd(), ex);
-                        }
-                    }
+                    using var error = ex.Response.GetResponseStream();
+                    using var streamReader = new StreamReader(error);
+                    Log.Logger.Error(streamReader.ReadToEnd(), ex);
                 }
             }
             catch (Exception ex)
@@ -158,13 +193,9 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http.Impl
                 }
                 else
                 {
-                    using (var error = ex.Response.GetResponseStream())
-                    {
-                        using (var streamReader = new StreamReader(error))
-                        {
-                            Log.Logger.Error(streamReader.ReadToEnd(), ex);
-                        }
-                    }
+                    using var error = ex.Response.GetResponseStream();
+                    using var streamReader = new StreamReader(error);
+                    Log.Logger.Error(streamReader.ReadToEnd(), ex);
                 }
             }
             catch (Exception ex)
@@ -182,7 +213,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http.Impl
         /// <returns></returns>
         private static HttpRequestMessage CreateVoiceVoxAudioQueryHttpRequest(string text)
         {
-            var query = System.Web.HttpUtility.ParseQueryString("");
+            var query = HttpUtility.ParseQueryString("");
             query.Add(Settings.AsString("VoiceVox.Request.AudioQuery.ParamName.Text"), text);
             query.Add(Settings.AsString("VoiceVox.Request.AudioQuery.ParamName.Speaker"), Settings.AsString("VoiceVox.Speaker"));
 
@@ -251,12 +282,15 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http.Impl
                     case "int":
                         audioQueryDic[paramKey] = CastUtil.ToInteger(splits[0]);
                         break;
+
                     case "double":
                         audioQueryDic[paramKey] = CastUtil.ToDouble(splits[0]);
                         break;
+
                     case "bool":
                         audioQueryDic[paramKey] = CastUtil.ToBoolean(splits[0]);
                         break;
+
                     default:
                         audioQueryDic[paramKey] = splits[0];
                         break;
@@ -271,7 +305,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http.Impl
         /// <returns></returns>
         private static bool WaitRetry(long retryCount)
         {
-            if (string.IsNullOrEmpty(Settings.Get("RetryCount")) || retryCount < Settings.AsLong("RetryCount"))
+            if (Settings.Get("RetryCount").HasValue() || retryCount < Settings.AsLong("RetryCount"))
             {
                 Log.Logger.DebugFormat("Retry Connect:{0}/{1}", retryCount, Settings.AsLong("RetryCount"));
                 Thread.Sleep(Settings.AsInteger("RetrySleepTime.Milliseconds"));

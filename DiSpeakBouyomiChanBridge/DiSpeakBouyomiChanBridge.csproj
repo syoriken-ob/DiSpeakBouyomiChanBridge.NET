@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>net.boilingwater.DiSpeakBouyomiChanBridge</RootNamespace>
     <AssemblyName>net.boilingwater.DiSpeakBouyomiChanBridge</AssemblyName>
     <StartupObject>net.boilingwater.DiSpeakBouyomiChanBridge.DiSpeakBoouyomiChanBridge</StartupObject>
@@ -17,22 +17,30 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BusinessLogic\MessageReplacer\net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.MessageReplacer.csproj" />
+    <ProjectReference Include="..\BusinessLogic\VoiceReadOut\net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadOut.csproj" />
     <ProjectReference Include="..\net.boilingwater.Application.Common\net.boilingwater.Application.Common.csproj" />
-    <ProjectReference Include="..\net.boilingwater.DiSpeakBouyomiChanBridge.external.AudioPlay\net.boilingwater.DiSpeakBouyomiChanBridge.external.AudioPlay.csproj" />
-    <ProjectReference Include="..\net.boilingwater.DiSpeakBouyomiChanBridge.external.DiscordClient\net.boilingwater.DiSpeakBouyomiChanBridge.external.DiscordClient.csproj" />
+    <ProjectReference Include="..\external\net.boilingwater.DiSpeakBouyomiChanBridge.external.AudioPlay\net.boilingwater.DiSpeakBouyomiChanBridge.external.AudioPlay.csproj" />
+    <ProjectReference Include="..\external\net.boilingwater.DiSpeakBouyomiChanBridge.external.DiscordClient\net.boilingwater.DiSpeakBouyomiChanBridge.external.DiscordClient.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <None Update="App.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="settings\command\command.json">
+    <None Update="settings\command\command.yaml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="settings\config\DiscordClient-Application-Setting.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="settings\config\DiscordClient-Definition-Setting.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="settings\config\VoiceReadOut-Application-Setting.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="settings\config\VoiceReadOut-Definition-Setting.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="settings\config\VoiceVox-Application-Setting.xml">
@@ -47,7 +55,7 @@
     <None Update="settings\config\System-Message-Setting.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="settings\command\system-command.json">
+    <None Update="settings\command\system-command.yaml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

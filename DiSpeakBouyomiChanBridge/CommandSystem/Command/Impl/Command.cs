@@ -7,7 +7,7 @@ using net.boilingwater.Application.Common.Extentions;
 using net.boilingwater.Application.Common.Logging;
 using net.boilingwater.Application.Common.Settings;
 using net.boilingwater.Application.Common.Utils;
-using net.boilingwater.DiSpeakBouyomiChanBridge.Http;
+using net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.HttpClients;
 
 namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl
 {

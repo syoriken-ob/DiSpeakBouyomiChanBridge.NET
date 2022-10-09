@@ -17,46 +17,43 @@
   <Item key="Format.DiscordMessage.MoveVoiceChannleMessage"              value="{NICKNAME}が{SOURCE_CHANNEL}から{TARGET_CHANNEL}に移動しました。" />
   <Item key="Format.DiscordMessage.StartStreamingVoiceChannleMessage"    value="{NICKNAME}が配信を開始しました。" />
   <Item key="Format.DiscordMessage.EndStreamingVoiceChannleMessage"      value="{NICKNAME}が配信を終了しました。" />
-    
-  <Item key="Format.Replace.URLShortener"                                value="URL省略"/>
-  <Item key="Format.Replace.Spoiler"                                     value=" 禁則事項です！ "/>
-  <Item key="Format.Replace.Mention.EveryOne"                            value="チャンネル全員へ "/>
-  <Item key="Format.Replace.Mention.Here"                                value="オンラインのチャンネル全員へ "/>
-  <Item key="Format.Replace.Mention.NickName"                            value="{NICKNAME}へ "/>
-  <Item key="Format.Replace.Mention.Channel"                             value="{CHANNEL}チャンネルへ "/>
-  <Item key="Format.Replace.Mention.Role"                                value="{ROLE}へ "/>
+
+  <Item key="Format.Replace.Spoiler"                                     value=" 禁則事項です！ " />
+  <Item key="Format.Replace.Mention.EveryOne"                            value="チャンネル全員へ " />
+  <Item key="Format.Replace.Mention.Here"                                value="オンラインのチャンネル全員へ " />
+  <Item key="Format.Replace.Mention.NickName"                            value="{NICKNAME}へ " />
+  <Item key="Format.Replace.Mention.Channel"                             value="{CHANNEL}チャンネルへ " />
+  <Item key="Format.Replace.Mention.Role"                                value="{ROLE}へ " />
 
   <!--
       ############################################
       ## 各種読み上げメッセージ用置換文字列定義 ##
       ############################################
   -->
-  <Item key="ReplaceKey.DiscordMessage.Guild"              value="{GUILD}"/>
-  <Item key="ReplaceKey.DiscordMessage.Channel"            value="{CHANNEL}"/>
-  <Item key="ReplaceKey.DiscordMessage.ChannelId"          value="{CHANNEL_ID}"/>
-  <Item key="ReplaceKey.DiscordMessage.Role"               value="{ROLE}"/>
-  <Item key="ReplaceKey.DiscordMessage.RoleId"             value="{ROLE_ID}"/>
-  <Item key="ReplaceKey.DiscordMessage.UserId"             value="{USER_ID}"/>
-  <Item key="ReplaceKey.DiscordMessage.UserName"           value="{USER_NAME}"/>
-  <Item key="ReplaceKey.DiscordMessage.NickName"           value="{NICKNAME}"/>
-  <Item key="ReplaceKey.DiscordMessage.Message"            value="{MESSAGE}"/>
-  <Item key="ReplaceKey.DiscordMessage.FileCount"          value="{FILE_COUNT}"/>
-  <Item key="ReplaceKey.DiscordMessage.FileNames"          value="{FILE_NAMES}"/>
-  <Item key="ReplaceKey.DiscordMessage.SourceChannel"      value="{SOURCE_CHANNEL}"/>
-  <Item key="ReplaceKey.DiscordMessage.TargetChannel"      value="{TARGET_CHANNEL}"/>
+  <Item key="ReplaceKey.DiscordMessage.Guild"              value="{GUILD}" />
+  <Item key="ReplaceKey.DiscordMessage.Channel"            value="{CHANNEL}" />
+  <Item key="ReplaceKey.DiscordMessage.ChannelId"          value="{CHANNEL_ID}" />
+  <Item key="ReplaceKey.DiscordMessage.Role"               value="{ROLE}" />
+  <Item key="ReplaceKey.DiscordMessage.RoleId"             value="{ROLE_ID}" />
+  <Item key="ReplaceKey.DiscordMessage.UserId"             value="{USER_ID}" />
+  <Item key="ReplaceKey.DiscordMessage.UserName"           value="{USER_NAME}" />
+  <Item key="ReplaceKey.DiscordMessage.NickName"           value="{NICKNAME}" />
+  <Item key="ReplaceKey.DiscordMessage.Message"            value="{MESSAGE}" />
+  <Item key="ReplaceKey.DiscordMessage.FileCount"          value="{FILE_COUNT}" />
+  <Item key="ReplaceKey.DiscordMessage.FileNames"          value="{FILE_NAMES}" />
+  <Item key="ReplaceKey.DiscordMessage.SourceChannel"      value="{SOURCE_CHANNEL}" />
+  <Item key="ReplaceKey.DiscordMessage.TargetChannel"      value="{TARGET_CHANNEL}" />
 
-  <Item key="ReplaceKey.System.Mention.EveryOne"           value="@everyone"/>
-  <Item key="ReplaceKey.System.Mention.Here"               value="@here"/>
-  <Item key="ReplaceKey.System.Mention.ChannelId"          value="&lt;#{CHANNEL_ID}&gt;"/>
-  <Item key="ReplaceKey.System.Mention.RoleId"             value="&lt;@&amp;{ROLE_ID}&gt;"/>
-  <Item key="ReplaceKey.System.Mention.UserId"             value="&lt;@{USER_ID}&gt;"/>
+  <Item key="ReplaceKey.System.Mention.EveryOne"           value="@everyone" />
+  <Item key="ReplaceKey.System.Mention.Here"               value="@here" />
+  <Item key="ReplaceKey.System.Mention.ChannelId"          value="&lt;#{CHANNEL_ID}&gt;" />
+  <Item key="ReplaceKey.System.Mention.RoleId"             value="&lt;@&amp;{ROLE_ID}&gt;" />
+  <Item key="ReplaceKey.System.Mention.UserId"             value="&lt;@{USER_ID}&gt;" />
 
   <!--
       ############################
       ## 各種検出用正規表現定義 ##
       ############################
   -->
-  <Item key="RegularExpression.URLShortener"         value="https?://[\w!?/+\-_~:;.,*&amp;@#$%()'[\]=]+"/>
-  <Item key="RegularExpression.Spoiler"              value="\|\|.+?\|\|"/>
-
+  <Item key="RegularExpression.Spoiler"              value="\|\|.+?\|\|" />
 </Settings>

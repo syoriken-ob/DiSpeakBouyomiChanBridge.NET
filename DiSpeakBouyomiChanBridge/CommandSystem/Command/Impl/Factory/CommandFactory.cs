@@ -3,8 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.Encodings.Web;
-using System.Text.Json;
 using System.Text.RegularExpressions;
 
 using net.boilingwater.Application.Common;
@@ -130,13 +128,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl.Factory
             SimpleDic<Command>? commandDic = null;
             if (content != null)
             {
-                commandDic = JsonSerializer.Deserialize<SimpleDic<Command>>(content, new JsonSerializerOptions()
-                {
-                    Encoder = JavaScriptEncoder.Default,
-                    AllowTrailingCommas = true,
-                    PropertyNameCaseInsensitive = true,
-                    WriteIndented = true
-                });
+                commandDic = SerializeUtil.DeserializeYaml<SimpleDic<Command>>(content, false);
                 Log.Logger.Debug($"読み込み：{commandFilePath}");
             }
 

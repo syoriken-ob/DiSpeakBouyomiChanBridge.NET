@@ -1,19 +1,16 @@
-﻿using System;
-using System.Net;
-using System.Net.Http;
-using System.Threading;
+﻿using System.Net;
 
+using net.boilingwater.Application.Common.Extensions;
 using net.boilingwater.Application.Common.Logging;
 using net.boilingwater.Application.Common.Settings;
 
-namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http.Impl
+namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.HttpClients.Impl
 {
     /// <summary>
     /// 棒読みちゃんにメッセージを送信するHttpClient
     /// </summary>
     public class HttpClientForBouyomiChan : HttpClientForReadOut
     {
-
         /// <summary>
         /// 棒読みちゃんにメッセージを送信します。
         /// </summary>
@@ -21,7 +18,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http.Impl
         public override void ReadOut(string text)
         {
             var sendMessage = text.Trim();
-            if (string.IsNullOrEmpty(sendMessage))
+            if (sendMessage.HasValue())
             {
                 return;
             }
@@ -50,7 +47,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http.Impl
                 }
 
                 Log.Logger.Fatal($"Fail to Send Message to BouyomiChan(http://{Settings.AsString("BouyomiChanHost")}:{Settings.AsString("BouyomiChanPort")}) : {sendMessage}");
-                if (string.IsNullOrEmpty(Settings.Get("RetryCount")) || retryCount++ < Settings.AsLong("RetryCount"))
+                if (Settings.Get("RetryCount").HasValue() || retryCount++ < Settings.AsLong("RetryCount"))
                 {
                     Log.Logger.DebugFormat("Retry Connect:{0}/{1}", retryCount, Settings.AsLong("RetryCount"));
                     Thread.Sleep(Settings.AsInteger("RetrySleepTime.Milliseconds"));
@@ -62,7 +59,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http.Impl
             }
         }
 
-        private static HttpRequestMessage CreateBouyomiChanHttpRequest(string text) => new HttpRequestMessage()
+        private static HttpRequestMessage CreateBouyomiChanHttpRequest(string text) => new()
         {
             Method = HttpMethod.Get,
             RequestUri = new Uri($"http://{Settings.AsString("BouyomiChanHost")}:{Settings.AsString("BouyomiChanPort")}/talk?text={Uri.EscapeDataString(text)}")

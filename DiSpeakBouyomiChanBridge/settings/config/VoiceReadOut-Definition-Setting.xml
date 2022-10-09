@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    ================================
+    == メッセージ置換処理定義設定 ==
+    ================================
+-->
+<Settings>
+  <!--
+      ################################
+      ## 各種読み上げメッセージ定義 ##
+      ################################
+  -->
+  <Item key="Format.Replace.URLShortener"                   value="URL省略" />
+  <Item key="Format.Replace.RegisterReplaceSetting"         value="{0}は、{1}と覚えました。" />
+  <Item key="Format.Replace.DeleteReplaceSetting"           value="{0}を忘れました。" />
+  <Item key="Format.Replace.NotRegisteredReplaceSetting"    value="{0}は、学習していません。" />
+
+  <!--
+      ############################
+      ## 各種検出用正規表現定義 ##
+      ############################
+  -->
+  <Item key="RegularExpression.URLShortener"         value="https?://[\w!?/+\-_~:;.,*&amp;@#$%()'[\]=]+" />
+</Settings>

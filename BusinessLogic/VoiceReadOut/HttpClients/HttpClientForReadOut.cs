@@ -1,7 +1,4 @@
-﻿using System;
-using System.Net.Http;
-
-namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http
+﻿namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.HttpClients
 {
     /// <summary>
     /// 読み上げ処理用の基底HttpClientクラス
@@ -49,7 +46,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http
         /// 初期化処理
         /// <para><typeparamref name="T"/>によって読み上げ先が変わります。</para>
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T"><see cref="HttpClientForReadOut"/>を継承した型</typeparam>
         /// <returns></returns>
         public static void Initialize<T>() where T : HttpClientForReadOut
         {
