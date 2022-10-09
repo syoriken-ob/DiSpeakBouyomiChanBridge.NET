@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 
 using Microsoft.VisualBasic;
@@ -45,7 +46,7 @@ namespace net.boilingwater.Application.Common.Utils
 
             if (dec < 0)
             {
-                return default(uint);
+                return default;
             }
 
             return (uint)dec;
@@ -85,7 +86,7 @@ namespace net.boilingwater.Application.Common.Utils
 
             if (dec < 0)
             {
-                return default(ulong);
+                return default;
             }
 
             return (ulong)ToDecimal(obj);
@@ -171,7 +172,11 @@ namespace net.boilingwater.Application.Common.Utils
                 return obj.ToString();
             }
 
-            return JsonSerializer.Serialize(obj);
+            return JsonSerializer.Serialize(obj, new JsonSerializerOptions()
+            {
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                ReadCommentHandling = JsonCommentHandling.Skip,
+            });
         }
 
         /// <summary>
@@ -201,7 +206,7 @@ namespace net.boilingwater.Application.Common.Utils
             }
             catch (Exception) { }
 
-            return default(T);
+            return default;
         }
     }
 }

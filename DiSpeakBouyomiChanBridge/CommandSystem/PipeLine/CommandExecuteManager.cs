@@ -8,8 +8,10 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.PipeLine
     internal class CommandExecuteManager
     {
         internal static CommandExecuteManager Instance { get; private set; } = new();
+
         //------------------------------------------------//
         private readonly CommandExecutor CommonCommandExecutor;
+
         private readonly CommandExecutor ImmediateCommandExecutor;
 
         internal CommandExecuteManager()

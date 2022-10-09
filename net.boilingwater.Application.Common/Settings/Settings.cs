@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 
+using net.boilingwater.Application.Common.Logging;
 using net.boilingwater.Application.Common.Utils;
 
 namespace net.boilingwater.Application.Common.Settings
@@ -13,13 +14,25 @@ namespace net.boilingwater.Application.Common.Settings
     public class Settings
     {
         private static readonly Dictionary<string, List<string>> _listCache = new();
+        private static readonly SimpleDic<MultiDic> _dicCache = new();
+        private static SettingHolder SettingHolderInstance { get; set; }
+
+        /// <summary>
+        /// アプリケーション設定値を読み込みます。
+        /// </summary>
+        public static void Initialize()
+        {
+            SettingHolderInstance = new SettingHolder();
+            _dicCache.Clear();
+            _listCache.Clear();
+        }
 
         /// <summary>
         /// <paramref name="key"/>に紐づくアプリケーション設定値を取得します
         /// </summary>
         /// <param name="key">設定キー</param>
         /// <returns>アプリケーション設定値</returns>
-        public static string Get(string key) => SettingHolder.Instance[key];
+        public static string Get(string key) => SettingHolderInstance[key];
 
         /// <summary>
         /// <see cref="string"/>型で<paramref name="key"/>に紐づくアプリケーション設定値を取得します<br/>
@@ -81,6 +94,44 @@ namespace net.boilingwater.Application.Common.Settings
             _listCache.Add($"{key}#{splitKey}", list);
 
             return list;
+        }
+
+        /// <summary>
+        /// <paramref name="key"/>に紐づくアプリケーション設定値を<paramref name="listSplitKey"/>と<paramref name="pairSplitKey"/>で分割した<see cref="MultiDic"/>を取得します
+        /// </summary>
+        /// <param name="key">設定キー</param>
+        /// <param name="listSplitKey">分割するキー  ※初期値は,（カンマ）</param>
+        /// <param name="pairSplitKey">さらに分割するキー  ※初期値は;（セミコロン）</param>
+        /// <returns>アプリケーション設定値を<paramref name="listSplitKey"/>と<paramref name="pairSplitKey"/>で分割して取得</returns>
+        /// <remarks>一度分割した設定値は<paramref name="key"/>と<paramref name="listSplitKey"/>と<paramref name="pairSplitKey"/>の組み合わせでキャッシュされます</remarks>
+        public static MultiDic AsMultiDic(string key, string listSplitKey = ",", string pairSplitKey = ";")
+        {
+            if (_dicCache.ContainsKey($"{key}#{listSplitKey}#{pairSplitKey}"))
+            {
+                return _dicCache[$"{key}#{listSplitKey}#{pairSplitKey}"];
+            }
+
+            var dic = new MultiDic();
+            try
+            {
+                foreach (var keyValue in Get(key).Split(listSplitKey))
+                {
+                    var split = keyValue.Split(pairSplitKey);
+                    if (!split.Any() || split[0] == null || dic.ContainsKey(split[0]))
+                    {
+                        continue;
+                    }
+                    dic[split[0].Trim()] = split.Length > 1 ? split[1].Trim() : (object)"";
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Warn(ex);
+            }
+
+            _dicCache.Add($"{key}#{listSplitKey}#{pairSplitKey}", dic);
+
+            return dic;
         }
 
         /// <summary>

@@ -6,7 +6,8 @@ using System.Threading;
 using net.boilingwater.Application.Common.Logging;
 using net.boilingwater.Application.Common.Settings;
 using net.boilingwater.Application.Common.Utils;
-using net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem;
+using net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.HttpClients;
+using net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Service;
 
 namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http
 {
@@ -30,7 +31,6 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http
         /// <param name="refreshHttpListener">HttpListenerを初期化するか</param>
         public void Initialize(bool refreshHttpListener = true)
         {
-
             if (refreshHttpListener)
             {
                 var retryCount = 0L;
@@ -47,7 +47,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http
                         _listener.Prefixes.Add($"http://localhost:{Settings.AsString("ListeningPort")}/");
 
                         _listener.Start();
-                        HttpClientForBouyomiChan.Instance.SendToBouyomiChan(Settings.AsString("Message.Connecting"));
+                        HttpClientForReadOut.Instance?.ReadOut(Settings.AsString("Message.Connecting"));
                         isValid = true;
                         _listener.Stop();
                         break;

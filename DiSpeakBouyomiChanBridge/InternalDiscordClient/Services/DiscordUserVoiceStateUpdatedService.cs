@@ -1,5 +1,4 @@
-﻿
-using Discord.WebSocket;
+﻿using Discord.WebSocket;
 
 using net.boilingwater.Application.Common.Settings;
 using net.boilingwater.Application.Common.Utils;

@@ -2,17 +2,20 @@
 using System.Threading.Tasks;
 
 using net.boilingwater.Application.Common.Extentions;
+using net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.MessageReplacer.Service;
+using net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.HttpClients;
 using net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl;
 using net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl.Factory;
 using net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.PipeLine;
-using net.boilingwater.DiSpeakBouyomiChanBridge.Http;
 using net.boilingwater.DiSpeakBouyomiChanBridge.InternalDiscordClient.Services;
 
 namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Handle
 {
     internal abstract class AbstractCommandHandler
     {
-        internal void ExecutePreProcess(ref string message) { }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:未使用のパラメーターを削除します", Justification = "<保留中>")]
+        internal void ExecutePreProcess(ref string message)
+        { }
 
         internal void Handle(ref string message)
         {
@@ -43,8 +46,11 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Handle
             //URL省略などの処理
             DiscordReceivedMessageService.ReplaceCommonReceivedInfoAfter(ref message);
 
+            //置換処理と教育コマンド処理
+            MessageReplaceService.ExecuteReplace(ref message);
+
             //棒読みちゃんに送信
-            HttpClientForBouyomiChan.Instance.SendToBouyomiChan(message);
+            HttpClientForReadOut.Instance?.ReadOut(message);
         }
     }
 }

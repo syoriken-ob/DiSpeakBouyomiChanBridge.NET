@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+    ================================
+    == メッセージ置換処理機能設定 ==
+    ================================
+-->
+<Settings>
+  <!-- メッセージ中の任意のテキストの置換機能を利用する(True:利用する,False:利用しない) -->
+  <Item key="Use.ReadOutReplace.MessageReplacer" value="True" />
+
+  <!-- メッセージ中のURL省略機能を利用する(True:利用する,False:利用しない) -->
+  <Item key="Use.ReadOutReplace.URLShortener"    value="True" />
+</Settings>

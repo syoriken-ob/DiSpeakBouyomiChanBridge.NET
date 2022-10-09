@@ -4,12 +4,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text.Encodings.Web;
-using System.Text.Json;
 using System.Text.RegularExpressions;
 
 using net.boilingwater.Application.Common.Logging;
 using net.boilingwater.Application.Common.Settings;
+using net.boilingwater.Application.Common.Utils;
 
 namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl.Factory
 {
@@ -34,7 +33,6 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl.Factory
         /// <returns></returns>
         public override IEnumerable<ExecutableCommand> CreateExecutableCommands(ref string input)
         {
-
             var list = new List<SystemCommand>();
 
             var regex = $"({string.Join("|", Dic.Keys)})";
@@ -69,16 +67,8 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl.Factory
                     Dic.Clear();
 
                     //読み込み
-                    var option = new JsonSerializerOptions()
-                    {
-                        Encoder = JavaScriptEncoder.Default,
-                        AllowTrailingCommas = true,
-                        PropertyNameCaseInsensitive = true,
-                        WriteIndented = true
-                    };
-
                     var commandFilePath = Path.Combine(Directory.GetCurrentDirectory(), Settings.GetAppConfig("CommandFileFolder"), Settings.AsString("SystemCommandFile"));
-                    var dic = JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(commandFilePath), option);
+                    var dic = SerializeUtil.DeserializeYaml<Dictionary<string, string>>(File.ReadAllText(commandFilePath), false);
                     Log.Logger.Debug($"読み込み：{commandFilePath}");
 
                     if (dic != null)

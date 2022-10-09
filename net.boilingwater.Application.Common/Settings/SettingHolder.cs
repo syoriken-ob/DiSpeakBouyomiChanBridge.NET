@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 
+using net.boilingwater.Application.Common.Extensions;
 using net.boilingwater.Application.Common.Logging;
 
 namespace net.boilingwater.Application.Common.Settings
@@ -15,13 +16,11 @@ namespace net.boilingwater.Application.Common.Settings
     {
         private static readonly string SEARCH_PATTERN = "*-Setting.xml";
 
-        internal static SettingHolder Instance { get; private set; }
-
         private readonly SimpleDic<string> Settings;
 
         internal string this[string key] => Settings[key.ToLower()];
 
-        private SettingHolder()
+        internal SettingHolder()
         {
             Settings = new();
             LoadSetting();
@@ -39,10 +38,24 @@ namespace net.boilingwater.Application.Common.Settings
                     Log.Logger.Debug($"読み込み：{file}");
 
                     var items = doc.SelectNodes("/Settings/Item");
+                    if (items == null)
+                    {
+                        return;
+                    }
                     foreach (XmlNode item in items)
                     {
                         var attr = item.Attributes;
-                        Settings[attr["key"].Value.ToLower()] = attr["value"].Value;
+                        if (attr == null)
+                        {
+                            continue;
+                        }
+                        var key = attr["key"];
+                        var value = attr["value"];
+                        if (key == null || value == null)
+                        {
+                            continue;
+                        }
+                        Settings[key.Value.ToLower()] = value.Value;
                     }
                 }
 
@@ -60,7 +73,7 @@ namespace net.boilingwater.Application.Common.Settings
             try
             {
                 var file = GetEnvironmentSettingFile();
-                if (string.IsNullOrEmpty(file))
+                if (!file.HasValue())
                 {
                     return;
                 }
@@ -70,10 +83,25 @@ namespace net.boilingwater.Application.Common.Settings
                 Log.Logger.Debug($"読み込み：{file}");
 
                 var items = doc.SelectNodes("/Settings/Item");
+                if (items == null)
+                {
+                    return;
+                }
+
                 foreach (XmlNode item in items)
                 {
                     var attr = item.Attributes;
-                    Settings[attr["key"].Value.ToLower()] = attr["value"].Value;
+                    if (attr == null)
+                    {
+                        continue;
+                    }
+                    var key = attr["key"];
+                    var value = attr["value"];
+                    if (key == null || value == null)
+                    {
+                        continue;
+                    }
+                    Settings[key.Value.ToLower()] = value.Value;
                 }
 
                 Log.Logger.Info("環境設定上書きファイルの読み込みが完了しました。");
@@ -84,24 +112,33 @@ namespace net.boilingwater.Application.Common.Settings
             }
         }
 
-        /// <summary>
-        /// 設定ファイルの読み込みを行います。
-        /// </summary>
-        /// <remarks>こちらを呼び出さないと<see cref="net.boilingwater.Application.Common.Settings.Settings"/>を利用できません</remarks>
-        public static void Initialize() => Instance = new SettingHolder();
-
         private static string[] GetSettingFiles()
         {
-            return Directory.GetFiles(ConfigurationManager.AppSettings["SettingFileFolder"], SEARCH_PATTERN, SearchOption.AllDirectories)
-                .Select(path => Path.GetFullPath(path))
-                .ToArray();
+            var folderPath = ConfigurationManager.AppSettings["SettingFileFolder"];
+            if (folderPath == null)
+            {
+                return Array.Empty<string>();
+            }
+
+            return Directory.GetFiles(folderPath, SEARCH_PATTERN, SearchOption.AllDirectories)
+                            .Select(path => Path.GetFullPath(path))
+                            .ToArray();
         }
 
         private static string GetEnvironmentSettingFile()
         {
-            return Directory.GetFiles(ConfigurationManager.AppSettings["OverrideFileFolder"], ConfigurationManager.AppSettings["EnvironmentSettingFile"], SearchOption.AllDirectories)
-                .Select(path => Path.GetFullPath(path))
-                .FirstOrDefault();
+            var folderPath = ConfigurationManager.AppSettings["OverrideFileFolder"];
+            var envFilePath = ConfigurationManager.AppSettings["EnvironmentSettingFile"];
+            if (folderPath == null || envFilePath == null)
+            {
+                return string.Empty;
+            }
+
+            var envFile = Directory.GetFiles(folderPath, envFilePath, SearchOption.AllDirectories)
+                        .Select(path => Path.GetFullPath(path))
+                        .FirstOrDefault();
+
+            return envFile ?? string.Empty;
         }
     }
 }

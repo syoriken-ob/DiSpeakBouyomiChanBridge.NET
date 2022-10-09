@@ -363,7 +363,6 @@ MigrationBackup/
 FodyWeavers.xsd
 
 /.gitattributes
-*.editorconfig
 
 # アプリケーション特有
 /DiSpeakBouyomiChanBridge/Properties/launchSettings.json

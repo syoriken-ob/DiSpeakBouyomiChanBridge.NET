@@ -1,7 +1,7 @@
 ﻿using net.boilingwater.Application.Common.Logging;
 using net.boilingwater.Application.Common.Settings;
+using net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.HttpClients;
 using net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.PipeLine;
-using net.boilingwater.DiSpeakBouyomiChanBridge.Http;
 
 namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem
 {
@@ -25,10 +25,10 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl
         /// </summary>
         public override void Execute()
         {
-            HttpClientForBouyomiChan.Instance.SendToBouyomiChan(Settings.AsString("Message.ReloadConfig"));
-            Log.Logger.Info("Reload SystemConfig...");
+            Settings.Initialize();
             ApplicationInitializer.CommandInitialize();
-            SettingHolder.Initialize();
+            Log.Logger.Info("Reload SystemConfig...");
+            HttpClientForReadOut.Instance?.ReadOut(Settings.AsString("Message.ReloadConfig"));
         }
     }
 
@@ -42,9 +42,9 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl
         /// </summary>
         public override void Execute()
         {
-            HttpClientForBouyomiChan.Instance.SendToBouyomiChan(Settings.AsString("Message.DeleteAllExecutionQueues"));
-            Log.Logger.Info("Shutdown CommandThreads...");
             CommandExecuteManager.Instance.ShutdownThreads();
+            Log.Logger.Info("Shutdown CommandThreads...");
+            HttpClientForReadOut.Instance?.ReadOut(Settings.AsString("Message.DeleteAllExecutionQueues"));
         }
     }
 
@@ -59,10 +59,10 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl
         public override void Execute()
         {
             var commands = CommandExecuteManager.Instance.GetCommandsInQueue();
-            HttpClientForBouyomiChan.Instance.SendToBouyomiChan(string.Format(Settings.AsString("Message.CommandsCount"), commands.Count));
+            HttpClientForReadOut.Instance?.ReadOut(string.Format(Settings.AsString("Message.CommandsCount"), commands.Count));
             for (var i = 0; i < commands.Count; i++)
             {
-                HttpClientForBouyomiChan.Instance.SendToBouyomiChan(
+                HttpClientForReadOut.Instance?.ReadOut(
                     string.Format(
                         Settings.AsString("Message.CommandDetail"),
                         i,

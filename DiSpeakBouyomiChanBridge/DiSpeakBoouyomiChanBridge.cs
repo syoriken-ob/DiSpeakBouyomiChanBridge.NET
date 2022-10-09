@@ -13,6 +13,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge
         /// アプリケーションを実行します
         /// </summary>
         /// <param name="args">実行時引数</param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:未使用のパラメーターを削除します", Justification = "<保留中>")]
         public static int Main(string[] args)
         {
             try

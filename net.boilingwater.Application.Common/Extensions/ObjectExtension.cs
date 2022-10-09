@@ -6,7 +6,7 @@ using net.boilingwater.Application.Common.Utils;
 namespace net.boilingwater.Application.Common.Extentions
 {
     /// <summary>
-    /// object型の拡張メソッドを管理するクラス<br/>
+    /// <see cref="object"/>型の拡張メソッドを管理するクラス<br/>
     /// こちらを利用しています。<br/>
     /// https://baba-s.hatenablog.com/entry/2014/02/27/000000
     /// </summary>

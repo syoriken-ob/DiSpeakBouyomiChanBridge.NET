@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\net.boilingwater.Application.Common\net.boilingwater.Application.Common.csproj" />
+    <ProjectReference Include="..\..\net.boilingwater.Application.Common\net.boilingwater.Application.Common.csproj" />
   </ItemGroup>
 
 </Project>

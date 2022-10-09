@@ -1,5 +1,0 @@
-{
-  "bridgerestart\\(\\)": "ReloadCommand",
-  "killall\\(\\)": "ShutdownCommand",
-  "queue\\(\\)": "ReadOutCommand"
-}

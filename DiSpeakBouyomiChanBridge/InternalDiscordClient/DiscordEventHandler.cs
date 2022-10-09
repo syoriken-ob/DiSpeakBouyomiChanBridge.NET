@@ -6,8 +6,8 @@ using Discord.WebSocket;
 
 using net.boilingwater.Application.Common.Logging;
 using net.boilingwater.Application.Common.Settings;
-using net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem;
-using net.boilingwater.DiSpeakBouyomiChanBridge.Http;
+using net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.HttpClients;
+using net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Service;
 using net.boilingwater.DiSpeakBouyomiChanBridge.InternalDiscordClient.Services;
 
 namespace net.boilingwater.DiSpeakBouyomiChanBridge.InternalDiscordClient
@@ -76,30 +76,35 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.InternalDiscordClient
             switch (state)
             {
                 case DiscordUserVoiceStateUpdatedService.VoiceState.JOIN:
-                    HttpClientForBouyomiChan.Instance.SendToBouyomiChan(
+                    HttpClientForReadOut.Instance?.ReadOut(
                         DiscordUserVoiceStateUpdatedService.GetJoinVoiceChannelMessage(guildUser, sourceVoiceState, targetVoiceState)
                     );
                     break;
+
                 case DiscordUserVoiceStateUpdatedService.VoiceState.LEAVE:
-                    HttpClientForBouyomiChan.Instance.SendToBouyomiChan(
+                    HttpClientForReadOut.Instance?.ReadOut(
                         DiscordUserVoiceStateUpdatedService.GetLeaveVoiceChannelMessage(guildUser, sourceVoiceState, targetVoiceState)
                     );
                     break;
+
                 case DiscordUserVoiceStateUpdatedService.VoiceState.MOVE:
-                    HttpClientForBouyomiChan.Instance.SendToBouyomiChan(
+                    HttpClientForReadOut.Instance?.ReadOut(
                         DiscordUserVoiceStateUpdatedService.GetMoveVoiceChannelMessage(guildUser, sourceVoiceState, targetVoiceState)
                     );
                     break;
+
                 case DiscordUserVoiceStateUpdatedService.VoiceState.START_STREAMING:
-                    HttpClientForBouyomiChan.Instance.SendToBouyomiChan(
+                    HttpClientForReadOut.Instance?.ReadOut(
                         DiscordUserVoiceStateUpdatedService.GetStartStreamingVoiceChannelMessage(guildUser, sourceVoiceState, targetVoiceState)
                     );
                     break;
+
                 case DiscordUserVoiceStateUpdatedService.VoiceState.END_STREAMING:
-                    HttpClientForBouyomiChan.Instance.SendToBouyomiChan(
+                    HttpClientForReadOut.Instance?.ReadOut(
                         DiscordUserVoiceStateUpdatedService.GetEndStreamingVoiceChannelMessage(guildUser, sourceVoiceState, targetVoiceState)
                     );
                     break;
+
                 default:
                     return;
             }
@@ -114,12 +119,15 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.InternalDiscordClient
                 case LogSeverity.Error:
                     Log.Logger.Error(message.Message);
                     break;
+
                 case LogSeverity.Warning:
                     Log.Logger.Warn(message.Message);
                     break;
+
                 case LogSeverity.Info:
                     Log.Logger.Info(message.Message);
                     break;
+
                 case LogSeverity.Verbose:
                 case LogSeverity.Debug:
                 default:
