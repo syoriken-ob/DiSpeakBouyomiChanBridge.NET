@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 
 using net.boilingwater.Application.Common.Extentions;
-using net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.MessageReplacer.Service;
 using net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.HttpClients;
 using net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl;
 using net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl.Factory;
@@ -45,9 +44,6 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Handle
         {
             //URL省略などの処理
             DiscordReceivedMessageService.ReplaceCommonReceivedInfoAfter(ref message);
-
-            //置換処理と教育コマンド処理
-            MessageReplaceService.ExecuteReplace(ref message);
 
             //棒読みちゃんに送信
             HttpClientForReadOut.Instance?.ReadOut(message);

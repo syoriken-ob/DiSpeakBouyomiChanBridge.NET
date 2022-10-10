@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\net.boilingwater.Application.Common\net.boilingwater.Application.Common.csproj" />
-    <ProjectReference Include="..\VoiceReadOut\net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadOut.csproj" />
   </ItemGroup>
 
 </Project>

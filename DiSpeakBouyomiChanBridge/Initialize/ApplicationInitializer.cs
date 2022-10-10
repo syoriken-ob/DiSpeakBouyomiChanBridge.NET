@@ -14,7 +14,7 @@ using net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.HttpC
 using net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl.Factory;
 using net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Service;
 using net.boilingwater.DiSpeakBouyomiChanBridge.external.DiscordClient;
-using net.boilingwater.DiSpeakBouyomiChanBridge.Http;
+using net.boilingwater.DiSpeakBouyomiChanBridge.Http.Impl;
 using net.boilingwater.DiSpeakBouyomiChanBridge.InternalDiscordClient;
 
 namespace net.boilingwater.DiSpeakBouyomiChanBridge
@@ -128,6 +128,11 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge
             {
                 HttpServerForDiSpeak.Instance.Initialize();
             }
+
+            if (Settings.AsBoolean("Use.CommonVoiceReadoutServer"))
+            {
+                HttpServerForCommon.Instance.Initialize();
+            }
         }
 
         /// <summary>
@@ -146,6 +151,11 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge
             else
             {
                 HttpServerForDiSpeak.Instance.Start();
+            }
+
+            if (Settings.AsBoolean("Use.CommonVoiceReadoutServer"))
+            {
+                HttpServerForCommon.Instance.Start();
             }
         }
     }

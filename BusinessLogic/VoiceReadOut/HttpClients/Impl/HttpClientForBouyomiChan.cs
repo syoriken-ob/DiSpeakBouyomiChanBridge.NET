@@ -29,7 +29,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.H
             {
                 try
                 {
-                    var responseMessage = client_.Send(CreateBouyomiChanHttpRequest(sendMessage));
+                    var responseMessage = Client.Send(CreateBouyomiChanHttpRequest(sendMessage));
                     if (responseMessage.StatusCode == HttpStatusCode.OK)
                     {
                         Log.Logger.Debug($"Send:{sendMessage}");

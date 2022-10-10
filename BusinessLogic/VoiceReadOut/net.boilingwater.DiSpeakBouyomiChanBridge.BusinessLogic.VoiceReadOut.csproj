@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\external\net.boilingwater.DiSpeakBouyomiChanBridge.external.AudioPlay\net.boilingwater.DiSpeakBouyomiChanBridge.external.AudioPlay.csproj" />
     <ProjectReference Include="..\..\net.boilingwater.Application.Common\net.boilingwater.Application.Common.csproj" />
+    <ProjectReference Include="..\MessageReplacer\net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.MessageReplacer.csproj" />
   </ItemGroup>
 
 </Project>

@@ -8,6 +8,7 @@ using net.boilingwater.Application.Common.Extensions;
 using net.boilingwater.Application.Common.Logging;
 using net.boilingwater.Application.Common.Settings;
 using net.boilingwater.Application.Common.Utils;
+using net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.MessageReplacer.Service;
 using net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadOut.VoiceExecutor;
 
 namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.HttpClients.Impl
@@ -24,11 +25,23 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.H
         {
             _thread = new Thread(() =>
             {
-                foreach (var voiceStreamByteArr in _receivedMessages.GetConsumingEnumerable())
+                foreach (var message in _receivedMessages.GetConsumingEnumerable())
                 {
                     try
                     {
-                        ExecuteReadOut(voiceStreamByteArr);
+                        var tempMessage = message;
+
+                        //置換処理と教育コマンド処理
+                        MessageReplaceService.ExecuteReplace(ref tempMessage);
+
+                        foreach (var splittedMessage in tempMessage.Split(new[] { '\n', '。' }))
+                        {
+                            var trimmed = splittedMessage.Trim();
+                            if (trimmed.HasValue())
+                            {
+                                ExecuteReadOut(trimmed);
+                            }
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -54,16 +67,6 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.H
             {
                 _receivedMessages.Add(message);
             }
-        }
-
-        /// <summary>
-        /// 読み上げメッセージの事前処理を行います。
-        /// </summary>
-        /// <param name="message"></param>
-        /// <returns></returns>
-        private string PrepareReadOutMessage(string message)
-        {
-            return message;
         }
 
         /// <summary>
@@ -125,7 +128,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.H
             var result = new MultiDic();
             try
             {
-                using (var audioQueryResponse = client_.Send(CreateVoiceVoxAudioQueryHttpRequest(message)))
+                using (var audioQueryResponse = Client.Send(CreateVoiceVoxAudioQueryHttpRequest(message)))
                 {
                     result["valid"] = audioQueryResponse.IsSuccessStatusCode;
                     result["statusCode"] = audioQueryResponse.StatusCode;
@@ -170,7 +173,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.H
             var result = new MultiDic();
             try
             {
-                using (var synthesisResponse = client_.Send(CreateVoiceVoxSynthesisHttpRequest(audioQueryDic)))
+                using (var synthesisResponse = Client.Send(CreateVoiceVoxSynthesisHttpRequest(audioQueryDic)))
                 {
                     result["valid"] = synthesisResponse.IsSuccessStatusCode;
                     result["statusCode"] = synthesisResponse.StatusCode;

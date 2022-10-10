@@ -5,7 +5,7 @@
     ==================================
 -->
 <Settings>
-  <Item key="ListeningPort"                  value="50083" />
+  <Item key="ListeningPort"                  value="9999" />
   <Item key="BouyomiChanPort"                value="50080" />
   <Item key="BouyomiChanHost"                value="localhost" />
 
@@ -28,4 +28,9 @@
   <!-- 棒読みちゃんを利用せず、VOICEVOXで読み上げする(True:利用する,False:利用しない) -->
   <!-- 利用する場合 VoiceVox-XXX-Setting.xmlの設定が必要です -->
   <Item key="Use.VoiceVox"                   value="False" />
+
+  <!--共通読み上げAPIを利用する(True:利用する,False:利用しない)-->
+  <Item key="Use.CommonVoiceReadoutServer"   value="False" />
+  <!--共通読み上げAPIの受付ポート番号-->
+  <Item key="CommonVoiceReadoutServer.ListeningPort"   value="9998" />
 </Settings>
