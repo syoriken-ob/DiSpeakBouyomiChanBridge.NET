@@ -35,7 +35,7 @@ namespace net.boilingwater.Application.Common.Utils
         }
 
         /// <summary>
-        /// JSON文字列を<see cref="MultiDic"/>型にデシリアライズして取得します。
+        /// JSON文字列を<see cref="MultiList"/>型にデシリアライズして取得します。
         /// </summary>
         /// <param name="json">JSON文字列</param>
         /// <returns></returns>
