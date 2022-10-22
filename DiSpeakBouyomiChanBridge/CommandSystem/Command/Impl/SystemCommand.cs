@@ -25,8 +25,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl
         /// </summary>
         public override void Execute()
         {
-            Settings.Initialize();
-            ApplicationInitializer.CommandInitialize();
+            ApplicationInitializer.Initialize();
             Log.Logger.Info("Reload SystemConfig...");
             HttpClientForReadOut.Instance?.ReadOut(Settings.AsString("Message.ReloadConfig"));
         }

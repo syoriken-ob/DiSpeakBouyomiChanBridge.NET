@@ -6,9 +6,16 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\net.boilingwater.Application.Common\net.boilingwater.Application.Common.csproj" />
-    <ProjectReference Include="..\VoiceReadOut\net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadOut.csproj" />
   </ItemGroup>
 
 </Project>

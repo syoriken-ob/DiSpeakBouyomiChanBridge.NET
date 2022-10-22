@@ -40,4 +40,12 @@
   <Item key="List.ReadOutTarget.GuildChannel.Text"   value="{DISCORD_READOUT_GUILD_TEXT_CHANNEL_LIST}" />
   <!-- 対象とするサーバーのボイスチャンネルID（カンマ区切りで複数設定可,カンマ前後のスペースはトリムされます） -->
   <Item key="List.ReadOutTarget.GuildChannel.Voice"  value="{DISCORD_READOUT_GUILD_VOICE_CHANNEL_LIST}" />
+
+  <!--
+      ##############
+      ## ログ設定 ##
+      ##############
+  -->
+  <!-- Discord.Netのログ出力をリダイレクトする最低レベル(Critical,Error,Warning,Info,Verbose,Debugのうちどれかを記入,空欄の場合はDebug扱い) -->
+  <Item key="RedirectLogDiscord.Net.LogSeverity"   value="Info" />
 </Settings>

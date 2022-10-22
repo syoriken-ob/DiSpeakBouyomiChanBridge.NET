@@ -35,6 +35,29 @@ namespace net.boilingwater.Application.Common.Utils
         }
 
         /// <summary>
+        /// JSON文字列を<see cref="MultiDic"/>型にデシリアライズして取得します。
+        /// </summary>
+        /// <param name="json">JSON文字列</param>
+        /// <returns></returns>
+        public static MultiList JsonToMultiList(string json)
+        {
+            if (string.IsNullOrEmpty(json) || string.IsNullOrWhiteSpace(json))
+            {
+                return new MultiList();
+            }
+
+            try
+            {
+                var rawList = JsonSerializer.Deserialize<MultiList>(json, CreateJsonSerializerOption());
+                return ConvertJsonElementToMultiDicFromMultiList(rawList);
+            }
+            catch
+            {
+                return new MultiList();
+            }
+        }
+
+        /// <summary>
         /// Yaml文字列を<typeparamref name="T"/>型にデシリアライズします。
         /// </summary>
         /// <typeparam name="T">デシリアライズしたい型</typeparam>
@@ -74,6 +97,20 @@ namespace net.boilingwater.Application.Common.Utils
             }
 
             return rawDic;
+        }
+
+        private static MultiList ConvertJsonElementToMultiDicFromMultiList(MultiList rawList)
+        {
+            for (var i = 0; i < rawList.Count; i++)
+            {
+                if (rawList[i] is not JsonElement @element)
+                {
+                    continue;
+                }
+                rawList[i] = Parse(element);
+            }
+
+            return rawList;
         }
 
         private static object Parse(JsonElement element)

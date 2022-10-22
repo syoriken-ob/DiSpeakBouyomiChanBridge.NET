@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-using net.boilingwater.Application.Common.Extentions;
+using net.boilingwater.Application.Common.Extensions;
 using net.boilingwater.Application.Common.Logging;
 using net.boilingwater.Application.Common.Settings;
 using net.boilingwater.Application.Common.Utils;
@@ -86,7 +86,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl
         /// <summary>
         /// Commandオブジェクトを複製
         /// </summary>
-        /// <returns><see cref="net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl.Command"/></returns>
+        /// <returns><see cref="Command"/></returns>
         public object Clone() => new Command()
         {
             Immediate = Immediate,

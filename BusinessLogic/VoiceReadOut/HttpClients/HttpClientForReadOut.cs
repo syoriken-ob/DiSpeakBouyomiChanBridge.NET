@@ -13,12 +13,12 @@
         /// <summary>
         /// 内部処理用HttpClient
         /// </summary>
-        protected HttpClient client_;
+        protected HttpClient Client { get; set; }
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public HttpClientForReadOut() => client_ = new();
+        public HttpClientForReadOut() => Client = new();
 
         /// <summary>
         /// 内部Httpクライアントを再生成します。
@@ -26,7 +26,7 @@
         public void RenewHttpClient()
         {
             ((IDisposable)this).Dispose();
-            client_ = new HttpClient();
+            Client = new HttpClient();
         }
 
         /// <summary>
@@ -38,7 +38,7 @@
         ///<inheritdoc/>
         public void Dispose()
         {
-            client_.Dispose();
+            Client.Dispose();
             GC.SuppressFinalize(this);
         }
 

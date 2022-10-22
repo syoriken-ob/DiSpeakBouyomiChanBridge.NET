@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Web;
 
 using net.boilingwater.Application.Common;
@@ -17,18 +18,31 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.H
     /// </summary>
     public class HttpClientForVoiceVox : HttpClientForReadOut
     {
+        private static Regex SpeakerRegex { get; set; } = new Regex(@"^(?<speaker_id>\w{1,2})\)", RegexOptions.Compiled);
         private readonly Thread _thread;
         private readonly BlockingCollection<string> _receivedMessages = new();
+        private SimpleDic<string> VoiceVoxSpeakers { get; set; }
 
         public HttpClientForVoiceVox()
         {
+            VoiceVoxSpeakers = FetchEnableVoiceVoxSpeaker();
+
             _thread = new Thread(() =>
             {
-                foreach (var voiceStreamByteArr in _receivedMessages.GetConsumingEnumerable())
+                foreach (var message in _receivedMessages.GetConsumingEnumerable())
                 {
                     try
                     {
-                        ExecuteReadOut(voiceStreamByteArr);
+                        var tempMessage = message;
+
+                        foreach (var splittedMessage in tempMessage.Split(new[] { '\n', '。' }))
+                        {
+                            var trimmed = splittedMessage.Trim();
+                            if (trimmed.HasValue())
+                            {
+                                ExecuteReadOut(trimmed);
+                            }
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -57,17 +71,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.H
         }
 
         /// <summary>
-        /// 読み上げメッセージの事前処理を行います。
-        /// </summary>
-        /// <param name="message"></param>
-        /// <returns></returns>
-        private string PrepareReadOutMessage(string message)
-        {
-            return message;
-        }
-
-        /// <summary>
-        /// VOICEVOXと通信して処理
+        /// VOICEVOXと通信して読み上げます。
         /// </summary>
         /// <param name="message">VOICEVOXに読み上げるメッセージ</param>
         private void ExecuteReadOut(string message)
@@ -75,7 +79,8 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.H
             var retryCount = 0L;
             while (true)
             {
-                var audioQueryResult = SendVoiceVoxAudioQueryRequst(message);
+                var speaker = ExtactVoiceVoxSpeaker(ref message);
+                var audioQueryResult = SendVoiceVoxAudioQueryRequst(message, speaker);
                 if (audioQueryResult.ContainsKey("statusCode"))
                 {
                     var statusCode = audioQueryResult.GetAsObject<HttpStatusCode>("statusCode");
@@ -94,7 +99,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.H
                 var audioQuery = audioQueryResult.GetAsMultiDic("audioQuery");
                 ReplaceAudioQueryJson(audioQuery);
 
-                var synthesisResult = SendVoiceVoxSynthesisRequest(audioQuery);
+                var synthesisResult = SendVoiceVoxSynthesisRequest(audioQuery, speaker);
                 if (synthesisResult.ContainsKey("statusCode"))
                 {
                     var statusCode = synthesisResult.GetAsObject<HttpStatusCode>("statusCode");
@@ -110,22 +115,127 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.H
                     continue;
                 }
 
-                Log.Logger.Debug($"ReadOut Message: {message}");
+                Log.Logger.Info($"ReadOut Message: {message}");
                 VoiceVoxReadOutAudioPlayExecutor.Instance.AddQueue(synthesisResult.GetAsObject<byte[]>("voice"));
                 return;
             }
         }
 
         /// <summary>
-        /// VoiceVoxAPI[audio_query]にリクエストを送信します。
+        /// 設定値とVoiceVoxAPI[speakers]から利用可能な話者のマッピングを取得します。
         /// </summary>
         /// <returns></returns>
-        private MultiDic SendVoiceVoxAudioQueryRequst(string message)
+        private SimpleDic<string> FetchEnableVoiceVoxSpeaker()
+        {
+            var dic = new SimpleDic<string>();
+
+            var result = SendVoiceVoxSpeakersRequst();
+
+            if (result.GetAsBoolean("valid"))
+            {
+                var baseSpeakerDic = Settings.AsMultiDic("VoiceVox.InlineSpeakersMapping");
+                var fetchedSpeakerList = result.GetAsMultiList("speakers")
+                                               .Select(s => CastUtil.ToObject<MultiDic>(s))
+                                               .SelectMany(s => s.GetAsMultiList("styles"))
+                                               .Select(s => CastUtil.ToObject<MultiDic>(s))
+                                               .Select(s => s.GetAsString("id"))
+                                               .Intersect(baseSpeakerDic.Keys)
+                                               .ToList();
+
+                fetchedSpeakerList.ForEach(id => dic[baseSpeakerDic.GetAsString(id)] = id);
+                dic.ForEach(pair => Log.Logger.Debug($"VoiceVox話者登録：{pair.Key}) => {pair.Value}"));
+            }
+
+            return dic;
+        }
+
+        #region SendRequest
+
+        /// <summary>
+        /// メッセージ中のVoiceVox話者を抽出します。
+        /// </summary>
+        /// <param name="message">読み上げメッセージ</param>
+        /// <returns>VoiceVox話者ID</returns>
+        private string ExtactVoiceVoxSpeaker(ref string message)
+        {
+            var match = SpeakerRegex.Match(message);
+            if (!match.Success)
+            {
+                return Settings.AsString("VoiceVox.DefaultSpeaker");
+            }
+
+            var speakerId = match.Groups["speaker_id"];
+
+            if (speakerId == null)
+            {
+                return Settings.AsString("VoiceVox.DefaultSpeaker");
+            }
+
+            if (!VoiceVoxSpeakers.ContainsKey(speakerId.Value))
+            {
+                return Settings.AsString("VoiceVox.DefaultSpeaker");
+            }
+
+            message = message.Replace(match.Value, "");
+            return VoiceVoxSpeakers[speakerId.Value];
+        }
+
+        /// <summary>
+        /// VoiceVoxAPI[speakers]にリクエストを送信します。
+        /// </summary>
+        /// <returns></returns>
+        private MultiDic SendVoiceVoxSpeakersRequst()
         {
             var result = new MultiDic();
             try
             {
-                using (var audioQueryResponse = client_.Send(CreateVoiceVoxAudioQueryHttpRequest(message)))
+                using (var speakersResponse = Client.Send(CreateVoiceVoxSpeakersHttpRequest()))
+                {
+                    result["valid"] = speakersResponse.IsSuccessStatusCode;
+                    result["statusCode"] = speakersResponse.StatusCode;
+                    if (!result.GetAsBoolean("valid"))
+                    {
+                        return result;
+                    }
+                    using var reader = new StreamReader(speakersResponse.Content.ReadAsStream(), Encoding.UTF8);
+                    result["speakers"] = SerializeUtil.JsonToMultiList(reader.ReadToEnd());
+                }
+                return result;
+            }
+            catch (WebException ex)
+            {
+                result["valid"] = false;
+                if (ex.Response == null)
+                {
+                    Log.Logger.Error(ex);
+                }
+                else
+                {
+                    using var error = ex.Response.GetResponseStream();
+                    using var streamReader = new StreamReader(error);
+                    Log.Logger.Error(streamReader.ReadToEnd(), ex);
+                }
+            }
+            catch (Exception ex)
+            {
+                result["valid"] = false;
+                Log.Logger.Error(ex);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// VoiceVoxAPI[audio_query]にリクエストを送信します。
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="speaker"></param>
+        /// <returns></returns>
+        private MultiDic SendVoiceVoxAudioQueryRequst(string message, string speaker)
+        {
+            var result = new MultiDic();
+            try
+            {
+                using (var audioQueryResponse = Client.Send(CreateVoiceVoxAudioQueryHttpRequest(message, speaker)))
                 {
                     result["valid"] = audioQueryResponse.IsSuccessStatusCode;
                     result["statusCode"] = audioQueryResponse.StatusCode;
@@ -164,13 +274,14 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.H
         /// VoiceVoxAPI[synthesis]にリクエストを送信します。
         /// </summary>
         /// <param name="audioQueryDic"></param>
+        /// <param name="speaker"></param>
         /// <returns></returns>
-        private MultiDic SendVoiceVoxSynthesisRequest(MultiDic audioQueryDic)
+        private MultiDic SendVoiceVoxSynthesisRequest(MultiDic audioQueryDic, string speaker)
         {
             var result = new MultiDic();
             try
             {
-                using (var synthesisResponse = client_.Send(CreateVoiceVoxSynthesisHttpRequest(audioQueryDic)))
+                using (var synthesisResponse = Client.Send(CreateVoiceVoxSynthesisHttpRequest(audioQueryDic, speaker)))
                 {
                     result["valid"] = synthesisResponse.IsSuccessStatusCode;
                     result["statusCode"] = synthesisResponse.StatusCode;
@@ -206,16 +317,41 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.H
             return result;
         }
 
+        #endregion SendRequest
+
+        #region CreateHttpRequest
+
+        /// <summary>
+        /// VoiceVoxAPI[speakers]に送信する<see cref="HttpRequestMessage"/>を作成します。
+        /// </summary>
+        /// <returns></returns>
+        private static HttpRequestMessage CreateVoiceVoxSpeakersHttpRequest()
+        {
+            var message = new HttpRequestMessage()
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new UriBuilder()
+                {
+                    Host = Settings.AsString("VoiceVox.Application.Host"),
+                    Scheme = Settings.AsString("VoiceVox.Application.Scheme"),
+                    Port = Settings.AsInteger("VoiceVox.Application.Port"),
+                    Path = Settings.AsString("VoiceVox.Request.Speakers.Path"),
+                }.Uri
+            };
+
+            return message;
+        }
+
         /// <summary>
         /// VoiceVoxAPI[audio_query]に送信する<see cref="HttpRequestMessage"/>を作成します。
         /// </summary>
         /// <param name="text">読み上げメッセージ</param>
         /// <returns></returns>
-        private static HttpRequestMessage CreateVoiceVoxAudioQueryHttpRequest(string text)
+        private static HttpRequestMessage CreateVoiceVoxAudioQueryHttpRequest(string text, string speaker)
         {
             var query = HttpUtility.ParseQueryString("");
             query.Add(Settings.AsString("VoiceVox.Request.AudioQuery.ParamName.Text"), text);
-            query.Add(Settings.AsString("VoiceVox.Request.AudioQuery.ParamName.Speaker"), Settings.AsString("VoiceVox.Speaker"));
+            query.Add(Settings.AsString("VoiceVox.Request.AudioQuery.ParamName.Speaker"), speaker);
 
             return new HttpRequestMessage()
             {
@@ -236,10 +372,10 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.H
         /// </summary>
         /// <param name="audioQueryDic">APIにPOST送信するパラメータ</param>
         /// <returns></returns>
-        private static HttpRequestMessage CreateVoiceVoxSynthesisHttpRequest(MultiDic audioQueryDic)
+        private static HttpRequestMessage CreateVoiceVoxSynthesisHttpRequest(MultiDic audioQueryDic, string speaker)
         {
             var query = System.Web.HttpUtility.ParseQueryString("");
-            query.Add(Settings.AsString("VoiceVox.Request.Synthesis.ParamName.Speaker"), Settings.AsString("VoiceVox.Speaker"));
+            query.Add(Settings.AsString("VoiceVox.Request.Synthesis.ParamName.Speaker"), speaker);
 
             var message = new HttpRequestMessage()
             {
@@ -262,6 +398,8 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.H
 
             return message;
         }
+
+        #endregion CreateHttpRequest
 
         /// <summary>
         /// VoiceVoxで生成する音声生成クエリを調整します。

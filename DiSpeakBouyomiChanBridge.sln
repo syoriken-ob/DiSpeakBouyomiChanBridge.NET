@@ -7,13 +7,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiSpeakBouyomiChanBridge", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "net.boilingwater.Application.Common", "net.boilingwater.Application.Common\net.boilingwater.Application.Common.csproj", "{5407CE29-CBB2-4B5B-AD31-0E2F2BE2C5A2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "net.boilingwater.DiSpeakBouyomiChanBridge.external.DiscordClient", "external\net.boilingwater.DiSpeakBouyomiChanBridge.external.DiscordClient\net.boilingwater.DiSpeakBouyomiChanBridge.external.DiscordClient.csproj", "{F05A67B4-CB26-4E56-B1B6-28D5D5D82EE1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "net.boilingwater.DiSpeakBouyomiChanBridge.external.DiscordClient", "external\DiscordClient\net.boilingwater.DiSpeakBouyomiChanBridge.external.DiscordClient.csproj", "{F05A67B4-CB26-4E56-B1B6-28D5D5D82EE1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "net.boilingwater.Application.CommonTest", "_Test\net.boilingwater.Application.CommonTest\net.boilingwater.Application.CommonTest.csproj", "{91A54929-3B85-421D-AA61-61624A8E6911}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Test", "_Test", "{38F94AA7-0023-46E4-9F98-E82056DB0923}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "net.boilingwater.DiSpeakBouyomiChanBridge.external.AudioPlay", "external\net.boilingwater.DiSpeakBouyomiChanBridge.external.AudioPlay\net.boilingwater.DiSpeakBouyomiChanBridge.external.AudioPlay.csproj", "{EA03E293-2CAF-436F-8765-C4CBF99300EC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "net.boilingwater.DiSpeakBouyomiChanBridge.external.AudioPlay", "external\AudioPlay\net.boilingwater.DiSpeakBouyomiChanBridge.external.AudioPlay.csproj", "{EA03E293-2CAF-436F-8765-C4CBF99300EC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "external", "external", "{51DA63F6-C2B3-4A36-9794-50AA54FA3ADE}"
 EndProject

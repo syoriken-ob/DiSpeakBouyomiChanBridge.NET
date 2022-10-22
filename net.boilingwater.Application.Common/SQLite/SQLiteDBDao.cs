@@ -44,7 +44,7 @@ namespace net.boilingwater.Application.Common.SQLite
                 using var command = CreateSQLiteCommand(connection, sql, parameters);
                 using var adapter = new SQLiteDataAdapter();
                 adapter.SelectCommand = command;
-                Log.Logger.Debug("[SQLite]" + command.CommandText.Trim());
+                LoggingSQLCommand(command);
                 _ = adapter.Fill(table);
             }
             catch (Exception ex)

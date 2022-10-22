@@ -22,17 +22,16 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.H
             {
                 return;
             }
-
+            Log.Logger.Info($"ReadOut Message: {sendMessage}");
             var retryCount = 0L;
             var isValid = false;
             while (true)
             {
                 try
                 {
-                    var responseMessage = client_.Send(CreateBouyomiChanHttpRequest(sendMessage));
+                    var responseMessage = Client.Send(CreateBouyomiChanHttpRequest(sendMessage));
                     if (responseMessage.StatusCode == HttpStatusCode.OK)
                     {
-                        Log.Logger.Debug($"Send:{sendMessage}");
                         isValid = true;
                     }
                 }
