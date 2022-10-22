@@ -5,18 +5,21 @@
     =======================
 -->
 <Settings>
-  <Item key="VoiceVox.ApplicationPath"                        value="{VOICEVOX-APPLICATIONPATH}" />
-
   <Item key="VoiceVox.Application.Host"                       value="localhost" />
   <Item key="VoiceVox.Application.Scheme"                     value="http" />
   <Item key="VoiceVox.Application.Port"                       value="50021" />
 
-  <Item key="VoiceVox.Speaker"                                value="3" /> <!--ずんだもん（ノーマル）-->
+  <!--ずんだもん（ノーマル）-->
+  <Item key="VoiceVox.DefaultSpeaker"                         value="3" />
+  <!--メッセージ中の話者切り替え用マッピング（style.id;key,~~）-->
+  <Item key="VoiceVox.InlineSpeakersMapping"                  value="" />
+
+  <Item key="VoiceVox.Request.Speakers.Path"                  value="/speakers" />
 
   <Item key="VoiceVox.Request.AudioQuery.Path"                value="/audio_query" />
   <Item key="VoiceVox.Request.AudioQuery.ParamName.Text"      value="text" />
   <Item key="VoiceVox.Request.AudioQuery.ParamName.Speaker"   value="speaker" />
-  <Item key="VoiceVox.Request.AudioQuery.ReplaceJsonParam"    value="outputSamplingRate;48000/int,outputStereo;true/bool,speedScale;1.1/double,intonationScale;1.4/double,volumeScale;1.5/double" />
+  <Item key="VoiceVox.Request.AudioQuery.ReplaceJsonParam"    value="outputSamplingRate;24000/int,outputStereo;true/bool,speedScale;1.1/double,intonationScale;0.75/double,volumeScale;1.0/double" />
 
   <Item key="VoiceVox.Request.Synthesis.Path"                 value="/synthesis" />
   <Item key="VoiceVox.Request.Synthesis.ParamName.Speaker"    value="speaker" />

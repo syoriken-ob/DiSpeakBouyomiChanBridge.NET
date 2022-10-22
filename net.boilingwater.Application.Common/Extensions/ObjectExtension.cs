@@ -3,7 +3,7 @@ using System.Reflection;
 
 using net.boilingwater.Application.Common.Utils;
 
-namespace net.boilingwater.Application.Common.Extentions
+namespace net.boilingwater.Application.Common.Extensions
 {
     /// <summary>
     /// <see cref="object"/>型の拡張メソッドを管理するクラス<br/>

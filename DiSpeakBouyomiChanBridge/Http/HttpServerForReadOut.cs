@@ -8,7 +8,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http
     /// <summary>
     /// リクエストを受け付けるHttpServerの基底クラス
     /// </summary>
-    public abstract class AbstractHttpServer : IDisposable
+    public abstract class HttpServerForReadOut : IDisposable
     {
         /// <summary>
         /// Httpリクエストを受け付けるリスナー
@@ -26,13 +26,13 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http
                 {
                     if (Listener.IsListening)
                     {
-                        Listener?.Stop();
+                        Listener.Stop();
                     }
                     Listener?.Close();
                 }
 
                 Listener = new HttpListener();
-                RegisterListenningUrlPrefix(Listener.Prefixes);
+                RegisterListeningUrlPrefix(Listener.Prefixes);
 
                 foreach (var prefix in Listener.Prefixes)
                 {
@@ -54,7 +54,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http
         /// <summary>
         /// リクエストを受け付けるURLのプレフィックスを設定します。
         /// </summary>
-        protected abstract void RegisterListenningUrlPrefix(HttpListenerPrefixCollection listenningPrefix);
+        protected abstract void RegisterListeningUrlPrefix(HttpListenerPrefixCollection listenerPrefix);
 
         /// <summary>
         /// リクエスト受付を開始します。
@@ -77,7 +77,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http
         /// <param name="result"></param>
         /// <returns></returns>
         /// <exception cref="ApplicationException"/>
-        protected HttpListenerContext GetContextAndResumeListenning(IAsyncResult result)
+        protected HttpListenerContext GetContextAndResumeListening(IAsyncResult result)
         {
             var context = Listener?.EndGetContext(result) ?? throw new ApplicationException();
             Listener?.BeginGetContext(OnRequestReceived, Listener);

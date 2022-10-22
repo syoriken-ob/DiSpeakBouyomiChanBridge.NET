@@ -130,6 +130,26 @@ namespace net.boilingwater.Application.Common
             return new MultiDic();
         }
 
+        /// <summary>
+        /// <see cref="MultiList"/>型としてデータを取得します。
+        /// キーに紐づくデータがない場合は、空の<see cref="MultiList"/>を返します。
+        /// </summary>
+        /// <param name="key">キー</param>
+        /// <returns></returns>
+        public MultiList GetAsMultiList(string key)
+        {
+            if (ContainsKey(key))
+            {
+                try
+                {
+                    return CastUtil.ToObject<MultiList>(this[key]);
+                }
+                catch (Exception) { }
+            }
+
+            return new MultiList();
+        }
+
         # region IEquatable
 
         /// <inheritdoc/>

@@ -1,6 +1,8 @@
 ﻿using System;
 
+using net.boilingwater.Application.Common.Logging;
 using net.boilingwater.Application.Common.Settings;
+using net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.HttpClients;
 using net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Handle;
 using net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Handle.Impl;
 
@@ -34,10 +36,17 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Service
             {
                 throw new InvalidOperationException("コマンドハンドラの初期化が行われていません。");
             }
-
-            _handler.ExecutePreProcess(ref message);
-            _handler.Handle(ref message);
-            _handler.ExecutePostProcess(ref message);
+            try
+            {
+                _handler.ExecutePreProcess(ref message);
+                _handler.Handle(ref message);
+                _handler.ExecutePostProcess(ref message);
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error("Error！", ex);
+                HttpClientForReadOut.Instance?.ReadOut(Settings.AsString("Message.ErrorOccurrence.CommandHandle"));
+            }
         }
     }
 }

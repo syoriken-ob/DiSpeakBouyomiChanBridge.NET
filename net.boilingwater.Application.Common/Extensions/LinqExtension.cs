@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace net.boilingwater.Application.Common.Extentions
+namespace net.boilingwater.Application.Common.Extensions
 {
     /// <summary>
     /// LINQの拡張メソッドを管理するクラス

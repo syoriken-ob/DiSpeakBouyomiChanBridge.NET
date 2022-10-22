@@ -1,9 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 
+using net.boilingwater.Application.Common.Extensions;
 using net.boilingwater.Application.Common.Logging;
 using net.boilingwater.Application.Common.Settings;
 using net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.HttpClients;
@@ -12,12 +15,43 @@ using net.boilingwater.DiSpeakBouyomiChanBridge.InternalDiscordClient.Services;
 
 namespace net.boilingwater.DiSpeakBouyomiChanBridge.InternalDiscordClient
 {
+    /// <summary>
+    /// Discord.NETのClientにアタッチする各種イベントのハンドラ処理を定義したクラス
+    /// </summary>
     internal class DiscordEventHandler
     {
-        private readonly IDiscordClient? client;
+        internal IDiscordClient? Client { get; private set; }
+        internal LogSeverity RedirectLogSeverity { get; private set; }
 
-        internal DiscordEventHandler(IDiscordClient? client) => this.client = client;
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="client"></param>
+        /// <exception cref="ArgumentException"></exception>
+        internal DiscordEventHandler(IDiscordClient? client)
+        {
+            Client = client;
 
+            //リダイレクトするログレベルの設定
+            if (!Settings.AsString("RedirectLogDiscord.Net.LogSeverity").HasValue())
+            {
+                RedirectLogSeverity = LogSeverity.Debug;
+                return;
+            }
+            var levels = Enum.GetNames<LogSeverity>()
+                             .Where(s => s == Settings.AsString("RedirectLogDiscord.Net.LogSeverity"))
+                             .ToList();
+            if (levels.Any())
+            {
+                RedirectLogSeverity = Enum.Parse<LogSeverity>(levels.First());
+            }
+        }
+
+        /// <summary>
+        /// Discordからメッセージを受信した時の処理を定義します。
+        /// </summary>
+        /// <param name="rawMessage"></param>
+        /// <returns></returns>
         internal async Task MessageReceived(SocketMessage rawMessage)
         {
             if (rawMessage is not SocketUserMessage message)
@@ -25,7 +59,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.InternalDiscordClient
                 return;
             }
 
-            var context = new CommandContext(client, message);
+            var context = new CommandContext(Client, message);
 
             if (DiscordReceivedMessageService.IsPrivateMessage(context))
             {
@@ -49,6 +83,13 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.InternalDiscordClient
             await Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Discordからユーザーのステータス変更イベントを受信した時の処理を定義します。
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="sourceVoiceState"></param>
+        /// <param name="targetVoiceState"></param>
+        /// <returns></returns>
         internal async Task UserVoiceStatusUpdated(SocketUser user, SocketVoiceState sourceVoiceState, SocketVoiceState targetVoiceState)
         {
             if (!Settings.AsBoolean("Use.ReadOut.GuildChannel.Voice"))
@@ -106,13 +147,23 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.InternalDiscordClient
                     break;
 
                 default:
-                    return;
+                    break;
             }
             await Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Discord.NETでログ出力された場合の処理を定義します。
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
         internal Task Logging(LogMessage message)
         {
+            if (message.Severity > RedirectLogSeverity)
+            {
+                return Task.CompletedTask;
+            }
+
             switch (message.Severity)
             {
                 case LogSeverity.Critical:
@@ -130,7 +181,6 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.InternalDiscordClient
 
                 case LogSeverity.Verbose:
                 case LogSeverity.Debug:
-                default:
                     Log.Logger.Debug(message.Message);
                     break;
             }

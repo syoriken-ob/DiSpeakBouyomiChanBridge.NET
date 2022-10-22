@@ -12,7 +12,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http.Impl
     /// <summary>
     /// DiSpeakからメッセージを受信するHttpServer
     /// </summary>
-    public class HttpServerForDiSpeak : AbstractHttpServer
+    public class HttpServerForDiSpeak : HttpServerForReadOut
     {
         /// <summary>
         /// シングルトンインスタンス
@@ -22,17 +22,17 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http.Impl
         static HttpServerForDiSpeak() => Instance = new();
 
         /// <inheritdoc/>
-        protected override void RegisterListenningUrlPrefix(HttpListenerPrefixCollection prefixs)
+        protected override void RegisterListeningUrlPrefix(HttpListenerPrefixCollection prefixes)
         {
             var url = $"http://localhost:{Settings.AsString("ListeningPort")}/";
-            prefixs.Add(url);
+            prefixes.Add(url);
         }
 
         /// <inheritdoc/>
         protected override void OnRequestReceived(IAsyncResult result)
         {
             // Listening処理
-            var context = GetContextAndResumeListenning(result);
+            var context = GetContextAndResumeListening(result);
             var request = context.Request;
             var message = "";
             using (var response = context.Response)
@@ -46,13 +46,13 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http.Impl
                 response.StatusCode = 200;
             }
 
-            Log.Logger.DebugFormat("Receive :{0}", message);
+            Log.Logger.Debug($"Receive({GetType().Name}) :{message}");
 
             CommandHandlingService.Handle(message);
         }
     }
 
-    internal static partial class HttpListennerRequestExtention
+    internal static partial class HttpListenerRequestExtension
     {
         public static string? GetDiscordMessage(this HttpListenerRequest request) => request.QueryString["text"];
     }

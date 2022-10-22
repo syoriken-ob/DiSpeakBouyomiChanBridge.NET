@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 
 using net.boilingwater.Application.Common;
+using net.boilingwater.Application.Common.Extensions;
 using net.boilingwater.Application.Common.Settings;
 using net.boilingwater.Application.Common.Utils;
 using net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.MessageReplacer.Dao;
@@ -53,10 +54,25 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.MessageReplace
                     Initialize();
                 }
             }
-            if (Settings.AsBoolean("Use.ReadOutReplace.URLShortener"))
+        }
+
+        /// <summary>
+        /// URL省略処理
+        /// </summary>
+        /// <param name="message">メッセージ</param>
+        public static void ReplaceMessageUrlShortener(ref string message)
+        {
+            if (!Settings.AsBoolean("Use.ReadOutReplace.URLShortener"))
             {
-                ReplaceMessageUrlShortener(ref message);
+                return;
             }
+
+            message = Regex.Replace(
+                message,
+                Settings.AsString("RegularExpression.URLShortener"),
+                Settings.AsString("Format.Replace.URLShortener"),
+                RegexOptions.Singleline
+            );
         }
 
         /// <summary>
@@ -75,20 +91,6 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.MessageReplace
         }
 
         /// <summary>
-        /// URL省略処理
-        /// </summary>
-        /// <param name="message">メッセージ</param>
-        public static void ReplaceMessageUrlShortener(ref string message)
-        {
-            message = Regex.Replace(
-                message,
-                Settings.AsString("RegularExpression.URLShortener"),
-                Settings.AsString("Format.Replace.URLShortener"),
-                RegexOptions.Singleline
-            );
-        }
-
-        /// <summary>
         /// [棒読みちゃん互換処理] 教育コマンドを検出してDBに登録します。<br/>
         /// 登録後、置換設定をDBから再読み込みします。
         /// </summary>
@@ -101,7 +103,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.MessageReplace
             {
                 return false;
             }
-
+            var registered = false;
             var dao = new MessageReplacerDao();
             do
             {
@@ -111,11 +113,18 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.MessageReplace
                 {
                     continue;
                 }
-                _ = dao.UpdateOrRegisterReplaceSetting(replaceKey.Value, replaceValue.Value);
-                message = message.Replace(match.Value, string.Format(Settings.AsString("Format.Replace.RegisterReplaceSetting"), replaceKey.Value, replaceValue.Value));
+
+                var key = replaceKey.Value.Trim();
+                if (!key.HasValue())
+                {
+                    continue;
+                }
+                _ = dao.UpdateOrRegisterReplaceSetting(key, replaceValue.Value);
+                registered = true;
+                message = message.Replace(match.Value, string.Format(Settings.AsString("Format.Replace.RegisterReplaceSetting"), key, replaceValue.Value));
             } while ((match = match.NextMatch()).Success);
 
-            return true;
+            return registered;
         }
 
         /// <summary>
@@ -132,6 +141,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.MessageReplace
             }
 
             var dao = new MessageReplacerDao();
+            var registered = false;
             do
             {
                 var replaceKey = match.Groups["replace_key"];
@@ -140,17 +150,24 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.MessageReplace
                     continue;
                 }
 
-                if (_replaceSetting.ContainsKey(replaceKey.Value))
+                var key = replaceKey.Value.Trim();
+                if (!key.HasValue())
                 {
-                    _ = dao.DeleteReplaceSetting(replaceKey.Value);
-                    message = message.Replace(match.Value, string.Format(Settings.AsString("Format.Replace.DeleteReplaceSetting"), replaceKey.Value));
+                    continue;
+                }
+
+                if (_replaceSetting.ContainsKey(key))
+                {
+                    _ = dao.DeleteReplaceSetting(key);
+                    registered = true;
+                    message = message.Replace(match.Value, string.Format(Settings.AsString("Format.Replace.DeleteReplaceSetting"), key));
                 }
                 else
                 {
-                    message = message.Replace(match.Value, string.Format(Settings.AsString("Format.Replace.NotRegisteredReplaceSetting"), replaceKey.Value));
+                    message = message.Replace(match.Value, string.Format(Settings.AsString("Format.Replace.NotRegisteredReplaceSetting"), key));
                 }
             } while ((match = match.NextMatch()).Success);
-            return true;
+            return registered;
         }
     }
 }

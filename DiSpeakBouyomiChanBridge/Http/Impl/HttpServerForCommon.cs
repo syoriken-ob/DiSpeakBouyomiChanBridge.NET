@@ -5,15 +5,14 @@ using System.Net.Http;
 using net.boilingwater.Application.Common.Logging;
 using net.boilingwater.Application.Common.Settings;
 using net.boilingwater.Application.Common.Utils;
-using net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.HttpClients;
+using net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Service;
 
 namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http.Impl
 {
     /// <summary>
     /// メッセージを受信する共通HttpServer
     /// </summary>
-    /// <remarks>コマンド検出処理を行わず、そのまま読み上げ処理を行います。</remarks>
-    public class HttpServerForCommon : AbstractHttpServer
+    public class HttpServerForCommon : HttpServerForReadOut
     {
         /// <summary>
         /// シングルトンインスタンス
@@ -23,17 +22,17 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http.Impl
         static HttpServerForCommon() => Instance = new();
 
         /// <inheritdoc/>
-        protected override void RegisterListenningUrlPrefix(HttpListenerPrefixCollection prefixs)
+        protected override void RegisterListeningUrlPrefix(HttpListenerPrefixCollection prefixes)
         {
             var url = $"http://localhost:{Settings.AsString("CommonVoiceReadoutServer.ListeningPort")}/";
-            prefixs.Add(url);
+            prefixes.Add(url);
         }
 
         /// <inheritdoc/>
         protected override void OnRequestReceived(IAsyncResult result)
         {
             // Listening処理
-            var context = GetContextAndResumeListenning(result);
+            var context = GetContextAndResumeListening(result);
             var request = context.Request;
             var message = "";
             using (var response = context.Response)
@@ -47,13 +46,13 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http.Impl
                 response.StatusCode = 200;
             }
 
-            Log.Logger.DebugFormat("Receive :{0}", message);
+            Log.Logger.Debug($"Receive({GetType().Name}) :{message}");
 
-            HttpClientForReadOut.Instance?.ReadOut(message);
+            CommandHandlingService.Handle(message);
         }
     }
 
-    internal static partial class HttpListennerRequestExtention
+    internal static partial class HttpListenerRequestExtension
     {
         public static string? GetTextMessage(this HttpListenerRequest request, string parameterName) => request.QueryString[parameterName];
     }

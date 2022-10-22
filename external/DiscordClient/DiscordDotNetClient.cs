@@ -15,10 +15,6 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.external.DiscordClient
     /// </summary>
     public class DiscordDotNetClient
     {
-        public DiscordSocketClient? Client { get; private set; }
-        internal CommandService? commands;
-        internal IServiceProvider? services;
-
         /// <summary>
         /// 読み上げ対象のサーバー
         /// </summary>
@@ -27,6 +23,9 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.external.DiscordClient
         public Func<SocketMessage, Task>? MessageReceived { private get; set; }
         public Func<SocketUser, SocketVoiceState, SocketVoiceState, Task>? UserVoiceStatusUpdated { private get; set; }
         public Func<LogMessage, Task>? Logging { private get; set; }
+        public DiscordSocketClient? InnerClient { get; private set; }
+        internal CommandService? Commands { get; set; }
+        internal IServiceProvider? ServicesProvider { get; set; }
 
         /// <summary>
         /// 非同期で初期化処理を行います
@@ -34,15 +33,16 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.external.DiscordClient
         /// <returns></returns>
         public async Task InitializeAsync()
         {
-            Client = new DiscordSocketClient(new DiscordSocketConfig
+            InnerClient = new DiscordSocketClient(new DiscordSocketConfig
             {
                 LogLevel = LogSeverity.Debug,
-                ConnectionTimeout = int.MaxValue
+                ConnectionTimeout = int.MaxValue,
+                AlwaysDownloadUsers = true,
             });
-            commands = new CommandService();
-            services = new ServiceCollection().BuildServiceProvider();
+            Commands = new CommandService();
+            ServicesProvider = new ServiceCollection().BuildServiceProvider();
 
-            _ = await commands.AddModulesAsync(Assembly.GetEntryAssembly(), services);
+            _ = await Commands.AddModulesAsync(Assembly.GetEntryAssembly(), ServicesProvider);
 
             await Task.CompletedTask;
         }
@@ -55,36 +55,36 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.external.DiscordClient
         /// <exception cref="InvalidOperationException"></exception>
         public async Task StartAsync(string token)
         {
-            if (Client == null)
+            if (InnerClient == null)
             {
                 throw new InvalidOperationException();
             }
             //ハンドラ関数のセット
             if (Logging != null)
             {
-                Client.Log += Logging;
+                InnerClient.Log += Logging;
             }
             if (MessageReceived != null)
             {
-                Client.MessageReceived += MessageReceived;
+                InnerClient.MessageReceived += MessageReceived;
             }
             if (UserVoiceStatusUpdated != null)
             {
-                Client.UserVoiceStateUpdated += UserVoiceStatusUpdated;
+                InnerClient.UserVoiceStateUpdated += UserVoiceStatusUpdated;
             }
 
-            await Client.LoginAsync(TokenType.Bot, token).ConfigureAwait(false);
+            await InnerClient.LoginAsync(TokenType.Bot, token).ConfigureAwait(false);
 
             if (TargetGuild != null)
             {
-                var guilds = TargetGuild.Select(guild => Client.GetGuild(CastUtil.ToUnsignedLong(guild)));
+                var guilds = TargetGuild.Select(guild => InnerClient.GetGuild(CastUtil.ToUnsignedLong(guild)));
                 if (guilds.Any())
                 {
-                    await Client.DownloadUsersAsync(guilds).ConfigureAwait(false);
+                    await InnerClient.DownloadUsersAsync(guilds).ConfigureAwait(false);
                 }
             }
 
-            await Client.StartAsync();
+            await InnerClient.StartAsync();
 
             await Task.Delay(-1);
         }
