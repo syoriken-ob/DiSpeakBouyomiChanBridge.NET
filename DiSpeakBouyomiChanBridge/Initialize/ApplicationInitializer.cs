@@ -42,7 +42,6 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge
 
             HttpClientForReadOut.Instance?.ReadOut(Settings.AsString("Message.FinishInitialize"));
             Log.Logger.Info("アプリケーションの初期化処理が完了しました。");
-            HttpClientForReadOut.Instance?.ReadOut(Settings.AsString("Message.Welcome"));
         }
 
         /// <summary>

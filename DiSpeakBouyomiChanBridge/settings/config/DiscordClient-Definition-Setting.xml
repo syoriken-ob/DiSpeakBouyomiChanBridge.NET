@@ -10,8 +10,10 @@
       ## 各種読み上げメッセージ定義 ##
       ################################
   -->
-  <Item key="Format.DiscordMessage.PostPlainMessage"                     value="{NICKNAME} {MESSAGE}" />
-  <Item key="Format.DiscordMessage.PostMessageWithFile"                  value="{NICKNAME}がファイルを{FILE_COUNT}件送信しました。{FILE_NAMES}。{MESSAGE}" />
+  <Item key="Format.DiscordMessage.PostPlainMessage"                     value="{NICKNAME}
+{MESSAGE}" />
+  <Item key="Format.DiscordMessage.PostMessageWithFile"                  value="{NICKNAME}がファイルを{FILE_COUNT}件送信しました。{FILE_NAMES}。
+{MESSAGE}" />
   <Item key="Format.DiscordMessage.JoinVoiceChannleMessage"              value="{NICKNAME}が{TARGET_CHANNEL}に参加しました。" />
   <Item key="Format.DiscordMessage.LeaveVoiceChannleMessage"             value="{NICKNAME}が{SOURCE_CHANNEL}から退出しました。" />
   <Item key="Format.DiscordMessage.MoveVoiceChannleMessage"              value="{NICKNAME}が{SOURCE_CHANNEL}から{TARGET_CHANNEL}に移動しました。" />
