@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Http;
 
+using net.boilingwater.Application.Common.Extensions;
 using net.boilingwater.Application.Common.Logging;
 using net.boilingwater.Application.Common.Settings;
 using net.boilingwater.Application.Common.Utils;
@@ -24,8 +25,14 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http.Impl
         /// <inheritdoc/>
         protected override void RegisterListeningUrlPrefix(HttpListenerPrefixCollection prefixes)
         {
-            var url = $"http://localhost:{Settings.AsString("CommonVoiceReadoutServer.ListeningPort")}/";
-            prefixes.Add(url);
+            Settings.AsStringList("List.CommonVoiceReadoutServer.ListeningHost")
+                    .ForEach(host => prefixes.Add(new UriBuilder()
+                    {
+                        Scheme = "http",
+                        Host = host,
+                        Port = Settings.AsInteger("CommonVoiceReadoutServer.ListeningPort"),
+                        Path = "/"
+                    }.Uri.ToString()));
         }
 
         /// <inheritdoc/>

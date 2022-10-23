@@ -9,6 +9,7 @@ using net.boilingwater.Application.Common.Extensions;
 using net.boilingwater.Application.Common.Logging;
 using net.boilingwater.Application.Common.Settings;
 using net.boilingwater.Application.Common.Utils;
+using net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.MessageReplacer.Service;
 using net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadOut.VoiceExecutor;
 
 namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.HttpClients.Impl
@@ -26,6 +27,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.H
         public HttpClientForVoiceVox()
         {
             VoiceVoxSpeakers = FetchEnableVoiceVoxSpeaker();
+            InitializeVoiceVoxSpeaker();
 
             _thread = new Thread(() =>
             {
@@ -80,6 +82,11 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.H
             while (true)
             {
                 var speaker = ExtactVoiceVoxSpeaker(ref message);
+                //メッセージ置換処理
+                MessageReplaceService.ReplaceMessage(ref message);
+                //URL省略処理
+                MessageReplaceService.ReplaceMessageUrlShortener(ref message);
+
                 var audioQueryResult = SendVoiceVoxAudioQueryRequst(message, speaker);
                 if (audioQueryResult.ContainsKey("statusCode"))
                 {
@@ -149,7 +156,18 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.H
             return dic;
         }
 
-        #region SendRequest
+        /// <summary>
+        /// VoiceVoxAPI[initialize_speaker]に通信し、話者の初期化を行います。
+        /// </summary>
+        private void InitializeVoiceVoxSpeaker()
+        {
+            foreach (var pair in VoiceVoxSpeakers)
+            {
+                Log.Logger.Debug($"VoiceVox話者：{pair.Key}を初期化します。");
+                var result = SendVoiceVoxInitializeSpeakerRequst(pair.Value);
+                Log.Logger.Debug($"VoiceVox話者：{pair.Key}の初期化に{(result.GetAsBoolean("valid") ? "成功" : "失敗")}しました。");
+            }
+        }
 
         /// <summary>
         /// メッセージ中のVoiceVox話者を抽出します。
@@ -180,6 +198,8 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.H
             return VoiceVoxSpeakers[speakerId.Value];
         }
 
+        #region SendRequest
+
         /// <summary>
         /// VoiceVoxAPI[speakers]にリクエストを送信します。
         /// </summary>
@@ -199,6 +219,45 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.H
                     }
                     using var reader = new StreamReader(speakersResponse.Content.ReadAsStream(), Encoding.UTF8);
                     result["speakers"] = SerializeUtil.JsonToMultiList(reader.ReadToEnd());
+                }
+                return result;
+            }
+            catch (WebException ex)
+            {
+                result["valid"] = false;
+                if (ex.Response == null)
+                {
+                    Log.Logger.Error(ex);
+                }
+                else
+                {
+                    using var error = ex.Response.GetResponseStream();
+                    using var streamReader = new StreamReader(error);
+                    Log.Logger.Error(streamReader.ReadToEnd(), ex);
+                }
+            }
+            catch (Exception ex)
+            {
+                result["valid"] = false;
+                Log.Logger.Error(ex);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// VoiceVoxAPI[initialize_speaker]にリクエストを送信します。
+        /// </summary>
+        /// <param name="speaker">初期化するVoiceVox話者ID</param>
+        /// <returns></returns>
+        private MultiDic SendVoiceVoxInitializeSpeakerRequst(string speaker)
+        {
+            var result = new MultiDic();
+            try
+            {
+                using (var speakersResponse = Client.Send(CreateVoiceVoxInitializeSpeakerHttpRequest(speaker)))
+                {
+                    result["valid"] = speakersResponse.IsSuccessStatusCode;
+                    result["statusCode"] = speakersResponse.StatusCode;
                 }
                 return result;
             }
@@ -327,7 +386,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.H
         /// <returns></returns>
         private static HttpRequestMessage CreateVoiceVoxSpeakersHttpRequest()
         {
-            var message = new HttpRequestMessage()
+            return new HttpRequestMessage()
             {
                 Method = HttpMethod.Get,
                 RequestUri = new UriBuilder()
@@ -338,8 +397,30 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.H
                     Path = Settings.AsString("VoiceVox.Request.Speakers.Path"),
                 }.Uri
             };
+        }
 
-            return message;
+        /// <summary>
+        /// VoiceVoxAPI[initialize_speaker]に送信する<see cref="HttpRequestMessage"/>を作成します。
+        /// </summary>
+        /// <param name="speaker">初期化を行うVoiceVox話者ID</param>
+        /// <returns></returns>
+        private static HttpRequestMessage CreateVoiceVoxInitializeSpeakerHttpRequest(string speaker)
+        {
+            var query = HttpUtility.ParseQueryString("");
+            query.Add(Settings.AsString("VoiceVox.Request.InitializeSpeaker.ParamName.Speaker"), speaker);
+
+            return new HttpRequestMessage()
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new UriBuilder()
+                {
+                    Host = Settings.AsString("VoiceVox.Application.Host"),
+                    Scheme = Settings.AsString("VoiceVox.Application.Scheme"),
+                    Port = Settings.AsInteger("VoiceVox.Application.Port"),
+                    Path = Settings.AsString("VoiceVox.Request.InitializeSpeaker.Path"),
+                    Query = query.ToString()
+                }.Uri
+            };
         }
 
         /// <summary>

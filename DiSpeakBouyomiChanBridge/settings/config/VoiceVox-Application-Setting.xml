@@ -16,6 +16,9 @@
 
   <Item key="VoiceVox.Request.Speakers.Path"                  value="/speakers" />
 
+  <Item key="VoiceVox.Request.InitializeSpeaker.Path"         value="/initialize_speaker" />
+  <Item key="VoiceVox.Request.InitializeSpeaker.ParamName.Speaker"  value="speaker" />
+
   <Item key="VoiceVox.Request.AudioQuery.Path"                value="/audio_query" />
   <Item key="VoiceVox.Request.AudioQuery.ParamName.Text"      value="text" />
   <Item key="VoiceVox.Request.AudioQuery.ParamName.Speaker"   value="speaker" />

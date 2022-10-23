@@ -58,12 +58,6 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Handle
             //スポイラーなどの処理
             DiscordReceivedMessageService.ReplaceCommonReceivedInfoAfter(ref message);
 
-            //メッセージ置換処理
-            MessageReplaceService.ReplaceMessage(ref message);
-
-            //URL省略処理
-            MessageReplaceService.ReplaceMessageUrlShortener(ref message);
-
             //棒読みちゃんに送信
             HttpClientForReadOut.Instance?.ReadOut(message);
         }
