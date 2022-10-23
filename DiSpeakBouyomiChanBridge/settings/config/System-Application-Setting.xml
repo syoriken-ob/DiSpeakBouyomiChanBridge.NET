@@ -33,4 +33,6 @@
   <Item key="Use.CommonVoiceReadoutServer"   value="False" />
   <!--共通読み上げAPIの受付ポート番号-->
   <Item key="CommonVoiceReadoutServer.ListeningPort"   value="9998" />
+  <!--共通読み上げAPIの受付ホスト名のリスト-->
+  <Item key="List.CommonVoiceReadoutServer.ListeningHost"   value="localhost" />
 </Settings>
