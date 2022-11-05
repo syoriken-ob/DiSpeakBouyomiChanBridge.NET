@@ -5,6 +5,7 @@ using System.IO;
 using System.Text;
 
 using net.boilingwater.Application.Common.Logging;
+using net.boilingwater.Application.Common.Setting;
 using net.boilingwater.Application.Common.Utils;
 
 namespace net.boilingwater.Application.Common.SQLite
@@ -22,7 +23,7 @@ namespace net.boilingwater.Application.Common.SQLite
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public SQLiteDBDao() => _connectionString = $"Data Source={Settings.Settings.AsString("SQLite3.DBFilePath")}";
+        public SQLiteDBDao() => _connectionString = $"Data Source={Settings.AsString("SQLite3.DBFilePath")}";
 
         /// <summary>
         /// Daoクラスで利用するテーブルの作成処理などを定義します。
@@ -35,7 +36,7 @@ namespace net.boilingwater.Application.Common.SQLite
         /// <param name="sql">実行するSQL文</param>
         /// <param name="parameters">パラメータリスト</param>
         /// <returns></returns>
-        protected DataTable Select(string sql, SQLiteParameterList parameters = null)
+        protected DataTable Select(string sql, SQLiteParameterList? parameters = null)
         {
             var table = new DataTable();
             try
@@ -61,7 +62,7 @@ namespace net.boilingwater.Application.Common.SQLite
         /// <param name="sql">実行するSQL文</param>
         /// <param name="parameters">パラメータリスト</param>
         /// <returns>影響行数</returns>
-        protected int Execute(string sql, SQLiteParameterList parameters = null)
+        protected int Execute(string sql, SQLiteParameterList? parameters = null)
         {
             try
             {
@@ -82,9 +83,9 @@ namespace net.boilingwater.Application.Common.SQLite
         /// </summary>
         public static void CreateDataBase()
         {
-            if (!File.Exists(Settings.Settings.AsString("SQLite3.DBFilePath")))
+            if (!File.Exists(Settings.AsString("SQLite3.DBFilePath")))
             {
-                SQLiteConnection.CreateFile(Settings.Settings.AsString("SQLite3.DBFilePath"));
+                SQLiteConnection.CreateFile(Settings.AsString("SQLite3.DBFilePath"));
             }
         }
 
@@ -103,7 +104,7 @@ namespace net.boilingwater.Application.Common.SQLite
         /// <param name="sql">実行するSQL</param>
         /// <param name="parameters">SQLパラメータ</param>
         /// <returns></returns>
-        private static SQLiteCommand CreateSQLiteCommand(SQLiteConnection connection, string sql, SQLiteParameterList parameters)
+        private static SQLiteCommand CreateSQLiteCommand(SQLiteConnection connection, string sql, SQLiteParameterList? parameters)
         {
             var command = connection.CreateCommand();
             command.CommandText = sql;

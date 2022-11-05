@@ -18,7 +18,9 @@ namespace net.boilingwater.Application.Common.Extensions
         /// <summary>
         /// すべての公開フィールドの情報を文字列にして返します
         /// </summary>
-        public static string ToStringFields<T>(this T obj) => string.Join(SEPARATOR, obj
+        public static string ToStringFields<T>(this T obj) => obj == null
+                ? string.Empty
+                : string.Join(SEPARATOR, obj
                 .GetType()
                 .GetFields(BindingFlags.Instance | BindingFlags.Public)
                 .Select(c => string.Format(FORMAT, c.Name, CastUtil.ToString(c.GetValue(obj)))));
@@ -26,7 +28,9 @@ namespace net.boilingwater.Application.Common.Extensions
         /// <summary>
         /// すべての公開プロパティの情報を文字列にして返します
         /// </summary>
-        public static string ToStringProperties<T>(this T obj) => string.Join(SEPARATOR, obj
+        public static string ToStringProperties<T>(this T obj) => obj == null
+                ? string.Empty
+                : string.Join(SEPARATOR, obj
                 .GetType()
                 .GetProperties(BindingFlags.Instance | BindingFlags.Public)
                 .Where(c => c.CanRead)

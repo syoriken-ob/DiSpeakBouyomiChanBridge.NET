@@ -1,9 +1,11 @@
-﻿namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.HttpClients
+﻿using net.boilingwater.Application.Common.Http;
+
+namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.HttpClients
 {
     /// <summary>
     /// 読み上げ処理用の基底HttpClientクラス
     /// </summary>
-    public abstract class HttpClientForReadOut : IDisposable
+    public abstract class HttpClientForReadOut : AbstractHttpClient
     {
         /// <summary>
         /// シングルトンインスタンス
@@ -11,36 +13,10 @@
         public static HttpClientForReadOut? Instance { get; internal set; }
 
         /// <summary>
-        /// 内部処理用HttpClient
-        /// </summary>
-        protected HttpClient Client { get; set; }
-
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        public HttpClientForReadOut() => Client = new();
-
-        /// <summary>
-        /// 内部Httpクライアントを再生成します。
-        /// </summary>
-        public void RenewHttpClient()
-        {
-            ((IDisposable)this).Dispose();
-            Client = new HttpClient();
-        }
-
-        /// <summary>
         /// メッセージを読み上げます。
         /// </summary>
         /// <param name="text"></param>
         public abstract void ReadOut(string text);
-
-        ///<inheritdoc/>
-        public void Dispose()
-        {
-            Client.Dispose();
-            GC.SuppressFinalize(this);
-        }
 
         /// <summary>
         /// 初期化処理

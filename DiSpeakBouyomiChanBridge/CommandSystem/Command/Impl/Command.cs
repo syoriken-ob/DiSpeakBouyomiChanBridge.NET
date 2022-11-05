@@ -5,7 +5,7 @@ using System.Linq;
 
 using net.boilingwater.Application.Common.Extensions;
 using net.boilingwater.Application.Common.Logging;
-using net.boilingwater.Application.Common.Settings;
+using net.boilingwater.Application.Common.Setting;
 using net.boilingwater.Application.Common.Utils;
 using net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.HttpClients;
 

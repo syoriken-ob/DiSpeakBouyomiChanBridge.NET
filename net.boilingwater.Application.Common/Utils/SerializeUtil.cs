@@ -26,7 +26,7 @@ namespace net.boilingwater.Application.Common.Utils
             try
             {
                 var rawDic = JsonSerializer.Deserialize<MultiDic>(json, CreateJsonSerializerOption());
-                return ConvertJsonElementToMultiDic(rawDic);
+                return rawDic != null ? ConvertJsonElementToMultiDic(rawDic) : new MultiDic();
             }
             catch
             {
@@ -49,7 +49,7 @@ namespace net.boilingwater.Application.Common.Utils
             try
             {
                 var rawList = JsonSerializer.Deserialize<MultiList>(json, CreateJsonSerializerOption());
-                return ConvertJsonElementToMultiDicFromMultiList(rawList);
+                return rawList != null ? ConvertJsonElementToMultiDicFromMultiList(rawList) : new MultiList();
             }
             catch
             {
@@ -113,7 +113,7 @@ namespace net.boilingwater.Application.Common.Utils
             return rawList;
         }
 
-        private static object Parse(JsonElement element)
+        private static object? Parse(JsonElement element)
         {
             switch (element.ValueKind)
             {
@@ -127,7 +127,7 @@ namespace net.boilingwater.Application.Common.Utils
                     return ParseList(element);
 
                 case JsonValueKind.String:
-                    return element.GetString();
+                    return element.GetString() ?? string.Empty;
 
                 case JsonValueKind.Number:
                     return element.GetDecimal();

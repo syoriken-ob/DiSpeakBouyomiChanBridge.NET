@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 
 using net.boilingwater.Application.Common.Logging;
-using net.boilingwater.Application.Common.Settings;
+using net.boilingwater.Application.Common.Setting;
 using net.boilingwater.Application.Common.Utils;
 
 namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl.Factory

@@ -7,7 +7,7 @@ using System.Xml;
 using net.boilingwater.Application.Common.Extensions;
 using net.boilingwater.Application.Common.Logging;
 
-namespace net.boilingwater.Application.Common.Settings
+namespace net.boilingwater.Application.Common.Setting
 {
     /// <summary>
     /// アプリケーション設定値を保持するクラス
@@ -18,7 +18,7 @@ namespace net.boilingwater.Application.Common.Settings
 
         private readonly SimpleDic<string> Settings;
 
-        internal string this[string key] => Settings[key.ToLower()];
+        internal string this[string key] => Settings[key.ToLower()] ?? string.Empty;
 
         internal SettingHolder()
         {

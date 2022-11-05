@@ -1,5 +1,5 @@
 ﻿using net.boilingwater.Application.Common.Logging;
-using net.boilingwater.Application.Common.Settings;
+using net.boilingwater.Application.Common.Setting;
 using net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.HttpClients;
 using net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.PipeLine;
 
@@ -26,6 +26,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl
         public override void Execute()
         {
             ApplicationInitializer.Initialize();
+            ApplicationInitializer.Start();
             Log.Logger.Info("Reload SystemConfig...");
             HttpClientForReadOut.Instance?.ReadOut(Settings.AsString("Message.ReloadConfig"));
         }

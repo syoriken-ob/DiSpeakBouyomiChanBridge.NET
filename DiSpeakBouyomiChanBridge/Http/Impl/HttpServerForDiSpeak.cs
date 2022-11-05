@@ -2,8 +2,9 @@
 using System.Net;
 using System.Net.Http;
 
+using net.boilingwater.Application.Common.Http;
 using net.boilingwater.Application.Common.Logging;
-using net.boilingwater.Application.Common.Settings;
+using net.boilingwater.Application.Common.Setting;
 using net.boilingwater.Application.Common.Utils;
 using net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Service;
 
@@ -12,7 +13,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http.Impl
     /// <summary>
     /// DiSpeakからメッセージを受信するHttpServer
     /// </summary>
-    public class HttpServerForDiSpeak : HttpServerForReadOut
+    public class HttpServerForDiSpeak : AbstractHttpServer
     {
         /// <summary>
         /// シングルトンインスタンス
@@ -33,6 +34,10 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http.Impl
         {
             // Listening処理
             var context = GetContextAndResumeListening(result);
+            if (context == null)
+            {
+                return;
+            }
             var request = context.Request;
             var message = "";
             using (var response = context.Response)

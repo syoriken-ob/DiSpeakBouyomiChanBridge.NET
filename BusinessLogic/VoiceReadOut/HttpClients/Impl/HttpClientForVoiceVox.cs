@@ -7,7 +7,7 @@ using System.Web;
 using net.boilingwater.Application.Common;
 using net.boilingwater.Application.Common.Extensions;
 using net.boilingwater.Application.Common.Logging;
-using net.boilingwater.Application.Common.Settings;
+using net.boilingwater.Application.Common.Setting;
 using net.boilingwater.Application.Common.Utils;
 using net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.MessageReplacer.Service;
 using net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadOut.VoiceExecutor;
@@ -82,10 +82,6 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.H
             while (true)
             {
                 var speaker = ExtactVoiceVoxSpeaker(ref message);
-                //メッセージ置換処理
-                MessageReplaceService.ReplaceMessage(ref message);
-                //URL省略処理
-                MessageReplaceService.ReplaceMessageUrlShortener(ref message);
 
                 var audioQueryResult = SendVoiceVoxAudioQueryRequst(message, speaker);
                 if (audioQueryResult.ContainsKey("statusCode"))
@@ -123,7 +119,11 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.H
                 }
 
                 Log.Logger.Info($"ReadOut Message: {message}");
-                VoiceVoxReadOutAudioPlayExecutor.Instance.AddQueue(synthesisResult.GetAsObject<byte[]>("voice"));
+                var voiceAudio = synthesisResult.GetAsObject<byte[]>("voice");
+                if (voiceAudio != null)
+                {
+                    VoiceVoxReadOutAudioPlayExecutor.Instance.AddQueue(voiceAudio);
+                }
                 return;
             }
         }
@@ -143,9 +143,11 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.H
                 var baseSpeakerDic = Settings.AsMultiDic("VoiceVox.InlineSpeakersMapping");
                 var fetchedSpeakerList = result.GetAsMultiList("speakers")
                                                .Select(s => CastUtil.ToObject<MultiDic>(s))
-                                               .SelectMany(s => s.GetAsMultiList("styles"))
+                                               .Where(s => s != null)
+                                               .SelectMany(s => s!.GetAsMultiList("styles"))
                                                .Select(s => CastUtil.ToObject<MultiDic>(s))
-                                               .Select(s => s.GetAsString("id"))
+                                               .Where(s => s != null)
+                                               .Select(s => s!.GetAsString("id"))
                                                .Intersect(baseSpeakerDic.Keys)
                                                .ToList();
 
@@ -164,7 +166,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.H
             foreach (var pair in VoiceVoxSpeakers)
             {
                 Log.Logger.Debug($"VoiceVox話者：{pair.Key}を初期化します。");
-                var result = SendVoiceVoxInitializeSpeakerRequst(pair.Value);
+                var result = SendVoiceVoxInitializeSpeakerRequst(CastUtil.ToString(pair.Value));
                 Log.Logger.Debug($"VoiceVox話者：{pair.Key}の初期化に{(result.GetAsBoolean("valid") ? "成功" : "失敗")}しました。");
             }
         }
@@ -195,7 +197,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.H
             }
 
             message = message.Replace(match.Value, "");
-            return VoiceVoxSpeakers[speakerId.Value];
+            return VoiceVoxSpeakers[speakerId.Value] ?? Settings.AsString("VoiceVox.DefaultSpeaker");
         }
 
         #region SendRequest

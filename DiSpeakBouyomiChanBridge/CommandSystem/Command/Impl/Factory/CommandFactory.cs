@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 using net.boilingwater.Application.Common;
 using net.boilingwater.Application.Common.Logging;
-using net.boilingwater.Application.Common.Settings;
+using net.boilingwater.Application.Common.Setting;
 using net.boilingwater.Application.Common.Utils;
 
 namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl.Factory
@@ -22,8 +22,11 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl.Factory
         /// </summary>
         public static CommandFactory Factory { get; protected set; } = new();
 
+        private Regex CommandPattern { get; set; }
+
         private CommandFactory()
         {
+            CommandPattern = new Regex("{dummy}", RegexOptions.Compiled);
         }
 
         /// <summary>
@@ -34,14 +37,18 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl.Factory
         public override IEnumerable<ExecutableCommand> CreateExecutableCommands(ref string input)
         {
             var executableCommands = new List<Command>();
-            var pattern = $"({string.Join("|", Dic.Values.Select(c => ((Command)c).Regex))})";
-            foreach (Match match in Regex.Matches(input, pattern))
+            foreach (Match match in CommandPattern.Matches(input))
             {
-                foreach (Command command1 in Dic.Values)
+                foreach (Command? command in Dic.Values)
                 {
-                    if (Regex.IsMatch(match.Value, CastUtil.ToString(command1.Regex)))
+                    if (command == null)
                     {
-                        var command2 = (Command)command1.Clone();
+                        continue;
+                    }
+
+                    if (Regex.IsMatch(match.Value, CastUtil.ToString(command.Regex)))
+                    {
+                        var command2 = (Command)command.Clone();
                         input = input.Replace(match.Value, "");
                         CommandFactory.ReplaceCommand(match, command2);
                         executableCommands.Add(command2);
@@ -85,10 +92,17 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl.Factory
                     {
                         foreach (var pair in dic)
                         {
+                            if (pair.Value == null)
+                            {
+                                continue;
+                            }
                             pair.Value.CommandTitle = pair.Key;
                             Dic.Add(pair.Key, pair.Value);
                             Log.Logger.Debug($"コマンド登録：{pair.Key}");
                         }
+
+                        CommandPattern = new($"({string.Join("|", Dic.Values.Select(c => ((Command)c!).Regex))})", RegexOptions.Compiled);
+
                         Log.Logger.Info("コマンドファイルの読み込みが完了しました。");
                     }
                     else
@@ -104,7 +118,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl.Factory
         }
 
         /// <summary>
-        /// コマンドのJSONファイルから辞書を取得します。
+        /// コマンドのYAMLファイルから辞書を取得します。
         /// </summary>
         /// <returns></returns>
         private SimpleDic<Command> LoadCommandDic()
@@ -133,12 +147,14 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl.Factory
             }
 
             var dic = new SimpleDic<Command>();
-            if (commandDic != null)
+            if (commandDic == null)
             {
-                foreach (var item in commandDic)
-                {
-                    dic[item.Key] = item.Value;
-                }
+                return dic;
+            }
+
+            foreach (var item in commandDic)
+            {
+                dic[item.Key] = item.Value;
             }
             return dic;
         }

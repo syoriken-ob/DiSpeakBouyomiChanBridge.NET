@@ -8,7 +8,7 @@ namespace net.boilingwater.Application.Common
     /// <summary>
     /// 任意の型のデータを格納できる辞書オブジェクト
     /// </summary>
-    public class MultiDic : Dictionary<string, object>, IEquatable<MultiDic>
+    public class MultiDic : Dictionary<string, object?>
     {
         /// <summary>
         /// 初期データを空とするコンストラクタ
@@ -19,26 +19,26 @@ namespace net.boilingwater.Application.Common
         /// <summary>
         /// 初期データを<paramref name="dictionary"/>とするコンストラクタ
         /// </summary>
-        public MultiDic(Dictionary<string, object> dictionary) : base(dictionary) { }
+        public MultiDic(Dictionary<string, object?> dictionary) : base(dictionary) { }
 
         /// <summary>
         /// 初期データを<paramref name="collection"/>とするコンストラクタ
         /// </summary>
-        public MultiDic(IEnumerable<KeyValuePair<string, object>> collection) : base(collection) { }
+        public MultiDic(IEnumerable<KeyValuePair<string, object?>> collection) : base(collection) { }
 
         /// <summary>
         /// データを取得・設定します。
         /// </summary>
         /// <param name="key">キー</param>
         /// <returns></returns>
-        public new object this[string key]
+        public new object? this[string key]
         {
             get => TryGetValue(key, out var value) ? value : default;
             set
             {
                 if (ContainsKey(key))
                 {
-                    ((Dictionary<string, object>)this)[key] = value;
+                    ((Dictionary<string, object?>)this)[key] = value;
                 }
                 else
                 {
@@ -108,7 +108,7 @@ namespace net.boilingwater.Application.Common
         /// </summary>
         /// <param name="key">キー</param>
         /// <returns></returns>
-        public T GetAsObject<T>(string key) => CastUtil.ToObject<T>(this[key]);
+        public T? GetAsObject<T>(string key) => CastUtil.ToObject<T>(this[key]);
 
         /// <summary>
         /// <see cref="MultiDic"/>型としてデータを取得します。
@@ -122,7 +122,8 @@ namespace net.boilingwater.Application.Common
             {
                 try
                 {
-                    return CastUtil.ToObject<MultiDic>(this[key]);
+                    var d = CastUtil.ToObject<MultiDic>(this[key]);
+                    return d ?? new MultiDic();
                 }
                 catch (Exception) { }
             }
@@ -142,59 +143,13 @@ namespace net.boilingwater.Application.Common
             {
                 try
                 {
-                    return CastUtil.ToObject<MultiList>(this[key]);
+                    var l = CastUtil.ToObject<MultiList>(this[key]);
+                    return l ?? new MultiList();
                 }
                 catch (Exception) { }
             }
 
             return new MultiList();
         }
-
-        # region IEquatable
-
-        /// <inheritdoc/>
-        public override bool Equals(object obj) => Equals(obj as MultiDic);
-
-        /// <inheritdoc/>
-        public bool Equals(MultiDic other)
-        {
-            if (other is null)
-            {
-                return false;
-            }
-
-            if (Count != other.Count)
-            {
-                return false;
-            }
-
-            if (!EqualityComparer<IEqualityComparer<string>>.Default.Equals(Comparer, other.Comparer))
-            {
-                return false;
-            }
-
-            if (!EqualityComparer<KeyCollection>.Default.Equals(Keys, other.Keys))
-            {
-                return false;
-            }
-
-            if (EqualityComparer<ValueCollection>.Default.Equals(Values, other.Values))
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        /// <inheritdoc/>
-        public static bool operator ==(MultiDic left, MultiDic right) => left.Equals(right);
-
-        /// <inheritdoc/>
-        public static bool operator !=(MultiDic left, MultiDic right) => !(left == right);
-
-        /// <inheritdoc/>
-        public override int GetHashCode() => HashCode.Combine(Keys.GetHashCode(), Values.GetHashCode());
-
-        # endregion IEquatable
     }
 }

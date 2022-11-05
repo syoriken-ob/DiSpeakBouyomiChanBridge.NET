@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Data;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 
-using net.boilingwater.Application.Common.Extensions;
+using net.boilingwater.Application.Common.Initialize;
 using net.boilingwater.Application.Common.Logging;
-using net.boilingwater.Application.Common.Settings;
-using net.boilingwater.Application.Common.SQLite;
+using net.boilingwater.Application.Common.Setting;
 using net.boilingwater.Application.Common.Utils;
 using net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.MessageReplacer.Service;
 using net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.HttpClients;
@@ -31,12 +28,11 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge
         internal static void Initialize()
         {
             Log.Logger.Info("アプリケーションの初期化処理を開始します。");
+            CommonInitializer.Initialize();
 
-            Settings.Initialize();
-            DBInitialize();
-            CommandInitialize();
-            ReadOutServiceInitialize();
-            HttpServerInitialize();
+            InitializeCommand();
+            InitializeReadOutService();
+            InitializeHttpServer();
             CommandHandlingService.Initialize();
             MessageReplaceService.Initialize();
 
@@ -45,24 +41,9 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge
         }
 
         /// <summary>
-        /// DB処理の初期化を行います
-        /// </summary>
-        private static void DBInitialize()
-        {
-            SQLiteDBDao.CreateDataBase();
-
-            Assembly.GetExecutingAssembly()
-                    .CollectReferencedAssemblies(assemblyName => assemblyName.Name != null && assemblyName.Name.StartsWith("net.boilingwater"))
-                    .ForEach(assembly => assembly?.GetTypes()
-                                                  .Where(t => t.IsSubclassOf(typeof(SQLiteDBDao)) && !t.IsAbstract)
-                                                  .Select(type => (SQLiteDBDao?)Activator.CreateInstance(type))
-                                                  .ForEach(dao => dao?.InitializeTable()));
-        }
-
-        /// <summary>
         /// コマンドの初期化を行います
         /// </summary>
-        private static void CommandInitialize()
+        private static void InitializeCommand()
         {
             CommandFactory.Factory.Initialize();
             SystemCommandFactory.Factory.Initialize();
@@ -71,7 +52,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge
         /// <summary>
         /// 読み上げサービスを初期化します
         /// </summary>
-        private static void ReadOutServiceInitialize()
+        private static void InitializeReadOutService()
         {
             if (Settings.AsBoolean("Use.VoiceVox"))
             {
@@ -87,11 +68,11 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge
         /// HttpServerの初期化します
         /// </summary>
         /// <exception cref="ApplicationException"></exception>
-        private static void HttpServerInitialize()
+        private static void InitializeHttpServer()
         {
             if (_client != null && _client.InnerClient != null)
             {
-                _client.InnerClient.LogoutAsync().GetAwaiter();
+                _client.StopAsync().GetAwaiter().GetResult();
             }
 
             if (Settings.AsBoolean("Use.InternalDiscordClient"))
@@ -153,7 +134,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge
                 {
                     throw new InvalidOperationException("先にアプリケーションの初期化処理を行ってください。");
                 }
-                awaiter = _client.StartAsync(Settings.Get("DiscordToken")).GetAwaiter();
+                awaiter = _client.StartAsync(Settings.AsString("DiscordToken")).GetAwaiter();
             }
             else
             {

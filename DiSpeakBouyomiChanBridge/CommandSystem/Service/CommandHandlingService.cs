@@ -1,7 +1,7 @@
 ﻿using System;
 
 using net.boilingwater.Application.Common.Logging;
-using net.boilingwater.Application.Common.Settings;
+using net.boilingwater.Application.Common.Setting;
 using net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.HttpClients;
 using net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Handle;
 using net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Handle.Impl;

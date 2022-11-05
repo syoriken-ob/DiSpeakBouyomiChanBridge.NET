@@ -15,7 +15,7 @@ namespace net.boilingwater.Application.Common.SQLite
         /// <param name="name">パラメータ名（※@を付けないこと）</param>
         /// <param name="type">パラメータの型</param>
         /// <param name="value">値</param>
-        public void Add(string name, DbType type, object value)
+        public void Add(string name, DbType type, object? value)
         {
             var parameter = new SQLiteParameter
             {

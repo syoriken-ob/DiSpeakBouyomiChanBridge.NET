@@ -17,7 +17,7 @@ namespace net.boilingwater.Application.Common.Utils
         /// </summary>
         /// <param name="obj">変換する値</param>
         /// <returns><see cref="int"/>型に変換した引数</returns>
-        public static int ToInteger(object obj)
+        public static int ToInteger(object? obj)
         {
             if (obj is int @int)
             {
@@ -35,7 +35,7 @@ namespace net.boilingwater.Application.Common.Utils
         /// <see cref="uint"/>型に変換した引数
         /// <para>引数が負数の場合、既定値を返却します。</para>
         /// </returns>
-        public static uint ToUnsignedInteger(object obj)
+        public static uint ToUnsignedInteger(object? obj)
         {
             if (obj is uint @int)
             {
@@ -57,7 +57,7 @@ namespace net.boilingwater.Application.Common.Utils
         /// </summary>
         /// <param name="obj">変換する値</param>
         /// <returns><see cref="long"/>型に変換した<paramref name="obj"/></returns>
-        public static long ToLong(object obj)
+        public static long ToLong(object? obj)
         {
             if (obj is long @long)
             {
@@ -75,7 +75,7 @@ namespace net.boilingwater.Application.Common.Utils
         ///     <see cref="ulong"/>型に変換した<paramref name="obj"/>
         ///     <para>引数が負数の場合、既定値を返却します。</para>
         /// </returns>
-        public static ulong ToUnsignedLong(object obj)
+        public static ulong ToUnsignedLong(object? obj)
         {
             if (obj is ulong @long)
             {
@@ -97,7 +97,7 @@ namespace net.boilingwater.Application.Common.Utils
         /// </summary>
         /// <param name="obj">変換する値</param>
         /// <returns><see cref="double"/>型に変換した<paramref name="obj"/></returns>
-        public static double ToDouble(object obj)
+        public static double ToDouble(object? obj)
         {
             if (obj is double @double)
             {
@@ -112,7 +112,7 @@ namespace net.boilingwater.Application.Common.Utils
         /// </summary>
         /// <param name="obj">変換する値</param>
         /// <returns><see cref="decimal"/>型に変換した<paramref name="obj"/></returns>
-        public static decimal ToDecimal(object obj)
+        public static decimal ToDecimal(object? obj)
         {
             if (obj is decimal @decimal)
             {
@@ -132,7 +132,7 @@ namespace net.boilingwater.Application.Common.Utils
         /// </summary>
         /// <param name="obj">変換する値</param>
         /// <returns><see cref="bool"/>型に変換した<paramref name="obj"/></returns>
-        public static bool ToBoolean(object obj)
+        public static bool ToBoolean(object? obj)
         {
             if (obj is bool @bool)
             {
@@ -155,7 +155,7 @@ namespace net.boilingwater.Application.Common.Utils
         ///     <see cref="string"/>型に変換した<paramref name="obj"/>
         ///     <para>※objectはJSONに変換します。</para>
         /// </returns>
-        public static string ToString(object obj)
+        public static string ToString(object? obj)
         {
             if (obj == null)
             {
@@ -169,7 +169,8 @@ namespace net.boilingwater.Application.Common.Utils
 
             if (!Information.IsReference(obj))
             {
-                return obj.ToString();
+                var str = obj.ToString();
+                return str ?? string.Empty;
             }
 
             return JsonSerializer.Serialize(obj, new JsonSerializerOptions()
@@ -188,8 +189,13 @@ namespace net.boilingwater.Application.Common.Utils
         ///     <typeparamref name="T"/>型に変換した<paramref name="obj"/><br/>
         ///     ※変換できない場合はdefault値を返却します。
         /// </returns>
-        public static T ToObject<T>(object obj)
+        public static T? ToObject<T>(object? obj)
         {
+            if (obj == null)
+            {
+                return default;
+            }
+
             if (obj is T @t)
             {
                 return @t;
@@ -201,7 +207,7 @@ namespace net.boilingwater.Application.Common.Utils
 
                 if (converter != null)
                 {
-                    return (T)converter.ConvertFrom(obj);
+                    return (T?)converter.ConvertFrom(obj);
                 }
             }
             catch (Exception) { }

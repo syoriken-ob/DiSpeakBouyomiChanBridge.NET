@@ -6,7 +6,7 @@ using System.Linq;
 using net.boilingwater.Application.Common.Logging;
 using net.boilingwater.Application.Common.Utils;
 
-namespace net.boilingwater.Application.Common.Settings
+namespace net.boilingwater.Application.Common.Setting
 {
     /// <summary>
     /// アプリケーション設定値を取得するクラス
@@ -15,7 +15,7 @@ namespace net.boilingwater.Application.Common.Settings
     {
         private static readonly Dictionary<string, List<string>> _listCache = new();
         private static readonly SimpleDic<MultiDic> _dicCache = new();
-        private static SettingHolder SettingHolderInstance { get; set; }
+        private static SettingHolder? SettingHolderInstance { get; set; }
 
         /// <summary>
         /// アプリケーション設定値を読み込みます。
@@ -32,7 +32,7 @@ namespace net.boilingwater.Application.Common.Settings
         /// </summary>
         /// <param name="key">設定キー</param>
         /// <returns>アプリケーション設定値</returns>
-        public static string Get(string key) => SettingHolderInstance[key];
+        public static string? Get(string key) => SettingHolderInstance?[key];
 
         /// <summary>
         /// <see cref="string"/>型で<paramref name="key"/>に紐づくアプリケーション設定値を取得します<br/>
@@ -86,7 +86,7 @@ namespace net.boilingwater.Application.Common.Settings
             var list = new List<string>();
             try
             {
-                var original = Get(key).Split(splitKey).Select(str => str.Trim());
+                var original = AsString(key).Split(splitKey).Select(str => str.Trim());
                 list.AddRange(original.ToList());
             }
             catch (Exception) { }
@@ -108,13 +108,13 @@ namespace net.boilingwater.Application.Common.Settings
         {
             if (_dicCache.ContainsKey($"{key}#{listSplitKey}#{pairSplitKey}"))
             {
-                return _dicCache[$"{key}#{listSplitKey}#{pairSplitKey}"];
+                return _dicCache[$"{key}#{listSplitKey}#{pairSplitKey}"] ?? new MultiDic();
             }
 
             var dic = new MultiDic();
             try
             {
-                foreach (var keyValue in Get(key).Split(listSplitKey))
+                foreach (var keyValue in AsString(key).Split(listSplitKey))
                 {
                     var split = keyValue.Split(pairSplitKey);
                     if (!split.Any() || split[0] == null || dic.ContainsKey(split[0]))

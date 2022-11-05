@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 using net.boilingwater.Application.Common;
 using net.boilingwater.Application.Common.Extensions;
-using net.boilingwater.Application.Common.Settings;
+using net.boilingwater.Application.Common.Setting;
 using net.boilingwater.Application.Common.Utils;
 using net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.MessageReplacer.Dao;
 
@@ -23,6 +23,11 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.MessageReplace
         private static readonly Regex DeleteReplaceSettingRegex = new("(忘却|消去)[(（](?<replace_key>.+?)[)）]", RegexOptions.Compiled | RegexOptions.Singleline);
 
         /// <summary>
+        /// メッセージ置換処理実行後初期化処理が必要かどうか
+        /// </summary>
+        private static bool _needInitialize = false;
+
+        /// <summary>
         /// 置換設定をDBから読み込み、初期化を行います。
         /// </summary>
         public static void Initialize()
@@ -39,6 +44,18 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.MessageReplace
         }
 
         /// <summary>
+        /// メッセージ読み込み処理後に初期化処理が必要な場合、初期化処理を行います。
+        /// </summary>
+        public static void InitializeAfterReadOutIfNeeded()
+        {
+            if (_needInitialize)
+            {
+                Initialize();
+                _needInitialize = false;
+            }
+        }
+
+        /// <summary>
         /// メッセージの置換処理を実行します。
         /// </summary>
         /// <param name="message"></param>
@@ -46,12 +63,12 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.MessageReplace
         {
             if (Settings.AsBoolean("Use.ReadOutReplace.MessageReplacer"))
             {
-                var deleteResult = DetectAndDeleteReplaceSetting(ref message);
+                DetectAndDeleteReplaceSetting(ref message);
                 var registerResult = DetectAndRegisterReplaceSetting(ref message);
                 ReplaceMessage(ref message);
-                if (deleteResult || registerResult)
+                if (registerResult)
                 {
-                    Initialize();
+                    _needInitialize = true;
                 }
             }
         }
@@ -167,6 +184,12 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.MessageReplace
                     message = message.Replace(match.Value, string.Format(Settings.AsString("Format.Replace.NotRegisteredReplaceSetting"), key));
                 }
             } while ((match = match.NextMatch()).Success);
+
+            if (registered)
+            {
+                Initialize();
+            }
+
             return registered;
         }
     }

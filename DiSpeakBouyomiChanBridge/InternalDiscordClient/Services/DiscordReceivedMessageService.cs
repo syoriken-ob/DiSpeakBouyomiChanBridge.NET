@@ -5,7 +5,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 
 using net.boilingwater.Application.Common.Extensions;
-using net.boilingwater.Application.Common.Settings;
+using net.boilingwater.Application.Common.Setting;
 using net.boilingwater.Application.Common.Utils;
 
 namespace net.boilingwater.DiSpeakBouyomiChanBridge.InternalDiscordClient.Services

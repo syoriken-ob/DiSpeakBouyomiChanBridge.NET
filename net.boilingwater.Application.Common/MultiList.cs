@@ -5,10 +5,10 @@ using net.boilingwater.Application.Common.Utils;
 
 namespace net.boilingwater.Application.Common
 {
-#pragma warning disable CS1591 // 公開されている型またはメンバー 'MultiList' の XML コメントがありません
-
-    public class MultiList : List<object>
-#pragma warning restore CS1591 // 公開されている型またはメンバー 'MultiList' の XML コメントがありません
+    /// <summary>
+    /// 任意の型のデータを格納できるリストオブジェクト
+    /// </summary>
+    public class MultiList : List<object?>
     {
         /// <summary>
         /// 初期データを空とするコンストラクタ
@@ -87,7 +87,7 @@ namespace net.boilingwater.Application.Common
         /// </summary>
         /// <param name="index">インデックス</param>
         /// <returns></returns>
-        public T GetAsObject<T>(int index) => CastUtil.ToObject<T>(this[index]);
+        public T? GetAsObject<T>(int index) => CastUtil.ToObject<T>(this[index]);
 
         /// <summary>
         /// <see cref="MultiDic"/>型としてデータを取得します。
@@ -99,7 +99,7 @@ namespace net.boilingwater.Application.Common
         {
             try
             {
-                return CastUtil.ToObject<MultiDic>(this[index]);
+                return CastUtil.ToObject<MultiDic>(this[index]) ?? new MultiDic();
             }
             catch (Exception) { }
             return new MultiDic();

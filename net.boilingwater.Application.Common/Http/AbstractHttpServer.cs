@@ -3,17 +3,22 @@ using System.Net;
 
 using net.boilingwater.Application.Common.Logging;
 
-namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http
+namespace net.boilingwater.Application.Common.Http
 {
     /// <summary>
-    /// リクエストを受け付けるHttpServerの基底クラス
+    /// Httpリクエスト処理を受け付ける基底HttpServerクラス
     /// </summary>
-    public abstract class HttpServerForReadOut : IDisposable
+    public abstract class AbstractHttpServer : IDisposable
     {
         /// <summary>
         /// Httpリクエストを受け付けるリスナー
         /// </summary>
         protected HttpListener? Listener { get; set; }
+
+        /// <summary>
+        /// リクエスト受付時のAsyncResult
+        /// </summary>
+        private IAsyncResult? CurrentAsyncResult { get; set; }
 
         /// <summary>
         /// 初期化処理
@@ -77,12 +82,25 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http
         /// <param name="result"></param>
         /// <returns></returns>
         /// <exception cref="ApplicationException"/>
-        protected HttpListenerContext GetContextAndResumeListening(IAsyncResult result)
+        protected HttpListenerContext? GetContextAndResumeListening(IAsyncResult result)
         {
+            if (CurrentAsyncResult != result)
+            {
+                return null;
+            }
             var context = Listener?.EndGetContext(result) ?? throw new ApplicationException();
-            Listener?.BeginGetContext(OnRequestReceived, Listener);
+            Listener?.BeginGetContext(OnRequestReceivedWrapper, Listener);
 
             return context;
+        }
+
+        /// <summary>
+        /// リクエスト受付時の処理(内部処理用)
+        /// </summary>
+        private void OnRequestReceivedWrapper(IAsyncResult result)
+        {
+            CurrentAsyncResult = result;
+            OnRequestReceived(result);
         }
 
         /// <summary>

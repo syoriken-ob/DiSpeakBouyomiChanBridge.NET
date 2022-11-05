@@ -28,6 +28,6 @@ namespace net.boilingwater.Application.Common.Extensions
         /// <param name="text"></param>
         /// <returns></returns>
         /// <remarks><see cref="string.IsNullOrEmpty(string?)"/>を利用して処理します。</remarks>
-        public static bool HasValue(this string text) => !string.IsNullOrEmpty(text);
+        public static bool HasValue(this string? text) => !string.IsNullOrEmpty(text);
     }
 }

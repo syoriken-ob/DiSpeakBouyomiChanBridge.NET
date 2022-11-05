@@ -88,5 +88,22 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.external.DiscordClient
 
             await Task.Delay(-1);
         }
+
+        /// <summary>
+        /// 非同期で終了処理を行います
+        /// </summary>
+        /// <returns></returns>
+        public async Task StopAsync()
+        {
+            if (InnerClient == null)
+            {
+                await Task.CompletedTask;
+                return;
+            }
+            await InnerClient.StopAsync();
+            InnerClient.LogoutAsync();
+
+            await Task.CompletedTask;
+        }
     }
 }
