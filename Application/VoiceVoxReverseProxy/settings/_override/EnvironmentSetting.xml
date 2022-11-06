@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    =========================================
+    == 環境設定上書きファイル ==
+    =========================================
+-->
+<Settings>
+  <!-- 接続対象のVOICEVOX系アプリケーションのホスト名とポート番号（host;port,host;port,…） -->
+  <Item key="Map.VoiceVox.Application.HostAndPort"            value="localhost;50021,localhost;50031" />
+</Settings>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    ==================================
+    == システムアプリケーション設定 ==
+    ==================================
+-->
+<Settings>
+  <Item key="ListeningHost"                  value="localhost" />
+  <Item key="ListeningPort"                  value="9995" />
+
+  <Item key="RetryCount"                     value="5" />
+  <Item key="RetrySleepTime.Milliseconds"    value="1000" />
+</Settings>

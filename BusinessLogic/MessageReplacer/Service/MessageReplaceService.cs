@@ -1,13 +1,13 @@
 ﻿using System.Data;
 using System.Text.RegularExpressions;
 
-using net.boilingwater.Application.Common;
-using net.boilingwater.Application.Common.Extensions;
-using net.boilingwater.Application.Common.Setting;
-using net.boilingwater.Application.Common.Utils;
-using net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.MessageReplacer.Dao;
+using net.boilingwater.BusinessLogic.MessageReplacer.Dao;
+using net.boilingwater.Framework.Common;
+using net.boilingwater.Framework.Common.Extensions;
+using net.boilingwater.Framework.Common.Setting;
+using net.boilingwater.Framework.Common.Utils;
 
-namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.MessageReplacer.Service
+namespace net.boilingwater.BusinessLogic.MessageReplacer.Service
 {
     /// <summary>
     /// メッセージ置換処理サービス

@@ -6,9 +6,9 @@ using Discord.WebSocket;
 
 using Microsoft.Extensions.DependencyInjection;
 
-using net.boilingwater.Application.Common.Utils;
+using net.boilingwater.Framework.Common.Utils;
 
-namespace net.boilingwater.DiSpeakBouyomiChanBridge.external.DiscordClient
+namespace net.boilingwater.external.DiscordClient
 {
     /// <summary>
     /// Discordクライアント実装クラス

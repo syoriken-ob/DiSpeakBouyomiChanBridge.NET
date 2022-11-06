@@ -1,9 +1,9 @@
 ﻿using System.Collections.Concurrent;
 
-using net.boilingwater.Application.Common.Logging;
-using net.boilingwater.DiSpeakBouyomiChanBridge.external.AudioPlay;
+using net.boilingwater.external.AudioPlay;
+using net.boilingwater.Framework.Common.Logging;
 
-namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadOut.VoiceExecutor
+namespace net.boilingwater.BusinessLogic.VoiceReadOut.VoiceExecutor
 {
     /// <summary>
     /// VoiceVoxで生成した音声を順次再生します。

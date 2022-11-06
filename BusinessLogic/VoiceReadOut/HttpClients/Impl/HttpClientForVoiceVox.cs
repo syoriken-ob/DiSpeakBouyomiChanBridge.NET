@@ -4,15 +4,14 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 
-using net.boilingwater.Application.Common;
-using net.boilingwater.Application.Common.Extensions;
-using net.boilingwater.Application.Common.Logging;
-using net.boilingwater.Application.Common.Setting;
-using net.boilingwater.Application.Common.Utils;
-using net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.MessageReplacer.Service;
-using net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadOut.VoiceExecutor;
+using net.boilingwater.BusinessLogic.VoiceReadOut.VoiceExecutor;
+using net.boilingwater.Framework.Common;
+using net.boilingwater.Framework.Common.Extensions;
+using net.boilingwater.Framework.Common.Logging;
+using net.boilingwater.Framework.Common.Setting;
+using net.boilingwater.Framework.Common.Utils;
 
-namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.HttpClients.Impl
+namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl
 {
     /// <summary>
     /// VOICEVOX用の読み上げクライアント

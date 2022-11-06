@@ -1,10 +1,10 @@
 ﻿using System.Net;
 
-using net.boilingwater.Application.Common.Extensions;
-using net.boilingwater.Application.Common.Logging;
-using net.boilingwater.Application.Common.Setting;
+using net.boilingwater.Framework.Common.Extensions;
+using net.boilingwater.Framework.Common.Logging;
+using net.boilingwater.Framework.Common.Setting;
 
-namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.HttpClients.Impl
+namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl
 {
     /// <summary>
     /// 棒読みちゃんにメッセージを送信するHttpClient

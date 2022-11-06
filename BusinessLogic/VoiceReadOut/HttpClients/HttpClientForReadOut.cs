@@ -1,6 +1,6 @@
-﻿using net.boilingwater.Application.Common.Http;
+﻿using net.boilingwater.Framework.Common.Http;
 
-namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.VoiceReadout.HttpClients
+namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients
 {
     /// <summary>
     /// 読み上げ処理用の基底HttpClientクラス
