@@ -6,14 +6,14 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 
+using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Service;
+using net.boilingwater.Application.DiSpeakBouyomiChanBridge.InternalDiscordClient.Services;
 using net.boilingwater.BusinessLogic.VoiceReadout.HttpClients;
-using net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Service;
-using net.boilingwater.DiSpeakBouyomiChanBridge.InternalDiscordClient.Services;
 using net.boilingwater.Framework.Common.Extensions;
 using net.boilingwater.Framework.Common.Logging;
 using net.boilingwater.Framework.Common.Setting;
 
-namespace net.boilingwater.DiSpeakBouyomiChanBridge.InternalDiscordClient
+namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.InternalDiscordClient
 {
     /// <summary>
     /// Discord.NETのClientにアタッチする各種イベントのハンドラ処理を定義したクラス

@@ -1,4 +1,4 @@
-﻿namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem
+﻿namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem
 {
     /// <summary>
     /// 文字列中から検出する実行可能なコマンドの基底クラス

@@ -98,6 +98,8 @@ namespace net.boilingwater.BusinessLogic.MessageReplacer.Dao
             sql += " , user ";
             sql += " , update_dt ";
             sql += " FROM replace_setting";
+            sql += " ORDER BY LENGTH(replace_key) DESC ";
+            sql += "        , replace_key         DESC ";
 
             return Select(sql);
         }

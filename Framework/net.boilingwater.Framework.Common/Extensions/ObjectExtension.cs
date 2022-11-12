@@ -23,7 +23,7 @@ namespace net.boilingwater.Framework.Common.Extensions
                 : string.Join(SEPARATOR, obj
                 .GetType()
                 .GetFields(BindingFlags.Instance | BindingFlags.Public)
-                .Select(c => string.Format(FORMAT, c.Name, CastUtil.ToString(c.GetValue(obj)))));
+                .Select(c => string.Format(FORMAT, c.Name, SerializeUtil.SerializeJson(c.GetValue(obj)))));
 
         /// <summary>
         /// すべての公開プロパティの情報を文字列にして返します
@@ -34,7 +34,7 @@ namespace net.boilingwater.Framework.Common.Extensions
                 .GetType()
                 .GetProperties(BindingFlags.Instance | BindingFlags.Public)
                 .Where(c => c.CanRead)
-                .Select(c => string.Format(FORMAT, c.Name, CastUtil.ToString(c.GetValue(obj, null)))));
+                .Select(c => string.Format(FORMAT, c.Name, SerializeUtil.SerializeJson(c.GetValue(obj, null)))));
 
         /// <summary>
         /// すべての公開フィールドと公開プロパティの情報を文字列にして返します

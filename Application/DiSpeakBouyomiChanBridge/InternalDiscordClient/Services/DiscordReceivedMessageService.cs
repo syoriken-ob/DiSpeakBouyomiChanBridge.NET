@@ -8,7 +8,7 @@ using net.boilingwater.Framework.Common.Extensions;
 using net.boilingwater.Framework.Common.Setting;
 using net.boilingwater.Framework.Common.Utils;
 
-namespace net.boilingwater.DiSpeakBouyomiChanBridge.InternalDiscordClient.Services
+namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.InternalDiscordClient.Services
 {
     /// <summary>
     /// Discordから取得したメッセージに対して行う処理を定義します

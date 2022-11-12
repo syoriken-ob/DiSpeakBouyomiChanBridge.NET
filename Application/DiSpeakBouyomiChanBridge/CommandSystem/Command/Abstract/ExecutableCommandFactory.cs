@@ -2,7 +2,7 @@
 
 using net.boilingwater.Framework.Common;
 
-namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem
+namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem
 {
     /// <summary>
     /// <see cref="ExecutableCommand"/>を文字列中から作成するファクトリの基底クラス

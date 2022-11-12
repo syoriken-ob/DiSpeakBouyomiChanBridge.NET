@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 
-using net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl;
+using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Impl;
 using net.boilingwater.Framework.Common.Logging;
 
-namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.PipeLine
+namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.PipeLine
 {
     internal class CommandExecuteManager
     {

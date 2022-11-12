@@ -1,9 +1,9 @@
-﻿using net.boilingwater.BusinessLogic.VoiceReadout.HttpClients;
-using net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.PipeLine;
+﻿using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.PipeLine;
+using net.boilingwater.BusinessLogic.VoiceReadout.HttpClients;
 using net.boilingwater.Framework.Common.Logging;
 using net.boilingwater.Framework.Common.Setting;
 
-namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem
+namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem
 {
     /// <summary>
     /// プログラム処理を定義したコマンドの基底クラス
@@ -13,7 +13,7 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem
     }
 }
 
-namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl
+namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Impl
 {
     /// <summary>
     /// リロード処理を実行します。

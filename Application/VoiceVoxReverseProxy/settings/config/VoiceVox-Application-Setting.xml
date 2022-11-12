@@ -8,7 +8,7 @@
   <Item key="VoiceVox.Application.Scheme"                     value="http" />
 
   <!-- 接続対象のVOICEVOX系アプリケーションのホスト名とポート番号（host;port,host;port,…） -->
-  <Item key="Map.VoiceVox.Application.HostAndPort"            value="localhost;50021,localhost;50031" />
+  <Item key="Map.VoiceVox.Application.HostAndPort"            value="" />
 
   <Item key="VoiceVox.Request.Speakers.Path"                  value="/speakers" />
 

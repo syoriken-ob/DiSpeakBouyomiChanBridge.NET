@@ -1,4 +1,5 @@
-﻿using System.Text.Encodings.Web;
+﻿using System.Collections.Generic;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 
 using YamlDotNet.Serialization;
@@ -11,6 +12,13 @@ namespace net.boilingwater.Framework.Common.Utils
     /// </summary>
     public class SerializeUtil
     {
+        /// <summary>
+        /// オブジェクトをJSON文字列にシリアライズします。
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static string SerializeJson(object? obj) => obj == null ? "{}" : Utf8Json.JsonSerializer.ToJsonString(obj);
+
         /// <summary>
         /// JSON文字列を<see cref="MultiDic"/>型にデシリアライズして取得します。
         /// </summary>

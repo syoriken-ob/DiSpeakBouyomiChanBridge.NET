@@ -167,17 +167,8 @@ namespace net.boilingwater.Framework.Common.Utils
                 return @string;
             }
 
-            if (!Information.IsReference(obj))
-            {
-                var str = obj.ToString();
-                return str ?? string.Empty;
-            }
-
-            return JsonSerializer.Serialize(obj, new JsonSerializerOptions()
-            {
-                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-                ReadCommentHandling = JsonCommentHandling.Skip,
-            });
+            var str = obj.ToString();
+            return str ?? string.Empty;
         }
 
         /// <summary>

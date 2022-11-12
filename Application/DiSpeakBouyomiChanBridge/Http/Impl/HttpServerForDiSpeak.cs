@@ -2,13 +2,13 @@
 using System.Net;
 using System.Net.Http;
 
-using net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Service;
+using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Service;
 using net.boilingwater.Framework.Common.Http;
 using net.boilingwater.Framework.Common.Logging;
 using net.boilingwater.Framework.Common.Setting;
 using net.boilingwater.Framework.Common.Utils;
 
-namespace net.boilingwater.DiSpeakBouyomiChanBridge.Http.Impl
+namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.Http.Impl
 {
     /// <summary>
     /// DiSpeakからメッセージを受信するHttpServer

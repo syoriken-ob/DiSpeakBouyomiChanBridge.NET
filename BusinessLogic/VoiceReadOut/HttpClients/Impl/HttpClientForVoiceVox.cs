@@ -1,9 +1,8 @@
 ﻿using System.Collections.Concurrent;
 using System.Net;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Web;
 
+using net.boilingwater.BusinessLogic.VoiceReadOut.Httpclients.Service;
 using net.boilingwater.BusinessLogic.VoiceReadOut.VoiceExecutor;
 using net.boilingwater.Framework.Common;
 using net.boilingwater.Framework.Common.Extensions;
@@ -21,10 +20,17 @@ namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl
         private static Regex SpeakerRegex { get; set; } = new Regex(@"^(?<speaker_id>\w{1,2})\)", RegexOptions.Compiled);
         private readonly Thread _thread;
         private readonly BlockingCollection<string> _receivedMessages = new();
+        private  MultiDic RequestSetting { get; set; }
         private SimpleDic<string> VoiceVoxSpeakers { get; set; }
 
         public HttpClientForVoiceVox()
         {
+            RequestSetting = VoiceVoxRequestService.CreateRequestSettingDic(
+                Settings.AsString("VoiceVox.Application.Scheme"),
+                Settings.AsString("VoiceVox.Application.Host"),
+                Settings.AsInteger("VoiceVox.Application.Port")
+            );
+
             VoiceVoxSpeakers = FetchEnableVoiceVoxSpeaker();
             InitializeVoiceVoxSpeaker();
 
@@ -80,9 +86,9 @@ namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl
             var retryCount = 0L;
             while (true)
             {
-                var speaker = ExtactVoiceVoxSpeaker(ref message);
+                var speaker = ExtractVoiceVoxSpeaker(ref message);
 
-                var audioQueryResult = SendVoiceVoxAudioQueryRequst(message, speaker);
+                var audioQueryResult = VoiceVoxRequestService.SendVoiceVoxAudioQueryRequst(Client, RequestSetting, message, speaker);
                 if (audioQueryResult.ContainsKey("statusCode"))
                 {
                     var statusCode = audioQueryResult.GetAsObject<HttpStatusCode>("statusCode");
@@ -99,9 +105,9 @@ namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl
                 }
 
                 var audioQuery = audioQueryResult.GetAsMultiDic("audioQuery");
-                ReplaceAudioQueryJson(audioQuery);
+                VoiceVoxRequestService.ReplaceAudioQueryJson(audioQuery);
 
-                var synthesisResult = SendVoiceVoxSynthesisRequest(audioQuery, speaker);
+                var synthesisResult = VoiceVoxRequestService.SendVoiceVoxSynthesisRequest(Client, RequestSetting, audioQuery, speaker);
                 if (synthesisResult.ContainsKey("statusCode"))
                 {
                     var statusCode = synthesisResult.GetAsObject<HttpStatusCode>("statusCode");
@@ -135,7 +141,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl
         {
             var dic = new SimpleDic<string>();
 
-            var result = SendVoiceVoxSpeakersRequst();
+            var result = VoiceVoxRequestService.SendVoiceVoxSpeakersRequst(Client, RequestSetting);
 
             if (result.GetAsBoolean("valid"))
             {
@@ -165,7 +171,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl
             foreach (var pair in VoiceVoxSpeakers)
             {
                 Log.Logger.Debug($"VoiceVox話者：{pair.Key}を初期化します。");
-                var result = SendVoiceVoxInitializeSpeakerRequst(CastUtil.ToString(pair.Value));
+                var result = VoiceVoxRequestService.SendVoiceVoxInitializeSpeakerRequst(Client, RequestSetting, CastUtil.ToString(pair.Value));
                 Log.Logger.Debug($"VoiceVox話者：{pair.Key}の初期化に{(result.GetAsBoolean("valid") ? "成功" : "失敗")}しました。");
             }
         }
@@ -175,7 +181,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl
         /// </summary>
         /// <param name="message">読み上げメッセージ</param>
         /// <returns>VoiceVox話者ID</returns>
-        private string ExtactVoiceVoxSpeaker(ref string message)
+        private string ExtractVoiceVoxSpeaker(ref string message)
         {
             var match = SpeakerRegex.Match(message);
             if (!match.Success)
@@ -197,325 +203,6 @@ namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl
 
             message = message.Replace(match.Value, "");
             return VoiceVoxSpeakers[speakerId.Value] ?? Settings.AsString("VoiceVox.DefaultSpeaker");
-        }
-
-        #region SendRequest
-
-        /// <summary>
-        /// VoiceVoxAPI[speakers]にリクエストを送信します。
-        /// </summary>
-        /// <returns></returns>
-        private MultiDic SendVoiceVoxSpeakersRequst()
-        {
-            var result = new MultiDic();
-            try
-            {
-                using (var speakersResponse = Client.Send(CreateVoiceVoxSpeakersHttpRequest()))
-                {
-                    result["valid"] = speakersResponse.IsSuccessStatusCode;
-                    result["statusCode"] = speakersResponse.StatusCode;
-                    if (!result.GetAsBoolean("valid"))
-                    {
-                        return result;
-                    }
-                    using var reader = new StreamReader(speakersResponse.Content.ReadAsStream(), Encoding.UTF8);
-                    result["speakers"] = SerializeUtil.JsonToMultiList(reader.ReadToEnd());
-                }
-                return result;
-            }
-            catch (WebException ex)
-            {
-                result["valid"] = false;
-                if (ex.Response == null)
-                {
-                    Log.Logger.Error(ex);
-                }
-                else
-                {
-                    using var error = ex.Response.GetResponseStream();
-                    using var streamReader = new StreamReader(error);
-                    Log.Logger.Error(streamReader.ReadToEnd(), ex);
-                }
-            }
-            catch (Exception ex)
-            {
-                result["valid"] = false;
-                Log.Logger.Error(ex);
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// VoiceVoxAPI[initialize_speaker]にリクエストを送信します。
-        /// </summary>
-        /// <param name="speaker">初期化するVoiceVox話者ID</param>
-        /// <returns></returns>
-        private MultiDic SendVoiceVoxInitializeSpeakerRequst(string speaker)
-        {
-            var result = new MultiDic();
-            try
-            {
-                using (var speakersResponse = Client.Send(CreateVoiceVoxInitializeSpeakerHttpRequest(speaker)))
-                {
-                    result["valid"] = speakersResponse.IsSuccessStatusCode;
-                    result["statusCode"] = speakersResponse.StatusCode;
-                }
-                return result;
-            }
-            catch (WebException ex)
-            {
-                result["valid"] = false;
-                if (ex.Response == null)
-                {
-                    Log.Logger.Error(ex);
-                }
-                else
-                {
-                    using var error = ex.Response.GetResponseStream();
-                    using var streamReader = new StreamReader(error);
-                    Log.Logger.Error(streamReader.ReadToEnd(), ex);
-                }
-            }
-            catch (Exception ex)
-            {
-                result["valid"] = false;
-                Log.Logger.Error(ex);
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// VoiceVoxAPI[audio_query]にリクエストを送信します。
-        /// </summary>
-        /// <param name="message"></param>
-        /// <param name="speaker"></param>
-        /// <returns></returns>
-        private MultiDic SendVoiceVoxAudioQueryRequst(string message, string speaker)
-        {
-            var result = new MultiDic();
-            try
-            {
-                using (var audioQueryResponse = Client.Send(CreateVoiceVoxAudioQueryHttpRequest(message, speaker)))
-                {
-                    result["valid"] = audioQueryResponse.IsSuccessStatusCode;
-                    result["statusCode"] = audioQueryResponse.StatusCode;
-                    if (!result.GetAsBoolean("valid"))
-                    {
-                        return result;
-                    }
-                    using var reader = new StreamReader(audioQueryResponse.Content.ReadAsStream(), Encoding.UTF8);
-                    result["audioQuery"] = SerializeUtil.JsonToMultiDic(reader.ReadToEnd());
-                }
-                return result;
-            }
-            catch (WebException ex)
-            {
-                result["valid"] = false;
-                if (ex.Response == null)
-                {
-                    Log.Logger.Error(ex);
-                }
-                else
-                {
-                    using var error = ex.Response.GetResponseStream();
-                    using var streamReader = new StreamReader(error);
-                    Log.Logger.Error(streamReader.ReadToEnd(), ex);
-                }
-            }
-            catch (Exception ex)
-            {
-                result["valid"] = false;
-                Log.Logger.Error(ex);
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// VoiceVoxAPI[synthesis]にリクエストを送信します。
-        /// </summary>
-        /// <param name="audioQueryDic"></param>
-        /// <param name="speaker"></param>
-        /// <returns></returns>
-        private MultiDic SendVoiceVoxSynthesisRequest(MultiDic audioQueryDic, string speaker)
-        {
-            var result = new MultiDic();
-            try
-            {
-                using (var synthesisResponse = Client.Send(CreateVoiceVoxSynthesisHttpRequest(audioQueryDic, speaker)))
-                {
-                    result["valid"] = synthesisResponse.IsSuccessStatusCode;
-                    result["statusCode"] = synthesisResponse.StatusCode;
-
-                    if (!result.GetAsBoolean("valid"))
-                    {
-                        return result;
-                    }
-
-                    result["voice"] = synthesisResponse.Content.ReadAsByteArrayAsync().GetAwaiter().GetResult();
-                }
-                return result;
-            }
-            catch (WebException ex)
-            {
-                result["valid"] = false;
-                if (ex.Response == null)
-                {
-                    Log.Logger.Error(ex);
-                }
-                else
-                {
-                    using var error = ex.Response.GetResponseStream();
-                    using var streamReader = new StreamReader(error);
-                    Log.Logger.Error(streamReader.ReadToEnd(), ex);
-                }
-            }
-            catch (Exception ex)
-            {
-                result["valid"] = false;
-                Log.Logger.Error(ex);
-            }
-            return result;
-        }
-
-        #endregion SendRequest
-
-        #region CreateHttpRequest
-
-        /// <summary>
-        /// VoiceVoxAPI[speakers]に送信する<see cref="HttpRequestMessage"/>を作成します。
-        /// </summary>
-        /// <returns></returns>
-        private static HttpRequestMessage CreateVoiceVoxSpeakersHttpRequest()
-        {
-            return new HttpRequestMessage()
-            {
-                Method = HttpMethod.Get,
-                RequestUri = new UriBuilder()
-                {
-                    Host = Settings.AsString("VoiceVox.Application.Host"),
-                    Scheme = Settings.AsString("VoiceVox.Application.Scheme"),
-                    Port = Settings.AsInteger("VoiceVox.Application.Port"),
-                    Path = Settings.AsString("VoiceVox.Request.Speakers.Path"),
-                }.Uri
-            };
-        }
-
-        /// <summary>
-        /// VoiceVoxAPI[initialize_speaker]に送信する<see cref="HttpRequestMessage"/>を作成します。
-        /// </summary>
-        /// <param name="speaker">初期化を行うVoiceVox話者ID</param>
-        /// <returns></returns>
-        private static HttpRequestMessage CreateVoiceVoxInitializeSpeakerHttpRequest(string speaker)
-        {
-            var query = HttpUtility.ParseQueryString("");
-            query.Add(Settings.AsString("VoiceVox.Request.InitializeSpeaker.ParamName.Speaker"), speaker);
-
-            return new HttpRequestMessage()
-            {
-                Method = HttpMethod.Post,
-                RequestUri = new UriBuilder()
-                {
-                    Host = Settings.AsString("VoiceVox.Application.Host"),
-                    Scheme = Settings.AsString("VoiceVox.Application.Scheme"),
-                    Port = Settings.AsInteger("VoiceVox.Application.Port"),
-                    Path = Settings.AsString("VoiceVox.Request.InitializeSpeaker.Path"),
-                    Query = query.ToString()
-                }.Uri
-            };
-        }
-
-        /// <summary>
-        /// VoiceVoxAPI[audio_query]に送信する<see cref="HttpRequestMessage"/>を作成します。
-        /// </summary>
-        /// <param name="text">読み上げメッセージ</param>
-        /// <returns></returns>
-        private static HttpRequestMessage CreateVoiceVoxAudioQueryHttpRequest(string text, string speaker)
-        {
-            var query = HttpUtility.ParseQueryString("");
-            query.Add(Settings.AsString("VoiceVox.Request.AudioQuery.ParamName.Text"), text);
-            query.Add(Settings.AsString("VoiceVox.Request.AudioQuery.ParamName.Speaker"), speaker);
-
-            return new HttpRequestMessage()
-            {
-                Method = HttpMethod.Post,
-                RequestUri = new UriBuilder()
-                {
-                    Host = Settings.AsString("VoiceVox.Application.Host"),
-                    Scheme = Settings.AsString("VoiceVox.Application.Scheme"),
-                    Port = Settings.AsInteger("VoiceVox.Application.Port"),
-                    Path = Settings.AsString("VoiceVox.Request.AudioQuery.Path"),
-                    Query = query.ToString()
-                }.Uri
-            };
-        }
-
-        /// <summary>
-        /// VoiceVoxAPI[synthesis]に送信する<see cref="HttpRequestMessage"/>を作成します。
-        /// </summary>
-        /// <param name="audioQueryDic">APIにPOST送信するパラメータ</param>
-        /// <returns></returns>
-        private static HttpRequestMessage CreateVoiceVoxSynthesisHttpRequest(MultiDic audioQueryDic, string speaker)
-        {
-            var query = System.Web.HttpUtility.ParseQueryString("");
-            query.Add(Settings.AsString("VoiceVox.Request.Synthesis.ParamName.Speaker"), speaker);
-
-            var message = new HttpRequestMessage()
-            {
-                Method = HttpMethod.Post,
-                Content = new StringContent(CastUtil.ToString(audioQueryDic), Encoding.UTF8, Settings.AsString("VoiceVox.Request.Synthesis.Content-Type")),
-                RequestUri = new UriBuilder()
-                {
-                    Host = Settings.AsString("VoiceVox.Application.Host"),
-                    Scheme = Settings.AsString("VoiceVox.Application.Scheme"),
-                    Port = Settings.AsInteger("VoiceVox.Application.Port"),
-                    Path = Settings.AsString("VoiceVox.Request.Synthesis.Path"),
-                    Query = query.ToString()
-                }.Uri
-            };
-
-            foreach (var pair in Settings.AsMultiDic("VoiceVox.Request.Synthesis.Header"))
-            {
-                message.Headers.Add(pair.Key, CastUtil.ToString(pair.Value));
-            }
-
-            return message;
-        }
-
-        #endregion CreateHttpRequest
-
-        /// <summary>
-        /// VoiceVoxで生成する音声生成クエリを調整します。
-        /// </summary>
-        /// <param name="audioQueryDic"></param>
-        private static void ReplaceAudioQueryJson(MultiDic audioQueryDic)
-        {
-            var paramList = Settings.AsMultiDic("VoiceVox.Request.AudioQuery.ReplaceJsonParam");
-            foreach (var paramKey in paramList.Keys)
-            {
-                var splits = paramList.GetAsString(paramKey).Split("/").Select(param => param.Trim()).ToList();
-                if (splits.Count <= 1)
-                {
-                    continue;
-                }
-                switch (splits[1])
-                {
-                    case "int":
-                        audioQueryDic[paramKey] = CastUtil.ToInteger(splits[0]);
-                        break;
-
-                    case "double":
-                        audioQueryDic[paramKey] = CastUtil.ToDouble(splits[0]);
-                        break;
-
-                    case "bool":
-                        audioQueryDic[paramKey] = CastUtil.ToBoolean(splits[0]);
-                        break;
-
-                    default:
-                        audioQueryDic[paramKey] = splits[0];
-                        break;
-                }
-            }
         }
 
         /// <summary>

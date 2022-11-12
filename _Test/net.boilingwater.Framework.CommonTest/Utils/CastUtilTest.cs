@@ -194,7 +194,6 @@ namespace net.boilingwater.Framework.CommonTest.Utils
             new TestCaseData("sample").Returns("sample").SetName("String cast"),
             new TestCaseData(1).Returns("1").SetName("String num"),
             new TestCaseData(ToStringTestEnum.HOGE).Returns("HOGE").SetName("String enum"),
-            new TestCaseData(new { a = "test" }).Returns("{\"a\":\"test\"}").SetName("String ref"),
         };
 
         // TODO: Write ToObjectTest

@@ -73,7 +73,7 @@ namespace net.boilingwater.Framework.Common.Http
             }
 
             Listener.Start();
-            Listener.BeginGetContext(OnRequestReceived, null);
+            Listener.BeginGetContext(OnRequestReceivedWrapper, null);
         }
 
         /// <summary>

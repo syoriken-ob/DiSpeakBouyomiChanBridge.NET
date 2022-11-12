@@ -2,20 +2,20 @@
 using System.Linq;
 using System.Runtime.CompilerServices;
 
+using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Impl.Factory;
+using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Service;
+using net.boilingwater.Application.DiSpeakBouyomiChanBridge.Http.Impl;
+using net.boilingwater.Application.DiSpeakBouyomiChanBridge.InternalDiscordClient;
 using net.boilingwater.BusinessLogic.MessageReplacer.Service;
 using net.boilingwater.BusinessLogic.VoiceReadout.HttpClients;
 using net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl;
-using net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl.Factory;
-using net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Service;
-using net.boilingwater.DiSpeakBouyomiChanBridge.Http.Impl;
-using net.boilingwater.DiSpeakBouyomiChanBridge.InternalDiscordClient;
 using net.boilingwater.external.DiscordClient;
 using net.boilingwater.Framework.Common.Initialize;
 using net.boilingwater.Framework.Common.Logging;
 using net.boilingwater.Framework.Common.Setting;
 using net.boilingwater.Framework.Common.Utils;
 
-namespace net.boilingwater.DiSpeakBouyomiChanBridge
+namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge
 {
     internal class ApplicationInitializer
     {

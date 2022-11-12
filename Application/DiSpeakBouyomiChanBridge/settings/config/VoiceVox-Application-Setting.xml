@@ -5,8 +5,8 @@
     =======================
 -->
 <Settings>
-  <Item key="VoiceVox.Application.Host"                       value="localhost" />
   <Item key="VoiceVox.Application.Scheme"                     value="http" />
+  <Item key="VoiceVox.Application.Host"                       value="localhost" />
   <Item key="VoiceVox.Application.Port"                       value="50021" />
 
   <!--ずんだもん（ノーマル）-->

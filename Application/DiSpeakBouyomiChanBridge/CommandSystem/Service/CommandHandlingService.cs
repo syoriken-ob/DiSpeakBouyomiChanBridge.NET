@@ -1,12 +1,12 @@
 ﻿using System;
 
+using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Handle;
+using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Handle.Impl;
 using net.boilingwater.BusinessLogic.VoiceReadout.HttpClients;
-using net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Handle;
-using net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Handle.Impl;
 using net.boilingwater.Framework.Common.Logging;
 using net.boilingwater.Framework.Common.Setting;
 
-namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Service
+namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Service
 {
     /// <summary>
     /// コマンド検出サービス

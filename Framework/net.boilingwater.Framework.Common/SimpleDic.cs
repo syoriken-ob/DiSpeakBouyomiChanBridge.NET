@@ -8,6 +8,22 @@ namespace net.boilingwater.Framework.Common
     public class SimpleDic<T> : Dictionary<string, T?>
     {
         /// <summary>
+        /// 初期データを空とするコンストラクタ
+        /// </summary>
+        public SimpleDic()
+        { }
+
+        /// <summary>
+        /// 初期データを<paramref name="dictionary"/>とするコンストラクタ
+        /// </summary>
+        public SimpleDic(Dictionary<string, T?> dictionary) : base(dictionary) { }
+
+        /// <summary>
+        /// 初期データを<paramref name="collection"/>とするコンストラクタ
+        /// </summary>
+        public SimpleDic(IEnumerable<KeyValuePair<string, T?>> collection) : base(collection) { }
+
+        /// <summary>
         /// データを取得・設定します。
         /// </summary>
         /// <param name="key">キー</param>

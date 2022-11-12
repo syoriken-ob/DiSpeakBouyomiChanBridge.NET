@@ -10,7 +10,7 @@ using net.boilingwater.Framework.Common.Logging;
 using net.boilingwater.Framework.Common.Setting;
 using net.boilingwater.Framework.Common.Utils;
 
-namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl.Factory
+namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Impl.Factory
 {
     /// <summary>
     /// <see cref="SystemCommand"/>を文字列中から作成するファクトリ

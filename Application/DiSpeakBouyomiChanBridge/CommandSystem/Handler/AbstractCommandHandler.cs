@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Threading.Tasks;
 
+using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Impl;
+using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Impl.Factory;
+using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.PipeLine;
+using net.boilingwater.Application.DiSpeakBouyomiChanBridge.InternalDiscordClient.Services;
 using net.boilingwater.BusinessLogic.MessageReplacer.Service;
 using net.boilingwater.BusinessLogic.VoiceReadout.HttpClients;
-using net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl;
-using net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl.Factory;
-using net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.PipeLine;
-using net.boilingwater.DiSpeakBouyomiChanBridge.InternalDiscordClient.Services;
 using net.boilingwater.Framework.Common.Extensions;
 
-namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Handle
+namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Handle
 {
     /// <summary>
     /// コマンド検出処理を定義する基底クラス

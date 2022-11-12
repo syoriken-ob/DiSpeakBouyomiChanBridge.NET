@@ -3,7 +3,7 @@
 using net.boilingwater.Framework.Common.Setting;
 using net.boilingwater.Framework.Common.Utils;
 
-namespace net.boilingwater.DiSpeakBouyomiChanBridge.InternalDiscordClient.Services
+namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.InternalDiscordClient.Services
 {
     internal class DiscordUserVoiceStateUpdatedService
     {

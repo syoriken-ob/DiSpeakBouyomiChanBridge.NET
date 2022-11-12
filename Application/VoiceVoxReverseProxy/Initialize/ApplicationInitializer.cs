@@ -1,7 +1,8 @@
-﻿using net.boilingwater.Framework.Common.Initialize;
+﻿using net.boilingwater.Application.VoiceVoxReverseProxy.Http;
+using net.boilingwater.Framework.Common.Initialize;
 using net.boilingwater.Framework.Common.Logging;
 
-namespace net.boilingwater.VoiceVoxProxy
+namespace net.boilingwater.Application.VoiceVoxReverseProxy
 {
     internal class ApplicationInitializer
     {
@@ -14,26 +15,10 @@ namespace net.boilingwater.VoiceVoxProxy
             CommonInitializer.Initialize();
             Log.Logger.Info("アプリケーションの初期化処理を開始します。");
 
-            InitializeHttpServer();
-            InitializeHttpClinet();
+            VoiceVoxHttpClientManager.Initialize();
+            HttpServerForVoiceVoxBridge.Instance.Initialize();
 
             Log.Logger.Info("アプリケーションの初期化処理が完了しました。");
-        }
-
-        /// <summary>
-        /// HttpServerの初期化します
-        /// </summary>
-        /// <exception cref="ApplicationException"></exception>
-        private static void InitializeHttpServer()
-        {
-            //HttpServerForCommon.Instance.Initialize();
-        }
-
-        /// <summary>
-        ///
-        /// </summary>
-        private static void InitializeHttpClinet()
-        {
         }
 
         /// <summary>
@@ -41,7 +26,7 @@ namespace net.boilingwater.VoiceVoxProxy
         /// </summary>
         internal static void Start()
         {
-            //HttpServerForCommon.Instance.Start();
+            HttpServerForVoiceVoxBridge.Instance.Start();
         }
     }
 }

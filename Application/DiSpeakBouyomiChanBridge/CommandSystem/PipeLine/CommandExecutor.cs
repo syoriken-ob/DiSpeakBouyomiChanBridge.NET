@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
-using net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl;
+using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Impl;
 using net.boilingwater.Framework.Common.Logging;
 
-namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.PipeLine
+namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.PipeLine
 {
     /// <summary>
     /// コマンドを順次実行する

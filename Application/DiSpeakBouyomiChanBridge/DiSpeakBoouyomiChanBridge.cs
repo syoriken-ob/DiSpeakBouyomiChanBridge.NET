@@ -2,7 +2,7 @@
 
 using net.boilingwater.Framework.Common.Logging;
 
-namespace net.boilingwater.DiSpeakBouyomiChanBridge
+namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge
 {
     /// <summary>
     /// エントリーポイントのクラス

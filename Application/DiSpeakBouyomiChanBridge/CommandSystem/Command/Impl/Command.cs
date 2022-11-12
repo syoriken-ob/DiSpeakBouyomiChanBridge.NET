@@ -9,7 +9,7 @@ using net.boilingwater.Framework.Common.Logging;
 using net.boilingwater.Framework.Common.Setting;
 using net.boilingwater.Framework.Common.Utils;
 
-namespace net.boilingwater.DiSpeakBouyomiChanBridge.CommandSystem.Impl
+namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Impl
 {
     /// <summary>
     /// Discordの入力に応じた処理を定義したコマンド
