@@ -104,6 +104,13 @@ namespace net.boilingwater.Framework.Common
         public uint GetAsUnsignedInteger(string key) => CastUtil.ToUnsignedInteger(this[key]);
 
         /// <summary>
+        /// <see cref="Guid"/>型としてデータを取得します。
+        /// </summary>
+        /// <param name="key">キー</param>
+        /// <returns></returns>
+        public Guid GetAsGuid(string key) => CastUtil.ToGuid(this[key]);
+
+        /// <summary>
         /// <typeparamref name="T"/>型としてデータを取得します。
         /// </summary>
         /// <param name="key">キー</param>
@@ -151,5 +158,10 @@ namespace net.boilingwater.Framework.Common
 
             return new MultiList();
         }
+
+        #region debug
+        /// <inheritdoc/>
+        public override string ToString() => SerializeUtil.SerializeJson(this);
+        #endregion debug
     }
 }

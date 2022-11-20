@@ -20,7 +20,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl
         private static Regex SpeakerRegex { get; set; } = new Regex(@"^(?<speaker_id>\w{1,2})\)", RegexOptions.Compiled);
         private readonly Thread _thread;
         private readonly BlockingCollection<string> _receivedMessages = new();
-        private  MultiDic RequestSetting { get; set; }
+        private MultiDic RequestSetting { get; set; }
         private SimpleDic<string> VoiceVoxSpeakers { get; set; }
 
         public HttpClientForVoiceVox()
@@ -88,7 +88,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl
             {
                 var speaker = ExtractVoiceVoxSpeaker(ref message);
 
-                var audioQueryResult = VoiceVoxRequestService.SendVoiceVoxAudioQueryRequst(Client, RequestSetting, message, speaker);
+                var audioQueryResult = VoiceVoxRequestService.SendVoiceVoxAudioQueryRequest(Client, RequestSetting, message, speaker);
                 if (audioQueryResult.ContainsKey("statusCode"))
                 {
                     var statusCode = audioQueryResult.GetAsObject<HttpStatusCode>("statusCode");
@@ -141,7 +141,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl
         {
             var dic = new SimpleDic<string>();
 
-            var result = VoiceVoxRequestService.SendVoiceVoxSpeakersRequst(Client, RequestSetting);
+            var result = VoiceVoxRequestService.SendVoiceVoxSpeakersRequest(Client, RequestSetting);
 
             if (result.GetAsBoolean("valid"))
             {
@@ -171,7 +171,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl
             foreach (var pair in VoiceVoxSpeakers)
             {
                 Log.Logger.Debug($"VoiceVox話者：{pair.Key}を初期化します。");
-                var result = VoiceVoxRequestService.SendVoiceVoxInitializeSpeakerRequst(Client, RequestSetting, CastUtil.ToString(pair.Value));
+                var result = VoiceVoxRequestService.SendVoiceVoxInitializeSpeakerRequest(Client, RequestSetting, CastUtil.ToString(pair.Value));
                 Log.Logger.Debug($"VoiceVox話者：{pair.Key}の初期化に{(result.GetAsBoolean("valid") ? "成功" : "失敗")}しました。");
             }
         }
@@ -203,22 +203,6 @@ namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl
 
             message = message.Replace(match.Value, "");
             return VoiceVoxSpeakers[speakerId.Value] ?? Settings.AsString("VoiceVox.DefaultSpeaker");
-        }
-
-        /// <summary>
-        /// エラー発生時の待機処理
-        /// </summary>
-        /// <param name="retryCount">リトライ回数</param>
-        /// <returns></returns>
-        private static bool WaitRetry(long retryCount)
-        {
-            if (Settings.Get("RetryCount").HasValue() || retryCount < Settings.AsLong("RetryCount"))
-            {
-                Log.Logger.DebugFormat("Retry Connect:{0}/{1}", retryCount, Settings.AsLong("RetryCount"));
-                Thread.Sleep(Settings.AsInteger("RetrySleepTime.Milliseconds"));
-                return true;
-            }
-            return false;
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using net.boilingwater.BusinessLogic.VoiceReadOut.Httpclients.Service;
+﻿using System.Net;
+
+using net.boilingwater.BusinessLogic.VoiceReadOut.Httpclients.Service;
 using net.boilingwater.Framework.Common;
 using net.boilingwater.Framework.Common.Http;
 using net.boilingwater.Framework.Common.Logging;
@@ -12,13 +14,21 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
     /// </summary>
     public class HttpClientForVoiceVoxBridge : AbstractHttpClient
     {
-        private MultiDic RequestSetting { get; set; }
-
+        /// <summary>
+        /// 利用可能なVOICEVOX話者IDのリスト
+        /// </summary>
         public List<string> Speakers { get; private set; }
+
+        /// <summary>
+        /// <see cref="VoiceVoxRequestService.CreateRequestSettingDic(string, string, int)"/>で生成した通信用共通設定辞書
+        /// </summary>
+        private MultiDic RequestSetting { get; set; }
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
+        /// <param name="host">通信先のホスト名</param>
+        /// <param name="port">通信先のポート番号</param>
         public HttpClientForVoiceVoxBridge(string host, int port) : base()
         {
             RequestSetting = VoiceVoxRequestService.CreateRequestSettingDic(
@@ -28,14 +38,83 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
             );
 
             Speakers = FetchEnableVoiceVoxSpeakers();
-            InitializeVoiceVoxSpeaker();
+            //InitializeVoiceVoxSpeaker();
         }
 
         /// <summary>
         /// VoiceVoxAPI[speakers]から利用可能な話者のリストを取得します。
         /// </summary>
         /// <returns></returns>
-        public MultiDic SendVoiceVoxSpeakersRequest() => VoiceVoxRequestService.SendVoiceVoxSpeakersRequst(Client, RequestSetting);
+        public MultiDic SendVoiceVoxSpeakersRequest() => VoiceVoxRequestService.SendVoiceVoxSpeakersRequest(Client, RequestSetting);
+
+        /// <summary>
+        /// VoiceVoxAPI[audio_query]にリクエストを送信します。
+        /// </summary>
+        /// <param name="message">読み上げメッセージ</param>
+        /// <param name="speaker">VoiceVox話者ID</param>
+        /// <param name="audioQuery">VoiceVoxAPI[audio_query]で生成した音声合成パラメータ</param>
+        /// <returns>取得できたかどうか</returns>
+        public bool SendVoiceVoxAudioQueryRequest(string message, string speaker, out MultiDic audioQuery)
+        {
+            var retryCount = 0L;
+            while (true)
+            {
+                var audioQueryResult = VoiceVoxRequestService.SendVoiceVoxAudioQueryRequest(Client, RequestSetting, message, speaker);
+                if (audioQueryResult.ContainsKey("statusCode"))
+                {
+                    var statusCode = audioQueryResult.GetAsObject<HttpStatusCode>("statusCode");
+                    Log.Logger.Debug(message: $"Send AudioQuery: {(int)statusCode}-{statusCode}");
+                }
+                if (!audioQueryResult.GetAsBoolean("valid"))
+                {
+                    Log.Logger.Fatal($"Fail to Send Message to VoiceVox[audio_query]: {message}");
+                    if (!WaitRetry(retryCount++))
+                    {
+                        audioQuery = new MultiDic();
+                        return false;
+                    }
+                    continue;
+                }
+                audioQuery = audioQueryResult.GetAsMultiDic("audioQuery");
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// VoiceVoxAPI[synthesis]にリクエストを送信します。
+        /// </summary>
+        /// <param name="audioQuery">VoiceVoxAPI[audio_query]で生成した音声合成パラメータ</param>
+        /// <param name="speaker">VoiceVox話者ID</param>
+        /// <param name="voice">wave形式の音声データ</param>
+        /// <returns>取得できたかどうか</returns>
+        public bool SendVoiceVoxSynthesisRequest(MultiDic audioQuery, string speaker, out byte[] voice)
+        {
+            var retryCount = 0L;
+            while (true)
+            {
+                var synthesisResult = VoiceVoxRequestService.SendVoiceVoxSynthesisRequest(Client, RequestSetting, audioQuery, speaker);
+                if (synthesisResult.ContainsKey("statusCode"))
+                {
+                    var statusCode = synthesisResult.GetAsObject<HttpStatusCode>("statusCode");
+                    Log.Logger.Debug($"Send Synthesis: {(int)statusCode}-{statusCode}");
+                }
+                if (!synthesisResult.GetAsBoolean("valid"))
+                {
+                    Log.Logger.Fatal($"Fail to Send Message to VoiceVox[synthesis]: {audioQuery.GetAsString("kana")}");
+                    if (!WaitRetry(retryCount++))
+                    {
+                        voice = Array.Empty<byte>();
+                        return false;
+                    }
+                    continue;
+                }
+
+                voice = synthesisResult.GetAsObject<byte[]>("voice")!;
+                return true;
+            }
+        }
+
+        #region private
 
         /// <summary>
         /// VoiceVoxAPI[speakers]から利用可能な話者のリストを取得し、キャッシュします。
@@ -70,9 +149,11 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
             foreach (var id in Speakers)
             {
                 Log.Logger.Debug($"VoiceVox話者：{id}を初期化します。");
-                var result = VoiceVoxRequestService.SendVoiceVoxInitializeSpeakerRequst(Client, RequestSetting, CastUtil.ToString(id));
+                var result = VoiceVoxRequestService.SendVoiceVoxInitializeSpeakerRequest(Client, RequestSetting, CastUtil.ToString(id));
                 Log.Logger.Debug($"VoiceVox話者：{id}の初期化に{(result.GetAsBoolean("valid") ? "成功" : "失敗")}しました。");
             }
         }
+
+        #endregion private
     }
 }

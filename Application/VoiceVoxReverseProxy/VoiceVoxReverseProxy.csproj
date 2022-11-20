@@ -15,8 +15,17 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\BusinessLogic\VoiceReadOut\net.boilingwater.BusinessLogic.VoiceReadOut.csproj" />
+    <ProjectReference Include="..\..\BusinessLogic\VoiceVoxSpeakerMapping\net.boilingwater.BusinessLogic.VoiceVoxSpeakerMapping.csproj" />
     <ProjectReference Include="..\..\Framework\net.boilingwater.Framework.Common\net.boilingwater.Framework.Common.csproj" />
   </ItemGroup>
+  
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>none</DebugType>
+  </PropertyGroup>
 
   <ItemGroup>
     <None Update="settings\config\System-Application-Setting.xml">

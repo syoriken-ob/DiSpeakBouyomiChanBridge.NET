@@ -10,7 +10,7 @@ namespace net.boilingwater.Framework.Common.Utils
     /// <summary>
     /// 型変換のユーティリティクラス
     /// </summary>
-    public class CastUtil
+    public static class CastUtil
     {
         /// <summary>
         /// <paramref name="obj"/>を<see cref="int"/>型に変換します
@@ -148,6 +148,26 @@ namespace net.boilingwater.Framework.Common.Utils
         }
 
         /// <summary>
+        /// <paramref name="obj"/>を<see cref="Guid"/>型に変換します
+        /// </summary>
+        /// <param name="obj">変換する値</param>
+        /// <returns><see cref="Guid"/>型に変換した<paramref name="obj"/></returns>
+        public static Guid ToGuid(object? obj)
+        {
+            if (obj is Guid guid)
+            {
+                return guid;
+            }
+
+            if (Guid.TryParse(ToString(obj), out guid))
+            {
+                return guid;
+            }
+
+            return default;
+        }
+
+        /// <summary>
         /// <paramref name="obj"/>を<see cref="string"/>型に変換します
         /// </summary>
         /// <param name="obj">変換する値</param>
@@ -157,14 +177,12 @@ namespace net.boilingwater.Framework.Common.Utils
         /// </returns>
         public static string ToString(object? obj)
         {
-            if (obj == null)
+            switch (obj)
             {
-                return string.Empty;
-            }
-
-            if (obj is string @string)
-            {
-                return @string;
+                case null:
+                    return string.Empty;
+                case string @string:
+                    return @string;
             }
 
             var str = obj.ToString();

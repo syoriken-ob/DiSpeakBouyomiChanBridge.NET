@@ -50,14 +50,8 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Pi
         internal void ShutdownThreads()
         {
             Command.KillProcess();
-            if (ImmediateCommandExecutor != null)
-            {
-                ImmediateCommandExecutor.ClearTask();
-            }
-            if (CommonCommandExecutor != null)
-            {
-                CommonCommandExecutor.ClearTask();
-            }
+            ImmediateCommandExecutor?.ClearTask();
+            CommonCommandExecutor?.ClearTask();
         }
     }
 }

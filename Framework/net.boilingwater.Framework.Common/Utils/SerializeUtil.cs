@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Text.Encodings.Web;
+﻿using System.Text.Encodings.Web;
 using System.Text.Json;
 
 using YamlDotNet.Serialization;
@@ -10,7 +9,7 @@ namespace net.boilingwater.Framework.Common.Utils
     /// <summary>
     /// シリアライズ・デシリアライズ用のユーティリティクラス
     /// </summary>
-    public class SerializeUtil
+    public static class SerializeUtil
     {
         /// <summary>
         /// オブジェクトをJSON文字列にシリアライズします。

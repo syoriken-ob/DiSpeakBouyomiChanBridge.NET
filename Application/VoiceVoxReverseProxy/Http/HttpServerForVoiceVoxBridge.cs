@@ -2,14 +2,19 @@
 using System.Text;
 
 using net.boilingwater.Framework.Common.Http;
-using net.boilingwater.Framework.Common.Logging;
 using net.boilingwater.Framework.Common.Setting;
 using net.boilingwater.Framework.Common.Utils;
 
 namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
 {
+    /// <summary>
+    /// VoiceVox互換の簡易HttpServerクラス
+    /// </summary>
     public class HttpServerForVoiceVoxBridge : AbstractHttpServer
     {
+        /// <summary>
+        /// シングルトンインスタンス
+        /// </summary>
         public static HttpServerForVoiceVoxBridge Instance { get; private set; } = new();
 
         /// <inheritdoc/>
@@ -40,25 +45,44 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
 
                 if (path == Settings.AsString("VoiceVox.Request.Speakers.Path"))
                 {
-                    ResponseSpeakersRequest(context);
+                    SetResponseFromSpeakersRequest(context);
                     return;
                 }
 
-                context.Response.StatusCode = 404;
+                if (path == Settings.AsString("VoiceVox.Request.AudioQuery.Path"))
+                {
+                    SetResponseFromAudioQueryRequest(context);
+                    return;
+                }
+
+                if (path == Settings.AsString("VoiceVox.Request.Synthesis.Path"))
+                {
+                    SetResponseFromSynthesisRequest(context);
+                    return;
+                }
+
+                context.Response.StatusCode = (int)HttpStatusCode.NotFound;
             }
             finally
             {
                 context.Response.Close();
             }
         }
-        private void ResponseSpeakersRequest(HttpListenerContext context)
+
+        #region レスポンス生成処理
+
+        /// <summary>
+        /// VoiceVoxAPI[speaker]に該当するリクエストの処理を行います。
+        /// </summary>
+        /// <param name="context"><see cref="HttpListenerContext"/></param>
+        private static void SetResponseFromSpeakersRequest(HttpListenerContext context)
         {
             if (!VoiceVoxHttpClientManager.FetchAllVoiceVoxSpeakers(out var speakers))
             {
-                context.Response.StatusCode = 400;
+                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
             }
             var response = context.Response;
-            response.StatusCode = 200;
+            response.StatusCode = (int)HttpStatusCode.OK;
             response.ContentEncoding = Encoding.UTF8;
 
             var str = SerializeUtil.SerializeJson(speakers);
@@ -66,5 +90,94 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
             using var writer = new StreamWriter(response.OutputStream);
             writer.Write(str);
         }
+
+        /// <summary>
+        /// VoiceVoxAPI[audio_query]に該当するリクエストの処理を行います。
+        /// </summary>
+        /// <param name="context"><see cref="HttpListenerContext"/></param>
+        private static void SetResponseFromAudioQueryRequest(HttpListenerContext context)
+        {
+            var query = context.Request.QueryString;
+            var response = context.Response;
+
+            if (!query.AllKeys.Contains("speaker") || !query.AllKeys.Contains("text"))
+            {
+                response.StatusCode = (int)HttpStatusCode.BadRequest;
+                return;
+            }
+
+            response.ContentEncoding = Encoding.UTF8;
+
+            try
+            {
+                if (!VoiceVoxHttpClientManager.SendVoiceVoxAudioQueryRequest(
+                    CastUtil.ToString(query.Get("text")),
+                    CastUtil.ToString(query.Get("speaker")),
+           out var audioQuery
+                ))
+                {
+                    response.StatusCode = (int)HttpStatusCode.BadRequest;
+                }
+
+                var str = SerializeUtil.SerializeJson(audioQuery);
+                using var writer = new StreamWriter(response.OutputStream);
+                writer.Write(str);
+                response.StatusCode = (int)HttpStatusCode.OK;
+            }
+            catch
+            {
+                response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            }
+            return;
+        }
+
+        /// <summary>
+        /// VoiceVoxAPI[synthesis]に該当するリクエストの処理を行います。
+        /// </summary>
+        /// <param name="context"><see cref="HttpListenerContext"/></param>
+        private static void SetResponseFromSynthesisRequest(HttpListenerContext context)
+        {
+            var query = context.Request.QueryString;
+            var request = context.Request;
+            var response = context.Response;
+
+            if (!query.AllKeys.Contains("speaker"))
+            {
+                response.StatusCode = (int)HttpStatusCode.BadRequest;
+                return;
+            }
+
+            using var stream = new StreamReader(request.InputStream);
+            var input = SerializeUtil.JsonToMultiDic(stream.ReadToEnd());
+
+            if (!input.Any())
+            {
+                response.StatusCode = (int)HttpStatusCode.BadRequest;
+                return;
+            }
+
+            try
+            {
+                if (!VoiceVoxHttpClientManager.SendVoiceVoxSynthesisRequest(
+                    input,
+                    CastUtil.ToString(query.Get("speaker")),
+                    out var voice
+                ))
+                {
+                    response.StatusCode = (int)HttpStatusCode.BadRequest;
+                }
+
+                response.ContentType = Settings.AsString("VoiceVox.Response.Synthesis.Content-Type");
+                response.OutputStream.Write(voice, 0, voice.Length);
+                response.StatusCode = (int)HttpStatusCode.OK;
+            }
+            catch
+            {
+                response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            }
+            return;
+        }
+
+        #endregion レスポンス生成処理
     }
 }

@@ -54,7 +54,7 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.Http.Impl
                 }
 
                 message = CastUtil.ToString(request.GetTextMessage("text"));
-                response.StatusCode = 200;
+                response.StatusCode = (int)HttpStatusCode.OK;
             }
 
             Log.Logger.Debug($"Receive({GetType().Name}) :{message}");

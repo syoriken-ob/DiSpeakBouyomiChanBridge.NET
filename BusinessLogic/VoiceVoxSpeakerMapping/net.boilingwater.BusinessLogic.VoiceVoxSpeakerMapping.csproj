@@ -1,10 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -16,11 +16,9 @@
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <DebugType>none</DebugType>
   </PropertyGroup>
-  
+
   <ItemGroup>
-    <ProjectReference Include="..\..\external\AudioPlay\net.boilingwater.external.AudioPlay.csproj" />
     <ProjectReference Include="..\..\Framework\net.boilingwater.Framework.Common\net.boilingwater.Framework.Common.csproj" />
-    <ProjectReference Include="..\MessageReplacer\net.boilingwater.BusinessLogic.MessageReplacer.csproj" />
   </ItemGroup>
 
 </Project>

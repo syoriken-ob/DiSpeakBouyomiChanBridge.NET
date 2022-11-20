@@ -1,4 +1,6 @@
-﻿using net.boilingwater.Framework.Common.Utils;
+﻿using System;
+
+using net.boilingwater.Framework.Common.Utils;
 
 using NUnit.Framework;
 
@@ -201,5 +203,23 @@ namespace net.boilingwater.Framework.CommonTest.Utils
 
         public enum ToStringTestEnum
         { HOGE }
+
+        /// <summary>
+        /// ToGuid Test
+        /// </summary>
+        /// <param name="obj">cast target</param>
+        /// <returns>cast result</returns>
+        [TestCaseSource(nameof(ToGuidTestSource))]
+        public Guid ToGuidTest(object obj) => CastUtil.ToGuid(obj);
+
+        public static readonly TestCaseData[] ToGuidTestSource =
+        {
+            new TestCaseData(null).Returns(Guid.Empty).SetCategory("ToGuidTestSource").SetName("Guid null"),
+            new TestCaseData("d1a6eadf-c842-40b9-9aa3-a2d87a6aef86").Returns(Guid.Parse("d1a6eadf-c842-40b9-9aa3-a2d87a6aef86")).SetCategory("ToGuidTestSource").SetName("Guid Castable string"),
+            new TestCaseData("d2d1c1bd-6805-11ed-bd01-bb9bcd5fc526").Returns(Guid.Parse("d2d1c1bd-6805-11ed-bd01-bb9bcd5fc526")).SetCategory("ToGuidTestSource").SetName("Guid Castable string v1 uuid"),
+            new TestCaseData("{d1a6eadf-c842-40b9-9aa3-a2d87a6aef86}").Returns(Guid.Parse("d1a6eadf-c842-40b9-9aa3-a2d87a6aef86")).SetCategory("ToGuidTestSource").SetName("Guid Castable string with Bracket"),
+            new TestCaseData("hoge").Returns(Guid.Empty).SetCategory("ToGuidTestSource").SetName("Guid not Castable string"),
+            new TestCaseData(Guid.Parse("d1a6eadf-c842-40b9-9aa3-a2d87a6aef86")).Returns(Guid.Parse("d1a6eadf-c842-40b9-9aa3-a2d87a6aef86")).SetCategory("ToGuidTestSource").SetName("Guid guid"),
+        };
     }
 }

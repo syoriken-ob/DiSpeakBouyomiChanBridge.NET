@@ -23,4 +23,6 @@
   <Item key="VoiceVox.Request.Synthesis.ParamName.Speaker"    value="speaker" />
   <Item key="VoiceVox.Request.Synthesis.Content-Type"         value="application/json" />
   <Item key="VoiceVox.Request.Synthesis.Header"               value="accept;audio/wav" />
+
+  <Item key="VoiceVox.Response.Synthesis.Content-Type"         value="audio/wav" />
 </Settings>

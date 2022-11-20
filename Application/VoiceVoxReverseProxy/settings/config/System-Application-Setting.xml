@@ -10,4 +10,10 @@
 
   <Item key="RetryCount"                     value="5" />
   <Item key="RetrySleepTime.Milliseconds"    value="1000" />
+
+  <!-- メモリキャッシュ有効期限 -->
+  <Item key="MemoryCache.Expiration.Default.Minutes" value="15" />
+
+  <!-- SQLiteのDBファイルパス -->
+  <Item key="SQLite3.DBFilePath"             value="./cache.db" />
 </Settings>

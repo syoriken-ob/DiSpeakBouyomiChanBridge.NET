@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 
+using net.boilingwater.Framework.Common.Utils;
+
 namespace net.boilingwater.Framework.Common
 {
     /// <summary>
@@ -43,5 +45,9 @@ namespace net.boilingwater.Framework.Common
                 }
             }
         }
+        #region debug
+        /// <inheritdoc/>
+        public override string ToString() => SerializeUtil.SerializeJson(this);
+        #endregion debug
     }
 }

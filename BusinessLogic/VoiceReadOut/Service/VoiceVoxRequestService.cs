@@ -9,6 +9,9 @@ using net.boilingwater.Framework.Common.Utils;
 
 namespace net.boilingwater.BusinessLogic.VoiceReadOut.Httpclients.Service
 {
+    /// <summary>
+    /// VOICEVOXにリクエストを送信するためのサービスクラス
+    /// </summary>
     public static class VoiceVoxRequestService
     {
         #region SendRequest
@@ -17,7 +20,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadOut.Httpclients.Service
         /// VoiceVoxAPI[speakers]にリクエストを送信します。
         /// </summary>
         /// <returns></returns>
-        public static MultiDic SendVoiceVoxSpeakersRequst(HttpClient client, MultiDic setting)
+        public static MultiDic SendVoiceVoxSpeakersRequest(HttpClient client, MultiDic setting)
         {
             var result = new MultiDic();
             try
@@ -60,9 +63,11 @@ namespace net.boilingwater.BusinessLogic.VoiceReadOut.Httpclients.Service
         /// <summary>
         /// VoiceVoxAPI[initialize_speaker]にリクエストを送信します。
         /// </summary>
+        /// <param name="client">Httpクライアント</param>
+        /// <param name="setting"><see cref="CreateRequestSettingDic(string, string, int)"/>で生成した通信用共通設定辞書</param>
         /// <param name="speaker">初期化するVoiceVox話者ID</param>
         /// <returns></returns>
-        public static MultiDic SendVoiceVoxInitializeSpeakerRequst(HttpClient client, MultiDic setting, string speaker)
+        public static MultiDic SendVoiceVoxInitializeSpeakerRequest(HttpClient client, MultiDic setting, string speaker)
         {
             var result = new MultiDic();
             try
@@ -99,10 +104,12 @@ namespace net.boilingwater.BusinessLogic.VoiceReadOut.Httpclients.Service
         /// <summary>
         /// VoiceVoxAPI[audio_query]にリクエストを送信します。
         /// </summary>
-        /// <param name="message"></param>
-        /// <param name="speaker"></param>
+        /// <param name="client">Httpクライアント</param>
+        /// <param name="setting"><see cref="CreateRequestSettingDic(string, string, int)"/>で生成した通信用共通設定辞書</param>
+        /// <param name="message">読み上げメッセージ</param>
+        /// <param name="speaker">VoiceVox話者ID</param>
         /// <returns></returns>
-        public static MultiDic SendVoiceVoxAudioQueryRequst(HttpClient client, MultiDic setting, string message, string speaker)
+        public static MultiDic SendVoiceVoxAudioQueryRequest(HttpClient client, MultiDic setting, string message, string speaker)
         {
             var result = new MultiDic();
             try
@@ -145,8 +152,10 @@ namespace net.boilingwater.BusinessLogic.VoiceReadOut.Httpclients.Service
         /// <summary>
         /// VoiceVoxAPI[synthesis]にリクエストを送信します。
         /// </summary>
-        /// <param name="audioQueryDic"></param>
-        /// <param name="speaker"></param>
+        /// <param name="client">Httpクライアント</param>
+        /// <param name="setting"><see cref="CreateRequestSettingDic(string, string, int)"/>で生成した通信用共通設定辞書</param>
+        /// <param name="audioQueryDic">VoiceVoxAPI[audio_query]で生成した音声合成パラメータ</param>
+        /// <param name="speaker">VoiceVox話者ID</param>
         /// <returns></returns>
         public static MultiDic SendVoiceVoxSynthesisRequest(HttpClient client, MultiDic setting, MultiDic audioQueryDic, string speaker)
         {
@@ -196,6 +205,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadOut.Httpclients.Service
         /// <summary>
         /// VoiceVoxAPI[speakers]に送信する<see cref="HttpRequestMessage"/>を作成します。
         /// </summary>
+        /// <param name="setting"><see cref="CreateRequestSettingDic(string, string, int)"/>で生成した通信用共通設定辞書</param>
         /// <returns></returns>
         public static HttpRequestMessage CreateVoiceVoxSpeakersHttpRequest(MultiDic setting)
         {
@@ -215,6 +225,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadOut.Httpclients.Service
         /// <summary>
         /// VoiceVoxAPI[initialize_speaker]に送信する<see cref="HttpRequestMessage"/>を作成します。
         /// </summary>
+        /// <param name="setting"><see cref="CreateRequestSettingDic(string, string, int)"/>で生成した通信用共通設定辞書</param>
         /// <param name="speaker">初期化を行うVoiceVox話者ID</param>
         /// <returns></returns>
         public static HttpRequestMessage CreateVoiceVoxInitializeSpeakerHttpRequest(MultiDic setting, string speaker)
@@ -239,7 +250,9 @@ namespace net.boilingwater.BusinessLogic.VoiceReadOut.Httpclients.Service
         /// <summary>
         /// VoiceVoxAPI[audio_query]に送信する<see cref="HttpRequestMessage"/>を作成します。
         /// </summary>
+        /// <param name="setting"><see cref="CreateRequestSettingDic(string, string, int)"/>で生成した通信用共通設定辞書</param>
         /// <param name="text">読み上げメッセージ</param>
+        /// <param name="speaker">VoiceVox話者ID</param>
         /// <returns></returns>
         public static HttpRequestMessage CreateVoiceVoxAudioQueryHttpRequest(MultiDic setting, string text, string speaker)
         {
@@ -264,7 +277,9 @@ namespace net.boilingwater.BusinessLogic.VoiceReadOut.Httpclients.Service
         /// <summary>
         /// VoiceVoxAPI[synthesis]に送信する<see cref="HttpRequestMessage"/>を作成します。
         /// </summary>
-        /// <param name="audioQueryDic">APIにPOST送信するパラメータ</param>
+        /// <param name="setting"><see cref="CreateRequestSettingDic(string, string, int)"/>で生成した通信用共通設定辞書</param>
+        /// <param name="audioQueryDic">VoiceVoxAPI[audio_query]で生成した音声合成パラメータ</param>
+        /// <param name="speaker">VoiceVox話者ID</param>
         /// <returns></returns>
         public static HttpRequestMessage CreateVoiceVoxSynthesisHttpRequest(MultiDic setting, MultiDic audioQueryDic, string speaker)
         {
@@ -315,7 +330,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadOut.Httpclients.Service
         /// <summary>
         /// VoiceVoxで生成する音声生成クエリを調整します。
         /// </summary>
-        /// <param name="audioQueryDic"></param>
+        /// <param name="audioQueryDic">VoiceVoxAPI[audio_query]で生成した音声合成パラメータ</param>
         public static void ReplaceAudioQueryJson(MultiDic audioQueryDic)
         {
             var paramList = Settings.AsMultiDic("VoiceVox.Request.AudioQuery.ReplaceJsonParam");

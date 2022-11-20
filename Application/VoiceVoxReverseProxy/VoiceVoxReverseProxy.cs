@@ -2,8 +2,16 @@
 
 namespace net.boilingwater.Application.VoiceVoxReverseProxy
 {
+    /// <summary>
+    /// VoiceVoxReverseProxy エントリーポイントのクラス
+    /// </summary>
     public class VoiceVoxReverseProxy
     {
+        /// <summary>
+        /// エントリーポイント
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
         public static int Main(string[] args)
         {
             try

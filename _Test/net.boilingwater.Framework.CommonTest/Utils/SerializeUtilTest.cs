@@ -2,7 +2,7 @@
 using net.boilingwater.Framework.Common.Utils;
 
 using NUnit.Framework;
-//            
+
 namespace net.boilingwater.Framework.CommonTest.Utils
 {
     public class SerializeUtilTest

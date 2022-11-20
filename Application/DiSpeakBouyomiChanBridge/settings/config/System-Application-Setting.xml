@@ -18,6 +18,9 @@
   <Item key="CommandFile"                    value="command.yaml" />
   <Item key="SystemCommandFile"              value="system-command.yaml" />
 
+  <!-- メモリキャッシュ有効期限 -->
+  <Item key="MemoryCache.Expiration.Default.Minutes" value="15" />
+
   <!-- SQLiteのDBファイルパス -->
   <Item key="SQLite3.DBFilePath"             value="./bridge.db" />
 

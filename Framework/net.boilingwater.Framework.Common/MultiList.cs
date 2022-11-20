@@ -83,6 +83,13 @@ namespace net.boilingwater.Framework.Common
         public uint GetAsUnsignedInteger(int index) => CastUtil.ToUnsignedInteger(this[index]);
 
         /// <summary>
+        /// <see cref="Guid"/>型としてデータを取得します。
+        /// </summary>
+        /// <param name="index">インデックス</param>
+        /// <returns></returns>
+        public Guid GetAsGuid(int index) => CastUtil.ToGuid(this[index]);
+
+        /// <summary>
         /// <typeparamref name="T"/>型としてデータを取得します。
         /// </summary>
         /// <param name="index">インデックス</param>
@@ -104,5 +111,12 @@ namespace net.boilingwater.Framework.Common
             catch (Exception) { }
             return new MultiDic();
         }
+
+        #region debug
+
+        /// <inheritdoc/>
+        public override string ToString() => SerializeUtil.SerializeJson(this);
+
+        #endregion debug
     }
 }

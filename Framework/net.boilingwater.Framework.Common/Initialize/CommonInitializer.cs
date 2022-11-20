@@ -6,6 +6,7 @@ using net.boilingwater.Framework.Common.Extensions;
 using net.boilingwater.Framework.Common.Logging;
 using net.boilingwater.Framework.Common.Setting;
 using net.boilingwater.Framework.Common.SQLite;
+using net.boilingwater.Framework.Common.Utils;
 
 namespace net.boilingwater.Framework.Common.Initialize
 {
@@ -40,11 +41,15 @@ namespace net.boilingwater.Framework.Common.Initialize
             SQLiteDBDao.CreateDataBase();
 
             Assembly.GetEntryAssembly()?
-                    .CollectReferencedAssemblies(assemblyName => assemblyName.Name != null && assemblyName.Name.StartsWith("net.boilingwater"))
+                    .CollectReferencedAssemblies(assemblyName => CastUtil.ToString(assemblyName.Name).StartsWith("net.boilingwater"))
                     .ForEach(assembly => assembly?.GetTypes()
                                                   .Where(t => t.IsSubclassOf(typeof(SQLiteDBDao)) && !t.IsAbstract)
                                                   .Select(type => (SQLiteDBDao?)Activator.CreateInstance(type))
-                                                  .ForEach(dao => dao?.InitializeTable()));
+                                                  .ForEach(dao =>
+                                                  {
+                                                      Log.Logger.Debug($"DB初期化実行：{dao?.GetType().Name}");
+                                                      dao?.InitializeTable();
+                                                  }));
         }
     }
 }

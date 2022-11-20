@@ -45,28 +45,35 @@ namespace net.boilingwater.Framework.Common.Setting
         /// <see cref="int"/>型で<paramref name="key"/>に紐づくアプリケーション設定値を取得します
         /// </summary>
         /// <param name="key">設定キー</param>
-        /// <returns>アプリケーション設定値を<see cref="net.boilingwater.Framework.Common.Utils.CastUtil.ToInteger(object)"/>で変換して取得</returns>
+        /// <returns>アプリケーション設定値を<see cref="net.boilingwater.Framework.Common.Utils.CastUtil.ToInteger(object?)"/>で変換して取得</returns>
         public static int AsInteger(string key) => CastUtil.ToInteger(Get(key));
 
         /// <summary>
         /// <see cref="long"/>型で<paramref name="key"/>に紐づくアプリケーション設定値を取得します
         /// </summary>
         /// <param name="key">設定キー</param>
-        /// <returns>アプリケーション設定値を<see cref="net.boilingwater.Framework.Common.Utils.CastUtil.ToLong(object)"/>で変換して取得</returns>
+        /// <returns>アプリケーション設定値を<see cref="net.boilingwater.Framework.Common.Utils.CastUtil.ToLong(object?)"/>で変換して取得</returns>
         public static long AsLong(string key) => CastUtil.ToLong(Get(key));
 
         /// <summary>
         /// <see cref="bool"/>型で<paramref name="key"/>に紐づくアプリケーション設定値を取得します
         /// </summary>
         /// <param name="key"></param>
-        /// <returns>アプリケーション設定値を<see cref="net.boilingwater.Framework.Common.Utils.CastUtil.ToBoolean(object)"/>で変換して取得</returns>
+        /// <returns>アプリケーション設定値を<see cref="net.boilingwater.Framework.Common.Utils.CastUtil.ToBoolean(object?)"/>で変換して取得</returns>
         public static bool AsBoolean(string key) => CastUtil.ToBoolean(Get(key));
+
+        /// <summary>
+        /// <see cref="bool"/>型で<paramref name="key"/>に紐づくアプリケーション設定値を取得します
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns>アプリケーション設定値を<see cref="net.boilingwater.Framework.Common.Utils.CastUtil.ToDouble(object?)"/>で変換して取得</returns>
+        public static double AsDouble(string key) => CastUtil.ToDouble(Get(key));
 
         /// <summary>
         /// <see cref="decimal"/>型で<paramref name="key"/>に紐づくアプリケーション設定値を取得します
         /// </summary>
         /// <param name="key">設定キー</param>
-        /// <returns>アプリケーション設定値を<see cref="net.boilingwater.Framework.Common.Utils.CastUtil.ToDecimal(object)"/>で変換して取得</returns>
+        /// <returns>アプリケーション設定値を<see cref="net.boilingwater.Framework.Common.Utils.CastUtil.ToDecimal(object?)"/>で変換して取得</returns>
         public static decimal AsDecimal(string key) => CastUtil.ToDecimal(Get(key));
 
         /// <summary>
@@ -146,7 +153,7 @@ namespace net.boilingwater.Framework.Common.Setting
             {
                 return CastUtil.ToString(ConfigurationManager.AppSettings[key]);
             }
-            catch (Exception)
+            catch
             {
                 return "";
             }
