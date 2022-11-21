@@ -32,5 +32,5 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: DiSpeakBouyomiChanBridge.NET
-        path: ~/publish/
+        path: ~/publish/**
         if-no-files-found: error
