@@ -12,6 +12,7 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy
         /// </summary>
         /// <param name="args"></param>
         /// <returns></returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:未使用のパラメーターを削除します", Justification = "<保留中>")]
         public static int Main(string[] args)
         {
             try
