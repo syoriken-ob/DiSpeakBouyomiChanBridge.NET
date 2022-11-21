@@ -1,0 +1,44 @@
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: .NET
+
+on:
+  push:
+    branches: [ "develop" ]
+  pull_request:
+    branches: [ "develop" ]
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 6.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build -c Release --no-restore
+    - name: Test
+      run: dotnet test -c Release --no-build --verbosity normal
+    - name: Publish DiSpaekBouyomiChanBridge
+      run: dotnet publish .\Application\DiSpeakBouyomiChanBridge\DiSpeakBouyomiChanBridge.csproj -c Release -o .\publish\bouyomi\
+    - name: Publish VoiceVoxReverseProxy
+      run: dotnet publish .\Application\VoiceVoxReverseProxy\VoiceVoxReverseProxy.csproj -c Release -o .\publish\cacheserver\
+    - name: Upload a Build Artifact(DiSpeakBouyomiChanBridge)
+      uses: actions/upload-artifact@v3
+      with:
+        name: DiSpeakBouyomiChanBridge.NET
+        path: .\publish\bouyomi\**
+        if-no-files-found: error
+    - name: Upload a Build Artifact(VoiceVoxReverseProxy)
+      uses: actions/upload-artifact@v3
+      with:
+        name: VoiceVoxReverseProxy
+        path: .\publish\cacheserver\**
+        if-no-files-found: error
