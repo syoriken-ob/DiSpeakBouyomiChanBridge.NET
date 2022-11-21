@@ -366,4 +366,4 @@ FodyWeavers.xsd
 
 # アプリケーション特有
 /DiSpeakBouyomiChanBridge/Properties/launchSettings.json
-/DiSpeakBouyomiChanBridge/settings/_override/*
+**/settings/_override/*

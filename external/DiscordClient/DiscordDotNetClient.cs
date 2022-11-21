@@ -6,9 +6,9 @@ using Discord.WebSocket;
 
 using Microsoft.Extensions.DependencyInjection;
 
-using net.boilingwater.Application.Common.Utils;
+using net.boilingwater.Framework.Common.Utils;
 
-namespace net.boilingwater.DiSpeakBouyomiChanBridge.external.DiscordClient
+namespace net.boilingwater.external.DiscordClient
 {
     /// <summary>
     /// Discordクライアント実装クラス
@@ -87,6 +87,23 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.external.DiscordClient
             await InnerClient.StartAsync();
 
             await Task.Delay(-1);
+        }
+
+        /// <summary>
+        /// 非同期で終了処理を行います
+        /// </summary>
+        /// <returns></returns>
+        public async Task StopAsync()
+        {
+            if (InnerClient == null)
+            {
+                await Task.CompletedTask;
+                return;
+            }
+            await InnerClient.StopAsync();
+            InnerClient.LogoutAsync();
+
+            await Task.CompletedTask;
         }
     }
 }

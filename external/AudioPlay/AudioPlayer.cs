@@ -1,6 +1,6 @@
 ﻿using NAudio.Wave;
 
-namespace net.boilingwater.DiSpeakBouyomiChanBridge.external.AudioPlay
+namespace net.boilingwater.external.AudioPlay
 {
     /// <summary>
     /// 音声再生クラス

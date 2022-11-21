@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <RootNamespace>net.boilingwater.Application.VoiceVoxReverseProxy</RootNamespace>
+    <AssemblyName>net.boilingwater.Application.VoiceVoxReverseProxy</AssemblyName>
+    <StartupObject>net.boilingwater.Application.VoiceVoxReverseProxy.VoiceVoxReverseProxy</StartupObject>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Version>6.6.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\BusinessLogic\VoiceReadOut\net.boilingwater.BusinessLogic.VoiceReadOut.csproj" />
+    <ProjectReference Include="..\..\BusinessLogic\VoiceVoxSpeakerMapping\net.boilingwater.BusinessLogic.VoiceVoxSpeakerMapping.csproj" />
+    <ProjectReference Include="..\..\Framework\net.boilingwater.Framework.Common\net.boilingwater.Framework.Common.csproj" />
+  </ItemGroup>
+  
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="settings\config\System-Application-Setting.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="settings\config\System-LogMessage-Setting.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="settings\config\VoiceVox-Application-Setting.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="settings\_override\EnvironmentSetting.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

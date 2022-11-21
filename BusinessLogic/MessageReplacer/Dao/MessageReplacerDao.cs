@@ -1,8 +1,8 @@
 ﻿using System.Data;
 
-using net.boilingwater.Application.Common.SQLite;
+using net.boilingwater.Framework.Common.SQLite;
 
-namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.MessageReplacer.Dao
+namespace net.boilingwater.BusinessLogic.MessageReplacer.Dao
 {
     /// <summary>
     /// Discord絵文字置換情報用DAOクラス
@@ -98,6 +98,8 @@ namespace net.boilingwater.DiSpeakBouyomiChanBridge.BusinessLogic.MessageReplace
             sql += " , user ";
             sql += " , update_dt ";
             sql += " FROM replace_setting";
+            sql += " ORDER BY LENGTH(replace_key) DESC ";
+            sql += "        , replace_key         DESC ";
 
             return Select(sql);
         }
