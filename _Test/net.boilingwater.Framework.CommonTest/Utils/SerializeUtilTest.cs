@@ -18,7 +18,7 @@ namespace net.boilingwater.Framework.CommonTest.Utils
         ///     is JSON parsable string
         /// </para>
         /// </summary>
-        /// <param name="json">cast target</param>
+        /// <param name="obj">cast target</param>
         /// <returns>cast result</returns>
         [TestCaseSource(nameof(SerializeJsonTestSource))]
         public string SerializeJsonTest(object? obj) => SerializeUtil.SerializeJson(obj);

@@ -45,9 +45,12 @@ namespace net.boilingwater.Framework.Common
                 }
             }
         }
+
         #region debug
+
         /// <inheritdoc/>
         public override string ToString() => SerializeUtil.SerializeJson(this);
+
         #endregion debug
     }
 }

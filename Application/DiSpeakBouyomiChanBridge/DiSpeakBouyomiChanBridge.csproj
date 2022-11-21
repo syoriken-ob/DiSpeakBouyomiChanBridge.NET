@@ -7,7 +7,8 @@
     <AssemblyName>net.boilingwater.Application.DiSpeakBouyomiChanBridge</AssemblyName>
     <StartupObject>net.boilingwater.Application.DiSpeakBouyomiChanBridge.DiSpeakBoouyomiChanBridge</StartupObject>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Version>6.6.0</Version>
   </PropertyGroup>
@@ -22,6 +23,16 @@
     <ProjectReference Include="..\..\Framework\net.boilingwater.Framework.Common\net.boilingwater.Framework.Common.csproj" />
     <ProjectReference Include="..\..\external\DiscordClient\net.boilingwater.external.DiscordClient.csproj" />
   </ItemGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
 
   <ItemGroup>
     <None Update="App.config">

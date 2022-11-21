@@ -1,7 +1,6 @@
 ﻿using System.Data;
 
 using net.boilingwater.Framework.Common.SQLite;
-using net.boilingwater.Framework.Common.Utils;
 
 namespace net.boilingwater.BusinessLogic.VoiceVoxSpeakerCache.Dao
 {

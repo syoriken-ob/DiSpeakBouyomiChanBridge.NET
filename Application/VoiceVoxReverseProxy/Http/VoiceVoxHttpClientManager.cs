@@ -1,13 +1,9 @@
-﻿using net.boilingwater.BusinessLogic.VoiceReadOut.Httpclients.Service;
-using net.boilingwater.BusinessLogic.VoiceVoxSpeakerCache;
+﻿using net.boilingwater.BusinessLogic.VoiceVoxSpeakerCache.Dto;
 using net.boilingwater.BusinessLogic.VoiceVoxSpeakerCache.Service;
-using net.boilingwater.BusinessLogic.VoiceVoxSpeakerCache.Utils;
 using net.boilingwater.Framework.Common;
 using net.boilingwater.Framework.Common.Extensions;
 using net.boilingwater.Framework.Common.Setting;
 using net.boilingwater.Framework.Common.Utils;
-
-using YamlDotNet.Core.Tokens;
 
 namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
 {

@@ -1,7 +1,7 @@
 ﻿using System.Data;
 
 using net.boilingwater.BusinessLogic.VoiceVoxSpeakerCache.Dao;
-using net.boilingwater.BusinessLogic.VoiceVoxSpeakerCache.Utils;
+using net.boilingwater.BusinessLogic.VoiceVoxSpeakerCache.Dto;
 using net.boilingwater.Framework.Common;
 using net.boilingwater.Framework.Common.Utils;
 

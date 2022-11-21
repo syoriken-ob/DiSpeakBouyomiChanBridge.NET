@@ -7,7 +7,7 @@ using net.boilingwater.Framework.Common.Logging;
 using net.boilingwater.Framework.Common.Setting;
 using net.boilingwater.Framework.Common.Utils;
 
-namespace net.boilingwater.BusinessLogic.VoiceReadOut.Httpclients.Service
+namespace net.boilingwater.BusinessLogic.VoiceReadOut.Service
 {
     /// <summary>
     /// VOICEVOXにリクエストを送信するためのサービスクラス

@@ -1,9 +1,4 @@
-﻿using System;
-using System.ComponentModel;
-using System.Text.Encodings.Web;
-using System.Text.Json;
-
-using Microsoft.VisualBasic;
+﻿using System.ComponentModel;
 
 namespace net.boilingwater.Framework.Common.Utils
 {
@@ -181,6 +176,7 @@ namespace net.boilingwater.Framework.Common.Utils
             {
                 case null:
                     return string.Empty;
+
                 case string @string:
                     return @string;
             }

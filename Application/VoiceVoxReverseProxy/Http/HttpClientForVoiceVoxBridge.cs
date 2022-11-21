@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-using net.boilingwater.BusinessLogic.VoiceReadOut.Httpclients.Service;
+using net.boilingwater.BusinessLogic.VoiceReadOut.Service;
 using net.boilingwater.Framework.Common;
 using net.boilingwater.Framework.Common.Http;
 using net.boilingwater.Framework.Common.Logging;

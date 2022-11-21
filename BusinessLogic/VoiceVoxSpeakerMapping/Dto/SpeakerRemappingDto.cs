@@ -1,4 +1,4 @@
-﻿namespace net.boilingwater.BusinessLogic.VoiceVoxSpeakerCache.Utils
+﻿namespace net.boilingwater.BusinessLogic.VoiceVoxSpeakerCache.Dto
 {
     /// <summary>
     /// VoiceVox話者Dto

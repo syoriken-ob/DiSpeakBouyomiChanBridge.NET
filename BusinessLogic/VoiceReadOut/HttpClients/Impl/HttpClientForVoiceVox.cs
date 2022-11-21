@@ -2,7 +2,7 @@
 using System.Net;
 using System.Text.RegularExpressions;
 
-using net.boilingwater.BusinessLogic.VoiceReadOut.Httpclients.Service;
+using net.boilingwater.BusinessLogic.VoiceReadOut.Service;
 using net.boilingwater.BusinessLogic.VoiceReadOut.VoiceExecutor;
 using net.boilingwater.Framework.Common;
 using net.boilingwater.Framework.Common.Extensions;
@@ -23,6 +23,9 @@ namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl
         private MultiDic RequestSetting { get; set; }
         private SimpleDic<string> VoiceVoxSpeakers { get; set; }
 
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
         public HttpClientForVoiceVox()
         {
             RequestSetting = VoiceVoxRequestService.CreateRequestSettingDic(
