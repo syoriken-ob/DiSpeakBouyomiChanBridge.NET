@@ -26,11 +26,19 @@ jobs:
       run: dotnet build -c Release --no-restore
     - name: Test
       run: dotnet test -c Release --no-build --verbosity normal
-    - name: Publish
-      run: dotnet publish -c Release -o .\publish
-    - name: Upload a Build Artifact
+    - name: Publish DiSpaekBouyomiChanBridge
+      run: dotnet publish .\Application\DiSpeakBouyomiChanBridge\DiSpeakBouyomiChanBridge.csproj -c Release -o .\publish\bouyomi\
+    - name: Publish VoiceVoxReverseProxy
+      run: dotnet publish .\Application\VoiceVoxReverseProxy\VoiceVoxReverseProxy.csproj -c Release -o .\publish\cacheserver\
+    - name: Upload a Build Artifact(DiSpeakBouyomiChanBridge)
       uses: actions/upload-artifact@v3
       with:
         name: DiSpeakBouyomiChanBridge.NET
-        path: .\publish\**
+        path: .\publish\bouyomi\**
+        if-no-files-found: error
+    - name: Upload a Build Artifact(VoiceVoxReverseProxy)
+      uses: actions/upload-artifact@v3
+      with:
+        name: VoiceVoxReverseProxy
+        path: .\publish\cacheserver\**
         if-no-files-found: error
