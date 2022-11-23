@@ -71,22 +71,23 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
 
                         if (SpeakerRemappingDic.ContainsValue(mappingKey))
                         {
-                            style["id"] = SpeakerRemappingDic.Where(p => p.Value.Equals(mappingKey)).First().Key;
-                            HttpClientDic[style.GetAsString("id")] = client;
+                            var remappingKey = SpeakerRemappingDic.Where(p => p.Value.Equals(mappingKey)).First().Key;
+                            style["id"] = CastUtil.ToInteger(remappingKey); //VOICEVOXのレスポンスは数値型
+                            HttpClientDic[remappingKey] = client;
                             continue;
                         }
 
-                        var newId = RandomUtil.CreateRandomNumber(9).ToString();
-                        style["id"] = newId;
+                        var newId = RandomUtil.CreateRandomNumber(9);
+                        style["id"] = newId; //VOICEVOXのレスポンスは数値型
 
                         VoiceVoxSpeakerMappingService.InsertMapping(
                             speaker.GetAsGuid("speaker_uuid"),
                             id,
-                            newId
+                            newId.ToString()
                         );
 
-                        SpeakerRemappingDic[newId] = mappingKey;
-                        HttpClientDic[newId] = client;
+                        SpeakerRemappingDic[newId.ToString()] = mappingKey;
+                        HttpClientDic[newId.ToString()] = client;
                     }
                 }
                 speakers.AddRange(currentClientSpeakers);
@@ -179,7 +180,7 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
         {
             SpeakerRemappingDic.Clear();
             VoiceVoxSpeakerMappingService.GetMapping()
-                                       .ForEach(pair => SpeakerRemappingDic.Add(pair.Key, pair.Value));
+                                         .ForEach(pair => SpeakerRemappingDic.Add(pair.Key, pair.Value));
         }
 
         /// <summary>
