@@ -9,7 +9,7 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <Nullable>enable</Nullable>
-    <Version>8.0.1</Version>
+    <Version>8.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
