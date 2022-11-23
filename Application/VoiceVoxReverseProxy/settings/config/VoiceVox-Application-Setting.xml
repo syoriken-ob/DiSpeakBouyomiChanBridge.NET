@@ -19,10 +19,13 @@
   <Item key="VoiceVox.Request.AudioQuery.ParamName.Text"      value="text" />
   <Item key="VoiceVox.Request.AudioQuery.ParamName.Speaker"   value="speaker" />
 
+  <Item key="VoiceVox.Response.AudioQuery.CacheExpiration.Minutes"  value="60" />
+
   <Item key="VoiceVox.Request.Synthesis.Path"                 value="/synthesis" />
   <Item key="VoiceVox.Request.Synthesis.ParamName.Speaker"    value="speaker" />
   <Item key="VoiceVox.Request.Synthesis.Content-Type"         value="application/json" />
   <Item key="VoiceVox.Request.Synthesis.Header"               value="accept;audio/wav" />
 
   <Item key="VoiceVox.Response.Synthesis.Content-Type"         value="audio/wav" />
+  <Item key="VoiceVox.Response.Synthesis.CacheExpiration.Minutes"   value="15" />
 </Settings>

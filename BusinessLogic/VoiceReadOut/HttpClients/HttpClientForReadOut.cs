@@ -1,4 +1,6 @@
-﻿using net.boilingwater.Framework.Common.Http;
+﻿using System;
+
+using net.boilingwater.Framework.Common.Http;
 
 namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients
 {

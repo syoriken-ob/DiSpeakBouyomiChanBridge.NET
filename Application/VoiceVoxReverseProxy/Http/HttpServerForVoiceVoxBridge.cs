@@ -1,4 +1,7 @@
-﻿using System.Net;
+﻿using System;
+using System.IO;
+using System.Linq;
+using System.Net;
 using System.Text;
 
 using net.boilingwater.Framework.Common.Http;
@@ -49,6 +52,12 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
                     return;
                 }
 
+                if (path == Settings.AsString("VoiceVox.Request.InitializeSpeaker.Path"))
+                {
+                    SetResponseFromInitializeSpeakerRequest(context);
+                    return;
+                }
+
                 if (path == Settings.AsString("VoiceVox.Request.AudioQuery.Path"))
                 {
                     SetResponseFromAudioQueryRequest(context);
@@ -72,7 +81,7 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
         #region レスポンス生成処理
 
         /// <summary>
-        /// VoiceVoxAPI[speaker]に該当するリクエストの処理を行います。
+        /// VoiceVoxAPI[speakers]に該当するリクエストの処理を行います。
         /// </summary>
         /// <param name="context"><see cref="HttpListenerContext"/></param>
         private static void SetResponseFromSpeakersRequest(HttpListenerContext context)
@@ -89,6 +98,34 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
 
             using var writer = new StreamWriter(response.OutputStream);
             writer.Write(str);
+        }
+
+        /// <summary>
+        /// VoiceVoxAPI[initialize_speaker]に該当するリクエストの処理を行います。
+        /// </summary>
+        /// <param name="context"><see cref="HttpListenerContext"/></param>
+        private static void SetResponseFromInitializeSpeakerRequest(HttpListenerContext context)
+        {
+            var query = context.Request.QueryString;
+            var response = context.Response;
+
+            if (!query.AllKeys.Contains(Settings.AsString("VoiceVox.Request.InitializeSpeaker.ParamName.Speaker")))
+            {
+                response.StatusCode = (int)HttpStatusCode.BadRequest;
+                return;
+            }
+
+            if (!VoiceVoxHttpClientManager.SendVoiceVoxInitializeSpeakerRequest(
+                    CastUtil.ToString(
+                        query.Get(Settings.AsString("VoiceVox.Request.InitializeSpeaker.ParamName.Speaker"))
+                    )
+            ))
+            {
+                response.StatusCode = (int)HttpStatusCode.BadRequest;
+                return;
+            }
+
+            response.StatusCode = (int)HttpStatusCode.NoContent;
         }
 
         /// <summary>
@@ -113,7 +150,7 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
                 if (!VoiceVoxHttpClientManager.SendVoiceVoxAudioQueryRequest(
                     CastUtil.ToString(query.Get("text")),
                     CastUtil.ToString(query.Get("speaker")),
-           out var audioQuery
+                    out var audioQuery
                 ))
                 {
                     response.StatusCode = (int)HttpStatusCode.BadRequest;

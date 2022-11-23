@@ -1,4 +1,6 @@
-﻿namespace net.boilingwater.BusinessLogic.VoiceVoxSpeakerCache.Dto
+﻿using System;
+
+namespace net.boilingwater.BusinessLogic.VoiceVoxSpeakerCache.Dto
 {
     /// <summary>
     /// VoiceVox話者Dto

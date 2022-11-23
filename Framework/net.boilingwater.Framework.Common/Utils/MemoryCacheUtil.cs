@@ -16,11 +16,11 @@ namespace net.boilingwater.Framework.Common.Utils
         /// <param name="key">キャッシュキー</param>
         /// <param name="obj">キャッシュするデータ</param>
         /// <param name="expiration">キャッシュ有効期限</param>
-        /// <param name="sholdNotRemovable">メモリキャッシュから削除されないようにするかどうか</param>
-        public static void RegisterCache(string key, object obj, TimeSpan? expiration = null, bool sholdNotRemovable = false)
+        /// <param name="shouldNotRemovable">メモリキャッシュから削除されないようにするかどうか</param>
+        public static void RegisterCache(string key, object obj, TimeSpan? expiration = null, bool shouldNotRemovable = false)
         {
             var item = CreateCacheItem(key, obj);
-            var policy = CreateCacheItemPolicy(expiration, sholdNotRemovable);
+            var policy = CreateCacheItemPolicy(expiration, shouldNotRemovable);
             _ = MemoryCache.Default.Add(item, policy);
         }
 
@@ -52,17 +52,27 @@ namespace net.boilingwater.Framework.Common.Utils
         /// <returns>取得できたかどうか</returns>
         public static bool TryGetCache<T>(string key, out T? obj)
         {
+            obj = GetCache<T>(key);
+            return obj != null;
+        }
+
+        /// <summary>
+        /// メモリキャッシュされたデータの有効期限を延長します。
+        /// </summary>
+        /// <param name="key">キャッシュキー</param>
+        /// <param name="expiration">新しい有効期限</param>
+        /// <param name="shouldNotRemovable">新しい有効期限</param>
+        /// <returns>延長するメモリキャッシュデータがあったかどうか</returns>
+        public static bool ExtendExpiration(string key, TimeSpan? expiration = null, bool shouldNotRemovable = false)
+        {
             if (MemoryCache.Default.Contains(key))
             {
-                try
-                {
-                    obj = (T)MemoryCache.Default.Get(key);
-                    return true;
-                }
-                catch { }
+                var item = MemoryCache.Default.GetCacheItem(key);
+                var policy = CreateCacheItemPolicy(expiration, shouldNotRemovable);
+                MemoryCache.Default.Set(item, policy);
+                return true;
             }
 
-            obj = default;
             return false;
         }
 
@@ -80,13 +90,13 @@ namespace net.boilingwater.Framework.Common.Utils
         /// 引数から<see cref="CacheItemPolicy"/>を生成します。
         /// </summary>
         /// <param name="expiration">キャッシュ有効期限</param>
-        /// <param name="sholdNotRemovable">メモリキャッシュから削除されないようにするかどうか</param>
+        /// <param name="shouldNotRemovable">メモリキャッシュから削除されないようにするかどうか</param>
         /// <returns></returns>
-        private static CacheItemPolicy CreateCacheItemPolicy(TimeSpan? expiration, bool sholdNotRemovable)
+        private static CacheItemPolicy CreateCacheItemPolicy(TimeSpan? expiration, bool shouldNotRemovable)
         {
             var policy = new CacheItemPolicy
             {
-                Priority = sholdNotRemovable ? CacheItemPriority.NotRemovable : CacheItemPriority.Default
+                Priority = shouldNotRemovable ? CacheItemPriority.NotRemovable : CacheItemPriority.Default
             };
 
             if (expiration.HasValue)
@@ -97,6 +107,7 @@ namespace net.boilingwater.Framework.Common.Utils
             {
                 policy.SlidingExpiration = TimeSpan.FromMinutes(Settings.AsDouble("MemoryCache.Expiration.Default.Minutes"));
             }
+
             return policy;
         }
 

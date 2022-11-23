@@ -8,9 +8,8 @@
     <StartupObject>net.boilingwater.Application.VoiceVoxReverseProxy.VoiceVoxReverseProxy</StartupObject>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
-    <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>8.0.1</Version>
+    <Version>8.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,7 +17,7 @@
     <ProjectReference Include="..\..\BusinessLogic\VoiceVoxSpeakerMapping\net.boilingwater.BusinessLogic.VoiceVoxSpeakerMapping.csproj" />
     <ProjectReference Include="..\..\Framework\net.boilingwater.Framework.Common\net.boilingwater.Framework.Common.csproj" />
   </ItemGroup>
-  
+
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <DebugType>full</DebugType>
