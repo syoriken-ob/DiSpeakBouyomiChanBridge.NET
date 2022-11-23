@@ -1,4 +1,7 @@
-﻿using NAudio.Wave;
+﻿using System.IO;
+using System.Threading;
+
+using NAudio.Wave;
 
 namespace net.boilingwater.external.AudioPlay
 {

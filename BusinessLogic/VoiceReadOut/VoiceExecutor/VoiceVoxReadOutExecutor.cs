@@ -1,4 +1,6 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Threading;
 
 using net.boilingwater.external.AudioPlay;
 using net.boilingwater.Framework.Common.Logging;

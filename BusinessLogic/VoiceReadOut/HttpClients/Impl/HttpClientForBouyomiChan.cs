@@ -1,4 +1,7 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
+using System.Net.Http;
+using System.Threading;
 
 using net.boilingwater.Framework.Common.Extensions;
 using net.boilingwater.Framework.Common.Logging;

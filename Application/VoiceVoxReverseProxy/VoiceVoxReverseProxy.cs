@@ -1,4 +1,6 @@
-﻿using net.boilingwater.Framework.Common.Logging;
+﻿using System;
+
+using net.boilingwater.Framework.Common.Logging;
 
 namespace net.boilingwater.Application.VoiceVoxReverseProxy
 {

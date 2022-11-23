@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using System.Text.RegularExpressions;
 
 using net.boilingwater.BusinessLogic.MessageReplacer.Dao;

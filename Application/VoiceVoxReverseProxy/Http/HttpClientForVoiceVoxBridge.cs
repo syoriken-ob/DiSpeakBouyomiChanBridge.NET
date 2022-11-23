@@ -1,4 +1,7 @@
-﻿using System.Net;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 
 using net.boilingwater.BusinessLogic.VoiceReadOut.Service;
 using net.boilingwater.Framework.Common;
@@ -46,6 +49,26 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
         /// </summary>
         /// <returns></returns>
         public MultiDic SendVoiceVoxSpeakersRequest() => VoiceVoxRequestService.SendVoiceVoxSpeakersRequest(Client, RequestSetting);
+
+        /// <summary>
+        /// VoiceVoxAPI[initialize_speaker]にリクエストを送信します。
+        /// </summary>
+        /// <param name="speaker">VoiceVox話者ID</param>
+        /// <returns>正常にVoiceVox話者を初期化できたか</returns>
+        public bool SendVoiceVoxInitializeSpeakerRequest(string speaker)
+        {
+            var result = VoiceVoxRequestService.SendVoiceVoxInitializeSpeakerRequest(Client, RequestSetting, speaker);
+            if (result.ContainsKey("statusCode"))
+            {
+                var statusCode = result.GetAsObject<HttpStatusCode>("statusCode");
+                Log.Logger.Debug(message: $"Send Initialize Speaker: {(int)statusCode}-{statusCode}");
+            }
+            if (!result.GetAsBoolean("valid"))
+            {
+                Log.Logger.Fatal($"Fail to Send Request to VoiceVox[initialize_speaker]: ID {speaker}");
+            }
+            return result.GetAsBoolean("valid");
+        }
 
         /// <summary>
         /// VoiceVoxAPI[audio_query]にリクエストを送信します。

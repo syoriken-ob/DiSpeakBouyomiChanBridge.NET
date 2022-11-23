@@ -8,7 +8,6 @@
     <StartupObject>net.boilingwater.Application.DiSpeakBouyomiChanBridge.DiSpeakBoouyomiChanBridge</StartupObject>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
-    <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Version>8.0.1</Version>
   </PropertyGroup>

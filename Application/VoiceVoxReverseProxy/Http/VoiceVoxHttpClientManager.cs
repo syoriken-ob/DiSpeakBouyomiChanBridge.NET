@@ -1,4 +1,8 @@
-﻿using net.boilingwater.BusinessLogic.VoiceVoxSpeakerCache.Dto;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+using net.boilingwater.BusinessLogic.VoiceVoxSpeakerCache.Dto;
 using net.boilingwater.BusinessLogic.VoiceVoxSpeakerCache.Service;
 using net.boilingwater.Framework.Common;
 using net.boilingwater.Framework.Common.Extensions;
@@ -98,6 +102,17 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
         }
 
         /// <summary>
+        /// VoiceVoxAPI[initialize_speaker]にリクエストを送信します。
+        /// </summary>
+        /// <param name="speaker">VoiceVox話者ID</param>
+        /// <returns>正常にVoiceVox話者を初期化できたか</returns>
+        public static bool SendVoiceVoxInitializeSpeakerRequest(string speaker)
+        {
+            var (speakerId, client) = FindActualVoiceVoxSpeakerIdAndHttpClient(speaker);
+            return client.SendVoiceVoxInitializeSpeakerRequest(speakerId);
+        }
+
+        /// <summary>
         /// VoiceVoxAPI[audio_query]にリクエストを送信します。
         /// </summary>
         /// <param name="message">読み上げメッセージ</param>
@@ -108,8 +123,11 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
         {
             const string CacheKey = "VoiceVoxHttpClientManager#AudioQuery";
             var key = $"{CacheKey}#{speaker}#{message}";
+            var cacheExpiration = TimeSpan.FromMinutes(Settings.AsDouble("VoiceVox.Response.AudioQuery.CacheExpiration.Minutes"));
+
             if (MemoryCacheUtil.TryGetCache(key, out audioQuery!))
             {
+                MemoryCacheUtil.ExtendExpiration(key, cacheExpiration);
                 return true;
             }
 
@@ -119,7 +137,7 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
 
             if (result)
             {
-                MemoryCacheUtil.RegisterCache(key, audioQuery, TimeSpan.FromHours(1));
+                MemoryCacheUtil.RegisterCache(key, audioQuery, cacheExpiration);
             }
 
             return result;
@@ -136,8 +154,11 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
         {
             const string CacheKey = "VoiceVoxHttpClientManager#Synthesis";
             var key = $"{CacheKey}#{speaker}#{audioQuery.GetAsString("kana")}";
+            var cacheExpiration = TimeSpan.FromMinutes(Settings.AsDouble("VoiceVox.Response.Synthesis.CacheExpiration.Minutes"));
+
             if (MemoryCacheUtil.TryGetCache(key, out voice!))
             {
+                MemoryCacheUtil.ExtendExpiration(key, cacheExpiration);
                 return true;
             }
 
@@ -147,7 +168,7 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
 
             if (result)
             {
-                MemoryCacheUtil.RegisterCache(key, voice, TimeSpan.FromMinutes(10));
+                MemoryCacheUtil.RegisterCache(key, voice, cacheExpiration);
             }
 
             return result;
