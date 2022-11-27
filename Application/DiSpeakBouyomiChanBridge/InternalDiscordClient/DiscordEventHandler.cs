@@ -8,7 +8,6 @@ using Discord.WebSocket;
 
 using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Service;
 using net.boilingwater.Application.DiSpeakBouyomiChanBridge.InternalDiscordClient.Services;
-using net.boilingwater.BusinessLogic.VoiceReadout.HttpClients;
 using net.boilingwater.Framework.Common.Extensions;
 using net.boilingwater.Framework.Common.Logging;
 using net.boilingwater.Framework.Common.Setting;
@@ -117,31 +116,31 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.InternalDiscordC
             switch (state)
             {
                 case DiscordUserVoiceStateUpdatedService.VoiceState.JOIN:
-                    HttpClientForReadOut.Instance?.ReadOut(
+                    CommandHandlingService.Handle(
                         DiscordUserVoiceStateUpdatedService.GetJoinVoiceChannelMessage(guildUser, sourceVoiceState, targetVoiceState)
                     );
                     break;
 
                 case DiscordUserVoiceStateUpdatedService.VoiceState.LEAVE:
-                    HttpClientForReadOut.Instance?.ReadOut(
+                    CommandHandlingService.Handle(
                         DiscordUserVoiceStateUpdatedService.GetLeaveVoiceChannelMessage(guildUser, sourceVoiceState, targetVoiceState)
                     );
                     break;
 
                 case DiscordUserVoiceStateUpdatedService.VoiceState.MOVE:
-                    HttpClientForReadOut.Instance?.ReadOut(
+                    CommandHandlingService.Handle(
                         DiscordUserVoiceStateUpdatedService.GetMoveVoiceChannelMessage(guildUser, sourceVoiceState, targetVoiceState)
                     );
                     break;
 
                 case DiscordUserVoiceStateUpdatedService.VoiceState.START_STREAMING:
-                    HttpClientForReadOut.Instance?.ReadOut(
+                    CommandHandlingService.Handle(
                         DiscordUserVoiceStateUpdatedService.GetStartStreamingVoiceChannelMessage(guildUser, sourceVoiceState, targetVoiceState)
                     );
                     break;
 
                 case DiscordUserVoiceStateUpdatedService.VoiceState.END_STREAMING:
-                    HttpClientForReadOut.Instance?.ReadOut(
+                    CommandHandlingService.Handle(
                         DiscordUserVoiceStateUpdatedService.GetEndStreamingVoiceChannelMessage(guildUser, sourceVoiceState, targetVoiceState)
                     );
                     break;
