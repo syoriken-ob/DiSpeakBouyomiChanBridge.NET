@@ -142,6 +142,23 @@ namespace net.boilingwater.Framework.Common.Setting
         }
 
         /// <summary>
+        /// <paramref name="key"/>に紐づくアプリケーション設定値をメッセージとして取得します。
+        /// </summary>
+        /// <param name="key">設定キー</param>
+        /// <returns>メッセージ</returns>
+        /// <remarks><see cref="AsString(string)"/>と同じ</remarks>
+        public static string AsMessage(string key) => AsString(key);
+
+        /// <summary>
+        /// <paramref name="key"/>に紐づくアプリケーション設定値をメッセージとして取得します。
+        /// 取得時に{0}などのプレースホルダを<paramref name="replaceValues"/>で置換します。
+        /// </summary>
+        /// <param name="key">設定キー</param>
+        /// <param name="replaceValues"></param>
+        /// <remarks><see cref="AsString(string)"/>と同じ</remarks>
+        public static string AsMessage(string key, params string[] replaceValues) => string.Format(AsMessage(key), replaceValues);
+
+        /// <summary>
         /// AppSettingsの設定値を取得します<br/>
         /// 存在しない場合は、空文字を返却します。
         /// </summary>

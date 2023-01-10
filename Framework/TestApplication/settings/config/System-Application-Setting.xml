@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    ==================================
+    == システムアプリケーション設定 ==
+    ==================================
+-->
+<Settings>
+  <Item key="RetryCount"                     value="5" />
+  <Item key="RetrySleepTime.Milliseconds"    value="5000" />
+
+  <!-- メモリキャッシュ有効期限 -->
+  <Item key="MemoryCache.Expiration.Default.Minutes" value="15" />
+
+  <!-- SQLiteのDBファイルパス -->
+  <Item key="SQLite3.DBFilePath"             value="./test.db" />
+</Settings>

@@ -134,6 +134,11 @@ namespace net.boilingwater.Framework.Common.Setting
                 return string.Empty;
             }
 
+            if (!Directory.Exists(folderPath))
+            {
+                return string.Empty;
+            }
+
             var envFile = Directory.GetFiles(folderPath, envFilePath, SearchOption.AllDirectories)
                         .Select(path => Path.GetFullPath(path))
                         .FirstOrDefault();
