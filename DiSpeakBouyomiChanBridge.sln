@@ -9,8 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "net.boilingwater.Framework.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "net.boilingwater.external.DiscordClient", "external\DiscordClient\net.boilingwater.external.DiscordClient.csproj", "{F05A67B4-CB26-4E56-B1B6-28D5D5D82EE1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "net.boilingwater.Framework.CommonTest", "_Test\net.boilingwater.Framework.CommonTest\net.boilingwater.Framework.CommonTest.csproj", "{91A54929-3B85-421D-AA61-61624A8E6911}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Test", "_Test", "{38F94AA7-0023-46E4-9F98-E82056DB0923}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "net.boilingwater.external.AudioPlay", "external\AudioPlay\net.boilingwater.external.AudioPlay.csproj", "{EA03E293-2CAF-436F-8765-C4CBF99300EC}"
@@ -36,6 +34,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VoiceVoxReverseProxy", "App
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "net.boilingwater.BusinessLogic.VoiceVoxSpeakerMapping", "BusinessLogic\VoiceVoxSpeakerMapping\net.boilingwater.BusinessLogic.VoiceVoxSpeakerMapping.csproj", "{8FCC9C40-146E-42FE-9944-77F5D70BD76C}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "net.boilingwater.Framework.CommonTest", "..\net.boilingwater.Framework\_Test\net.boilingwater.Framework.CommonTest\net.boilingwater.Framework.CommonTest.csproj", "{55C9C2DC-8F47-4A3B-AE7A-6214AD9A6791}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -54,10 +54,6 @@ Global
 		{F05A67B4-CB26-4E56-B1B6-28D5D5D82EE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F05A67B4-CB26-4E56-B1B6-28D5D5D82EE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F05A67B4-CB26-4E56-B1B6-28D5D5D82EE1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{91A54929-3B85-421D-AA61-61624A8E6911}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{91A54929-3B85-421D-AA61-61624A8E6911}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{91A54929-3B85-421D-AA61-61624A8E6911}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{91A54929-3B85-421D-AA61-61624A8E6911}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EA03E293-2CAF-436F-8765-C4CBF99300EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EA03E293-2CAF-436F-8765-C4CBF99300EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EA03E293-2CAF-436F-8765-C4CBF99300EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -78,6 +74,10 @@ Global
 		{8FCC9C40-146E-42FE-9944-77F5D70BD76C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8FCC9C40-146E-42FE-9944-77F5D70BD76C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8FCC9C40-146E-42FE-9944-77F5D70BD76C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55C9C2DC-8F47-4A3B-AE7A-6214AD9A6791}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55C9C2DC-8F47-4A3B-AE7A-6214AD9A6791}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55C9C2DC-8F47-4A3B-AE7A-6214AD9A6791}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55C9C2DC-8F47-4A3B-AE7A-6214AD9A6791}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -86,12 +86,12 @@ Global
 		{20023D4C-8073-4387-AA2E-1BF3A447B7F0} = {470A7537-9CA9-461E-BD62-71CB4BAE268B}
 		{5407CE29-CBB2-4B5B-AD31-0E2F2BE2C5A2} = {E659006F-ED70-48B0-A21A-FDCBAFEBEDD7}
 		{F05A67B4-CB26-4E56-B1B6-28D5D5D82EE1} = {51DA63F6-C2B3-4A36-9794-50AA54FA3ADE}
-		{91A54929-3B85-421D-AA61-61624A8E6911} = {38F94AA7-0023-46E4-9F98-E82056DB0923}
 		{EA03E293-2CAF-436F-8765-C4CBF99300EC} = {51DA63F6-C2B3-4A36-9794-50AA54FA3ADE}
 		{F960C239-D552-4A13-A727-49E6B340CC23} = {75A4B69F-7E5C-465C-B1F3-1CC915DFBA4F}
 		{B8CECB94-FDF1-45E5-9F3A-AD5871D90FE5} = {75A4B69F-7E5C-465C-B1F3-1CC915DFBA4F}
 		{264EA2D9-E022-4C3D-9070-D80717BFB340} = {470A7537-9CA9-461E-BD62-71CB4BAE268B}
 		{8FCC9C40-146E-42FE-9944-77F5D70BD76C} = {75A4B69F-7E5C-465C-B1F3-1CC915DFBA4F}
+		{55C9C2DC-8F47-4A3B-AE7A-6214AD9A6791} = {38F94AA7-0023-46E4-9F98-E82056DB0923}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BF8194DE-BD5B-4F65-B2FD-00B5834586DC}
