@@ -221,5 +221,22 @@ namespace net.boilingwater.Framework.CommonTest.Utils
             new TestCaseData("hoge").Returns(Guid.Empty).SetCategory("ToGuidTestSource").SetName("Guid not Castable string"),
             new TestCaseData(Guid.Parse("d1a6eadf-c842-40b9-9aa3-a2d87a6aef86")).Returns(Guid.Parse("d1a6eadf-c842-40b9-9aa3-a2d87a6aef86")).SetCategory("ToGuidTestSource").SetName("Guid guid"),
         };
+
+        /// <summary>
+        /// ToDateTime Test
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        [TestCaseSource(nameof(ToDateTimeTestSource))]
+        public DateTime ToDateTimeTest(object obj) => CastUtil.ToDateTime(obj);
+
+        public static readonly TestCaseData[] ToDateTimeTestSource =
+        {
+            new TestCaseData(null).Returns(DateTime.MinValue).SetCategory("ToDateTimeTestSource").SetName("DateTime null"),
+            new TestCaseData("").Returns(DateTime.MinValue).SetCategory("ToDateTimeTestSource").SetName("DateTime empty string"),
+            new TestCaseData("2022-11-19 22:43:45").Returns(new DateTime(2022, 11, 19, 22, 43, 45,0)).SetCategory("ToDateTimeTestSource").SetName("DateTime Castable string"),
+            new TestCaseData("2022-11-19T22:43:45").Returns(new DateTime(2022, 11, 19, 22, 43, 45,0)).SetCategory("ToDateTimeTestSource").SetName("DateTime Castable string T"),
+            new TestCaseData("2022-11-19T22:43:45.001").Returns(new DateTime(2022, 11, 19, 22, 43, 45,1)).SetCategory("ToDateTimeTestSource").SetName("DateTime Castable string T with Milliseconds"),
+        };
     }
 }

@@ -22,22 +22,19 @@ namespace net.boilingwater.Framework.Common.Http
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public AbstractHttpClient() => Client = new();
-
-        /// <summary>
-        /// 内部Httpクライアントを再生成します。
-        /// </summary>
-        public void RenewHttpClient()
+        public AbstractHttpClient()
         {
-            ((IDisposable)this).Dispose();
-            Client = new HttpClient();
+            Client = new HttpClient(new HttpClientHandler());
+            if (Settings.Get("HttpClient.RequestTimeout.Seconds").HasValue())
+            {
+                Client.Timeout = TimeSpan.FromSeconds(Settings.AsInteger("HttpClient.RequestTimeout.Seconds"));
+            }
         }
 
         ///<inheritdoc/>
         public void Dispose()
         {
-            Client.Dispose();
-            GC.SuppressFinalize(this);
+            Client?.Dispose();
         }
 
         /// <summary>

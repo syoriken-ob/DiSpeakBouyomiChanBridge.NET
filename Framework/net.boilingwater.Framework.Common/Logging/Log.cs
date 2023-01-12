@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Reflection;
+using System.Text;
+using System.Xml;
 
 using log4net;
 using log4net.Config;
@@ -29,18 +30,50 @@ namespace net.boilingwater.Framework.Common.Logging
             {
                 throw new ApplicationException("ロガー設定ファイルの読み込みに失敗しました。");
             }
-            XmlConfigurator.Configure(fileInfo);
 
-            var exeName = Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly()?.Location) ?? string.Empty;
-            LogManager.GetAllRepositories()
-                      .SelectMany(r => r.GetAppenders())
-                      .OfType<log4net.Appender.FileAppender>()
-                      .ForEach(appender =>
-                      {
-                          var dirName = Path.GetDirectoryName(appender.File) ?? string.Empty;
-                          appender.File = Path.Combine(dirName, exeName);//出力先ファイルを設定
-                          appender.ActivateOptions();
-                      });
+            try
+            {
+                //ファイル読み出し
+                var fileContent = File.ReadAllText(fileInfo.FullName, Encoding.UTF8);
+                //パラメータ置換
+                var replacedFile = ReplacePlaceholder(fileContent);
+                //設定
+                using var stream = new MemoryStream(Encoding.UTF8.GetBytes(replacedFile));
+                _ = XmlConfigurator.Configure(stream);
+            }
+            catch
+            {
+                throw new ApplicationException("ロガーの初期化に失敗しました。");
+            }
+        }
+
+        /// <summary>
+        /// ファイル内に指定された動的パラメータを置換します。
+        /// </summary>
+        /// <param name="configFileContent"></param>
+        /// <returns>置換後のファイル</returns>
+        private static string ReplacePlaceholder(string? configFileContent)
+        {
+            if (configFileContent == null)
+            {
+                return "";
+            }
+
+            SimpleDic<string> settings = CreateReplacePlaceholderSetting();
+            settings.ForEach(pair => configFileContent = configFileContent.Replace(pair.Key, pair.Value));
+            return configFileContent;
+        }
+
+        /// <summary>
+        /// log4net.config内の動的パラメータを置換する辞書を作成します。
+        /// </summary>
+        /// <returns>置換設定辞書</returns>
+        private static SimpleDic<string> CreateReplacePlaceholderSetting()
+        {
+            return new SimpleDic<string>
+            {
+                {"{{==name==}}", Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly()?.Location) ?? string.Empty}
+            };
         }
 
         /// <summary>
@@ -53,7 +86,7 @@ namespace net.boilingwater.Framework.Common.Logging
             {
                 const int callerFrameIndex = 1;
                 var callerFrame = new StackFrame(callerFrameIndex);
-                var callerMethod = callerFrame.GetMethod();
+                MethodBase? callerMethod = callerFrame.GetMethod();
 
                 return callerMethod != null ? LogManager.GetLogger(callerMethod.DeclaringType) : LogManager.GetLogger(typeof(object));
             }
