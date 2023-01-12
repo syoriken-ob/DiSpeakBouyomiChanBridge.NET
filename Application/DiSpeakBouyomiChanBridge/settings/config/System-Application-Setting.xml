@@ -18,6 +18,9 @@
   <Item key="CommandFile"                    value="command.yaml" />
   <Item key="SystemCommandFile"              value="system-command.yaml" />
 
+  <!-- HttpRequestタイムアウト時間(s) -->
+  <Item key="HttpClient.RequestTimeout.Seconds" value="600" />
+
   <!-- メモリキャッシュ有効期限 -->
   <Item key="MemoryCache.Expiration.Default.Minutes" value="15" />
 
