@@ -5,7 +5,7 @@
     ============================
 -->
 <Settings>
-  <Item key="Message.Welcome"                        value="テストアプリケーション バージョン1.1が起動しました！" />
+  <Item key="Message.Welcome"                        value="テストアプリケーション バージョン1.2が起動しました！" />
   <Item key="Message.Test"                           value="テスト実行を実施します。実行クラス:{0}" />
   <Item key="Message.FinishInitialize"               value="イニシャライズ完了！" />
 </Settings>

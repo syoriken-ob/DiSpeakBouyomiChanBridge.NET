@@ -8,6 +8,9 @@
   <Item key="RetryCount"                     value="5" />
   <Item key="RetrySleepTime.Milliseconds"    value="5000" />
 
+  <!-- HttpRequestタイムアウト時間(s) -->
+  <Item key="HttpClient.RequestTimeout.Seconds" value="600" />
+
   <!-- メモリキャッシュ有効期限 -->
   <Item key="MemoryCache.Expiration.Default.Minutes" value="15" />
 

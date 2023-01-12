@@ -164,6 +164,26 @@ namespace net.boilingwater.Framework.Common.Utils
         }
 
         /// <summary>
+        /// <paramref name="obj"/>を<see cref="DateTime"/>型に変換します
+        /// </summary>
+        /// <param name="obj">変換する値<</param>
+        /// <returns><see cref="DateTime"/>型に変換した<paramref name="obj"/></returns>
+        public static DateTime ToDateTime(object? obj)
+        {
+            if (obj is DateTime dateTime)
+            {
+                return dateTime;
+            }
+
+            if (DateTime.TryParse(ToString(obj), out dateTime))
+            {
+                return dateTime;
+            }
+
+            return default;
+        }
+
+        /// <summary>
         /// <paramref name="obj"/>を<see cref="string"/>型に変換します
         /// </summary>
         /// <param name="obj">変換する値</param>

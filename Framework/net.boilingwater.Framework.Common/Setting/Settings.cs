@@ -56,6 +56,13 @@ namespace net.boilingwater.Framework.Common.Setting
         public static long AsLong(string key) => CastUtil.ToLong(Get(key));
 
         /// <summary>
+        /// <see cref="long"/>型で<paramref name="key"/>に紐づくアプリケーション設定値を取得します
+        /// </summary>
+        /// <param name="key">設定キー</param>
+        /// <returns>アプリケーション設定値を<see cref="net.boilingwater.Framework.Common.Utils.CastUtil.ToUnsignedLong(object?)"/>で変換して取得</returns>
+        public static ulong AsUnsignedLong(string key) => CastUtil.ToUnsignedLong(Get(key));
+
+        /// <summary>
         /// <see cref="bool"/>型で<paramref name="key"/>に紐づくアプリケーション設定値を取得します
         /// </summary>
         /// <param name="key"></param>
