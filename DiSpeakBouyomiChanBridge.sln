@@ -34,7 +34,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VoiceVoxReverseProxy", "App
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "net.boilingwater.BusinessLogic.VoiceVoxSpeakerMapping", "BusinessLogic\VoiceVoxSpeakerMapping\net.boilingwater.BusinessLogic.VoiceVoxSpeakerMapping.csproj", "{8FCC9C40-146E-42FE-9944-77F5D70BD76C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "net.boilingwater.Framework.CommonTest", "..\net.boilingwater.Framework\_Test\net.boilingwater.Framework.CommonTest\net.boilingwater.Framework.CommonTest.csproj", "{55C9C2DC-8F47-4A3B-AE7A-6214AD9A6791}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "net.boilingwater.Framework.CommonTest", "Framework\_Test\net.boilingwater.Framework.CommonTest\net.boilingwater.Framework.CommonTest.csproj", "{55C9C2DC-8F47-4A3B-AE7A-6214AD9A6791}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
