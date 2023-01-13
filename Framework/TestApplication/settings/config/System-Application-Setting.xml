@@ -5,11 +5,8 @@
     ==================================
 -->
 <Settings>
-  <Item key="ListeningHost"                  value="localhost" />
-  <Item key="ListeningPort"                  value="9995" />
-
   <Item key="RetryCount"                     value="5" />
-  <Item key="RetrySleepTime.Milliseconds"    value="1000" />
+  <Item key="RetrySleepTime.Milliseconds"    value="5000" />
 
   <!-- HttpRequestタイムアウト時間(s) -->
   <Item key="HttpClient.RequestTimeout.Seconds" value="600" />
@@ -18,5 +15,5 @@
   <Item key="MemoryCache.Expiration.Default.Minutes" value="15" />
 
   <!-- SQLiteのDBファイルパス -->
-  <Item key="SQLite3.DBFilePath"             value="./cache.db" />
+  <Item key="SQLite3.DBFilePath"             value="./test.db" />
 </Settings>

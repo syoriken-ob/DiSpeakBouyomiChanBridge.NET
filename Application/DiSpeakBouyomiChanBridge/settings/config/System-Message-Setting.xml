@@ -8,7 +8,7 @@
   <Item key="Message.Connecting"                     value="棒読みちゃん 接続確認中・・・" />
   <Item key="Message.TryLoginToDiscord"              value="内部ディスコードクライアントが有効のためディスコードに接続します。" />
   <Item key="Message.SuccessLoginToDiscord"          value="ディスコードに接続しました。" />
-  <Item key="Message.Welcome"                        value="ディスピーク棒読みちゃんブリッジ バージョン8.1が起動しました！" />
+  <Item key="Message.Welcome"                        value="ディスピーク棒読みちゃんブリッジ バージョン8.2が起動しました！" />
   <Item key="Message.FinishInitialize"               value="イニシャライズ完了！" />
   <Item key="Message.ErrorOccurrence"                value="エラーが発生したため、実行を終了します" />
   <Item key="Message.DeleteAllExecutionQueues"       value="実行キューをすべて削除します" />
