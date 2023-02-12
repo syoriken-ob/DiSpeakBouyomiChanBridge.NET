@@ -339,7 +339,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadOut.Service
         /// <param name="speakerKey">メッセージ中にVOICEVOX話者を指定するキー</param>
         public static void ReplaceAudioQueryJson(MultiDic audioQueryDic, string speakerKey)
         {
-            var paramDic = new MultiDic();
+            MultiDic paramDic;
             if (Settings.Get($"VoiceVox.Request.AudioQuery.ReplaceJsonParam.{speakerKey}").HasValue())
             {
                 //話者固有設定
