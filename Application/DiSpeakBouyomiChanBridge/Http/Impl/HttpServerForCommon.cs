@@ -36,14 +36,8 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.Http.Impl
         }
 
         /// <inheritdoc/>
-        protected override void OnRequestReceived(IAsyncResult result)
+        protected override void OnRequestReceived(HttpListenerContext context)
         {
-            // Listening処理
-            var context = GetContextAndResumeListening(result);
-            if (context == null)
-            {
-                return;
-            }
             var request = context.Request;
             var message = "";
             using (var response = context.Response)
