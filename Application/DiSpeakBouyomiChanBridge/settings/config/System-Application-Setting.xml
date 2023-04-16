@@ -35,6 +35,10 @@
   <!-- 利用する場合 VoiceVox-XXX-Setting.xmlの設定が必要です -->
   <Item key="Use.VoiceVox"                   value="False" />
 
+  <!-- VOICEVOX利用時、VBANProtocolを利用したEmitter機能を利用する(True:利用する,False:利用しない) -->
+  <!-- 利用する場合 VBANEmitter-Application-Setting.xmlの設定が必要です -->
+  <Item key="Use.VBANEmitter"                value="False" />
+
   <!--共通読み上げAPIを利用する(True:利用する,False:利用しない)-->
   <Item key="Use.CommonVoiceReadoutServer"   value="False" />
   <!--共通読み上げAPIの受付ポート番号-->
