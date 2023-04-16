@@ -7,5 +7,5 @@
 <Settings>
   <Item key="Message.Log.Initialize.Start"          value="アプリケーションの初期化処理を行います。" />
   <Item key="Message.Log.Initialize.Finish"         value="アプリケーションの初期化処理が完了しました。" />
-  <Item key="Message.Log.Welcome"                   value="VOICEVOX ReverseProxy Ver 8.2が起動しました！" />
+  <Item key="Message.Log.Welcome"                   value="VOICEVOX ReverseProxy Ver 9.0が起動しました！" />
 </Settings>
