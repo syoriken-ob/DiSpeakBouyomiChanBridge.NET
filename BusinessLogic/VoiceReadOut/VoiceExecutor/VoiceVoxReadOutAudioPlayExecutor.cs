@@ -10,13 +10,8 @@ namespace net.boilingwater.BusinessLogic.VoiceReadOut.VoiceExecutor
     /// <summary>
     /// VoiceVoxで生成した音声を順次再生します。
     /// </summary>
-    public class VoiceVoxReadOutAudioPlayExecutor
+    public class VoiceVoxReadOutAudioPlayExecutor : VoiceVoxReadOutExecutor
     {
-        /// <summary>
-        /// シングルトンインスタンス
-        /// </summary>
-        public static VoiceVoxReadOutAudioPlayExecutor Instance { get; } = new();
-
         private readonly Thread _thread;
         private readonly BlockingCollection<byte[]> _audioStreamByteArrays = new();
 
@@ -50,7 +45,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadOut.VoiceExecutor
         /// </summary>
         /// <param name="audioStreamByteArray"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public void AddQueue(byte[] audioStreamByteArray)
+        public override void AddQueue(byte[] audioStreamByteArray)
         {
             if (audioStreamByteArray == null)
             {

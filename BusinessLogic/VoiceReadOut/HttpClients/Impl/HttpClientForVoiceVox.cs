@@ -133,7 +133,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl
                 var voiceAudio = synthesisResult.GetAsObject<byte[]>("voice");
                 if (voiceAudio != null)
                 {
-                    VoiceVoxReadOutAudioPlayExecutor.Instance.AddQueue(voiceAudio);
+                    VoiceVoxReadOutExecutor.Instance?.AddQueue(voiceAudio);
                 }
                 return;
             }

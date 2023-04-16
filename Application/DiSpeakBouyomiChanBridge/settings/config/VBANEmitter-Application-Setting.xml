@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    ===================================
+    == VBAN Protocol Support機能設定 ==
+    ===================================
+-->
+<Settings>
+  <Item key="VBAN.Emitter.Host"                 value="localhost" />
+  <Item key="VBAN.Emitter.Port"                 value="6090" />
+  <Item key="VBAN.Emitter.AudioSamplingRate"    value="24000" />
+  <Item key="VBAN.Emitter.BitDepth"             value="16" />
+  <Item key="VBAN.Emitter.AudioChannelCount"    value="1" />
+  <Item key="VBAN.Emitter.StreamName"           value="BOUYOMI" />
+</Settings>
