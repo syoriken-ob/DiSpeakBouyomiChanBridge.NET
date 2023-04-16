@@ -92,7 +92,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl
             var retryCount = 0L;
             while (true)
             {
-                var speaker = ExtractVoiceVoxSpeaker(ref message);
+                var speaker = ExtractVoiceVoxSpeaker(ref message, out var speakerKey);
 
                 var audioQueryResult = VoiceVoxRequestService.SendVoiceVoxAudioQueryRequest(Client, RequestSetting, message, speaker);
                 if (audioQueryResult.ContainsKey("statusCode"))
@@ -111,7 +111,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl
                 }
 
                 var audioQuery = audioQueryResult.GetAsMultiDic("audioQuery");
-                VoiceVoxRequestService.ReplaceAudioQueryJson(audioQuery);
+                VoiceVoxRequestService.ReplaceAudioQueryJson(audioQuery, speakerKey);
 
                 var synthesisResult = VoiceVoxRequestService.SendVoiceVoxSynthesisRequest(Client, RequestSetting, audioQuery, speaker);
                 if (synthesisResult.ContainsKey("statusCode"))
@@ -133,7 +133,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl
                 var voiceAudio = synthesisResult.GetAsObject<byte[]>("voice");
                 if (voiceAudio != null)
                 {
-                    VoiceVoxReadOutAudioPlayExecutor.Instance.AddQueue(voiceAudio);
+                    VoiceVoxReadOutExecutor.Instance?.AddQueue(voiceAudio);
                 }
                 return;
             }
@@ -187,8 +187,9 @@ namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl
         /// </summary>
         /// <param name="message">読み上げメッセージ</param>
         /// <returns>VoiceVox話者ID</returns>
-        private string ExtractVoiceVoxSpeaker(ref string message)
+        private string ExtractVoiceVoxSpeaker(ref string message, out string speakerKey)
         {
+            speakerKey = "";
             var match = SpeakerRegex.Match(message);
             if (!match.Success)
             {
@@ -208,6 +209,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl
             }
 
             message = message.Replace(match.Value, "");
+            speakerKey = speakerId.Value;
             return VoiceVoxSpeakers[speakerId.Value] ?? Settings.AsString("VoiceVox.DefaultSpeaker");
         }
     }

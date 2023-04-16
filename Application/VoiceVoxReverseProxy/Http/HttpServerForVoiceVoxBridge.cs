@@ -34,14 +34,8 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
         }
 
         /// <inheritdoc/>
-        protected override void OnRequestReceived(IAsyncResult result)
+        protected override void OnRequestReceived(HttpListenerContext context)
         {
-            // Listening処理
-            var context = GetContextAndResumeListening(result);
-            if (context == null)
-            {
-                return;
-            }
             try
             {
                 var path = CastUtil.ToString(context.Request.Url?.AbsolutePath);

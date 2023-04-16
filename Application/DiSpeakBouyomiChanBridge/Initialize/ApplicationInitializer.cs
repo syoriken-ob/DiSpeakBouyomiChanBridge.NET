@@ -9,6 +9,7 @@ using net.boilingwater.Application.DiSpeakBouyomiChanBridge.InternalDiscordClien
 using net.boilingwater.BusinessLogic.MessageReplacer.Service;
 using net.boilingwater.BusinessLogic.VoiceReadout.HttpClients;
 using net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl;
+using net.boilingwater.BusinessLogic.VoiceReadOut.VoiceExecutor;
 using net.boilingwater.external.DiscordClient;
 using net.boilingwater.Framework.Common.Initialize;
 using net.boilingwater.Framework.Common.Logging;
@@ -57,6 +58,16 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge
             if (Settings.AsBoolean("Use.VoiceVox"))
             {
                 HttpClientForReadOut.Initialize<HttpClientForVoiceVox>();
+
+                if (Settings.AsBoolean("Use.VBANEmitter"))
+                {
+                    VoiceVoxReadOutExecutor.Initialize<VoiceVoxReadOutVBanEmitter>();
+                }
+                else
+                {
+                    VoiceVoxReadOutExecutor.Initialize<VoiceVoxReadOutAudioPlayExecutor>();
+                }
+
             }
             else
             {

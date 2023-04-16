@@ -9,7 +9,7 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <Nullable>enable</Nullable>
-    <Version>8.2.0</Version>
+    <Version>9.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,6 +19,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\BusinessLogic\MessageReplacer\net.boilingwater.BusinessLogic.MessageReplacer.csproj" />
     <ProjectReference Include="..\..\BusinessLogic\VoiceReadOut\net.boilingwater.BusinessLogic.VoiceReadOut.csproj" />
+    <ProjectReference Include="..\..\external\VBanProtocolEmitter\net.boilingwater.external.VBanProtocolEmitter.csproj" />
     <ProjectReference Include="..\..\Framework\net.boilingwater.Framework.Common\net.boilingwater.Framework.Common.csproj" />
     <ProjectReference Include="..\..\external\DiscordClient\net.boilingwater.external.DiscordClient.csproj" />
   </ItemGroup>
@@ -38,6 +39,9 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="settings\command\command.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="settings\config\VBANEmitter-Application-Setting.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="settings\config\DiscordClient-Application-Setting.xml">

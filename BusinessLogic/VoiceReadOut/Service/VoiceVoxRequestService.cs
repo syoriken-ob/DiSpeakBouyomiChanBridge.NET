@@ -7,6 +7,7 @@ using System.Text;
 using System.Web;
 
 using net.boilingwater.Framework.Common;
+using net.boilingwater.Framework.Common.Extensions;
 using net.boilingwater.Framework.Common.Logging;
 using net.boilingwater.Framework.Common.Setting;
 using net.boilingwater.Framework.Common.Utils;
@@ -335,12 +336,24 @@ namespace net.boilingwater.BusinessLogic.VoiceReadOut.Service
         /// VoiceVoxで生成する音声生成クエリを調整します。
         /// </summary>
         /// <param name="audioQueryDic">VoiceVoxAPI[audio_query]で生成した音声合成パラメータ</param>
-        public static void ReplaceAudioQueryJson(MultiDic audioQueryDic)
+        /// <param name="speakerKey">メッセージ中にVOICEVOX話者を指定するキー</param>
+        public static void ReplaceAudioQueryJson(MultiDic audioQueryDic, string speakerKey)
         {
-            var paramList = Settings.AsMultiDic("VoiceVox.Request.AudioQuery.ReplaceJsonParam");
-            foreach (var paramKey in paramList.Keys)
+            MultiDic paramDic;
+            if (Settings.Get($"VoiceVox.Request.AudioQuery.ReplaceJsonParam.{speakerKey}").HasValue())
             {
-                var splits = paramList.GetAsString(paramKey).Split("/").Select(param => param.Trim()).ToList();
+                //話者固有設定
+                paramDic = Settings.AsMultiDic($"VoiceVox.Request.AudioQuery.ReplaceJsonParam.{speakerKey}");
+            }
+            else
+            {
+                //グローバル設定
+                paramDic = Settings.AsMultiDic("VoiceVox.Request.AudioQuery.ReplaceJsonParam");
+            }
+
+            foreach (var paramKey in paramDic.Keys)
+            {
+                var splits = paramDic.GetAsString(paramKey).Split("/").Select(param => param.Trim()).ToList();
                 if (splits.Count <= 1)
                 {
                     continue;

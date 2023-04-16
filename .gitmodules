@@ -1,0 +1,4 @@
+[submodule "Framework"]
+	path = Framework
+	url = https://github.com/syoriken-ob/net.boilingwater.Framework.git
+	branch = master
