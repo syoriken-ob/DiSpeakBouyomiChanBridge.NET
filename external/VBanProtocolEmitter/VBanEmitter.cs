@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Diagnostics;
 using System.Linq;
 using System.Net.Sockets;
 using System.Threading;
@@ -20,6 +19,7 @@ namespace net.boilingwater.external.VBanProtocolEmitter
         private readonly UdpClient _udpClient;
 
         /* パケット生成 */
+        private const int WaveFileHeaderDataLength = 44;
         private readonly int _maxDataSize;
         private readonly int _timerInterval;
         private uint PacketCounter = 0;
@@ -44,7 +44,8 @@ namespace net.boilingwater.external.VBanProtocolEmitter
                     OnElapsed_EmitVBAN(null, null);
                     Thread.Sleep(_timerInterval);
                 }
-            }) { IsBackground = true };
+            })
+            { IsBackground = true };
         }
 
         /// <summary>
@@ -73,34 +74,38 @@ namespace net.boilingwater.external.VBanProtocolEmitter
         /// <param name="audioBytes"></param>
         public void RegisterEmissionData(byte[] audioBytes)
         {
-            foreach (var audioByte in audioBytes.Chunk(_maxDataSize))
+            foreach (var audioByte in audioBytes.Skip(WaveFileHeaderDataLength).Chunk(_maxDataSize))
             {
-                _emittablePackets.TryAdd(audioByte, -1);
+                if (audioByte.Length < _maxDataSize)
+                {
+                    var wapper = new byte[_maxDataSize];
+                    audioByte.CopyTo(wapper, 0);
+                    _emittablePackets.TryAdd(wapper, -1);
+                }
+                else
+                {
+                    _emittablePackets.TryAdd(audioByte, -1);
+                }
             }
         }
 
         private void OnElapsed_EmitVBAN(object? sender, ElapsedEventArgs? e)
         {
-            byte sampleCount = 0;
-
             _emittablePackets.TryTake(out var data, 3);
 
             if (data == null || data.Length == 0)
             {
-                data = new byte[Config.BitPerSample];
-                sampleCount = CalculateSampleCount((byte)Config.BitPerSample);
+                data = new byte[_maxDataSize];
             }
-            else
-            {
-                sampleCount = CalculateSampleCount(data.Length);
-            }
+
+            var sampleCount = CalculateSampleCount(data.Length);
 
             var header = CreateVBANHeader(sampleCount);
 
             SendPacket(header, data);
 
             PacketCounter++; //VBANHeaderで利用するカウンターのカウントアップ
-            if (PacketCounter > uint.MaxValue)
+            if (PacketCounter >= uint.MaxValue)
             {
                 PacketCounter = 0U;
             }
