@@ -27,22 +27,30 @@ namespace net.boilingwater.external.VBanProtocolEmitter
         public VBanEmitter(EmitterConfig config)
         {
             Config = config;
-            _emittablePackets = new(new ConcurrentQueue<byte[]>(), 512);
-            _udpClient = new();
 
             //1パケットで送信可能な最大Byteサイズ（256サンプル）
-            _maxDataSize = VBanConst.MaxSampleCount * Config.BitPerSample;
+            _maxDataSize = VBanConst.MaxSampleCount * Config.BytePerSample;
+
+            _emittablePackets = new(new ConcurrentQueue<byte[]>(), _maxDataSize);
+            _udpClient = new();
 
             //タイマーに必要なクロック時間を計算
-            var packetCountsPerSec = Config.AudioSamplingRate / _maxDataSize;
-            _timerInterval = Math.Min(1000 / packetCountsPerSec, 10);
-
+            var packetCountsPerSec = Config.AudioSamplingRate / VBanConst.MaxSampleCount;
+            _timerInterval = 1000 / packetCountsPerSec;
             _thread = new Thread(() =>
             {
+                DateTime startAt;
+                double elapsedTime;
                 while (true)
                 {
+                    startAt = DateTime.UtcNow;
+                    elapsedTime = 0;
                     OnElapsed_EmitVBAN(null, null);
-                    Thread.Sleep(_timerInterval);
+                    do
+                    {
+                        Thread.SpinWait(10);
+                        elapsedTime = (DateTime.UtcNow - startAt).TotalMilliseconds;
+                    } while (_timerInterval > elapsedTime);
                 }
             })
             { IsBackground = true };
@@ -79,6 +87,7 @@ namespace net.boilingwater.external.VBanProtocolEmitter
                 if (audioByte.Length < _maxDataSize)
                 {
                     var wapper = new byte[_maxDataSize];
+                    Array.Fill<byte>(wapper, 0);
                     audioByte.CopyTo(wapper, 0);
                     _emittablePackets.TryAdd(wapper, -1);
                 }
@@ -96,6 +105,7 @@ namespace net.boilingwater.external.VBanProtocolEmitter
             if (data == null || data.Length == 0)
             {
                 data = new byte[_maxDataSize];
+                Array.Fill<byte>(data, 0);
             }
 
             var sampleCount = CalculateSampleCount(data.Length);
@@ -118,7 +128,7 @@ namespace net.boilingwater.external.VBanProtocolEmitter
         /// <returns>（0 = 1Sampleのため）-1補正したサンプル数</returns>
         private byte CalculateSampleCount(int length)
         {
-            return (byte)((length / Config.BitPerSample) - 1);
+            return (byte)((length / Config.BytePerSample) - 1);
         }
 
         /// <summary>
