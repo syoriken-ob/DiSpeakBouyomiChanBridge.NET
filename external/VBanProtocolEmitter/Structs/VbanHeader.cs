@@ -1,6 +1,8 @@
-﻿namespace net.boilingwater.external.VBanProtocolEmitter.Stricts
+﻿using System;
+
+namespace net.boilingwater.external.VBanProtocolEmitter.Stricts
 {
-    public struct VbanHeader
+    public readonly struct VbanHeader
     {
         private readonly char[] vban = { 'V', 'B', 'A', 'N' };
 
@@ -59,9 +61,10 @@
             //header.streamname End
 
             //header.framecounter Start
+            var counterBytes = BitConverter.GetBytes(counter);
             for (var i = 0; i < 4; i++)
             {
-                output[i + 24] = (byte)(counter >> (3 - i) & 255);
+                output[i + 24] = counterBytes[i];
             }
             //header.framecounter End
 
