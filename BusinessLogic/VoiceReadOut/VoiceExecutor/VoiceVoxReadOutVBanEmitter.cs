@@ -20,7 +20,8 @@ namespace net.boilingwater.BusinessLogic.VoiceReadOut.VoiceExecutor
                 audioSamplingRate: Settings.AsInteger("VBAN.Emitter.AudioSamplingRate"),
                 bitDepth: Settings.AsInteger("VBAN.Emitter.BitDepth"),
                 audioChannelCount: Settings.AsInteger("VBAN.Emitter.AudioChannelCount"),
-                streamName: Settings.AsString("VBAN.Emitter.StreamName")
+                streamName: Settings.AsString("VBAN.Emitter.StreamName"),
+                bufferSize: Settings.AsString("VBAN.Emitter.BufferSize")
             );
 
             _vbanEmitter = new(config);

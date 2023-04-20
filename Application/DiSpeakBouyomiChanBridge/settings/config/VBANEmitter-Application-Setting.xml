@@ -6,9 +6,10 @@
 -->
 <Settings>
   <Item key="VBAN.Emitter.Host"                 value="localhost" />
-  <Item key="VBAN.Emitter.Port"                 value="6090" />
+  <Item key="VBAN.Emitter.Port"                 value="6980" />
   <Item key="VBAN.Emitter.AudioSamplingRate"    value="24000" />
   <Item key="VBAN.Emitter.BitDepth"             value="16" />
   <Item key="VBAN.Emitter.AudioChannelCount"    value="1" />
   <Item key="VBAN.Emitter.StreamName"           value="BOUYOMI" />
+  <Item key="VBAN.Emitter.BufferSize"           value="Medium" />
 </Settings>
