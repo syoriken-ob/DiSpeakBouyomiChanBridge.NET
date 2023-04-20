@@ -9,7 +9,7 @@ namespace net.boilingwater.external.VBanProtocolEmitter
         public string Host { get; set; }
         public int Port { get; set; }
         public int AudioSamplingRate { get; set; }
-        public int BitPerSample { get; set; }
+        public int BytePerSample { get; set; }
         public FormatSamplingRate FormatSamplingRate { get; set; }
         public FormatBitDepth FormatBitDepth { get; set; }
         public byte AudioChannelCount { get; set; }
@@ -20,7 +20,7 @@ namespace net.boilingwater.external.VBanProtocolEmitter
             Host = host ?? throw new ArgumentNullException(nameof(host));
             Port = port;
             AudioSamplingRate = audioSamplingRate;
-            BitPerSample = bitDepth / 8;
+            BytePerSample = bitDepth / 8;
             FormatSamplingRate = ConvertSamplingRate(audioSamplingRate);
             FormatBitDepth = ConvertBitDepth(bitDepth);
             AudioChannelCount = (byte)(audioChannelCount - 1);
