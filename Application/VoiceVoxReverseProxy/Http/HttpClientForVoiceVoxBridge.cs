@@ -4,11 +4,11 @@ using System.Linq;
 using System.Net;
 
 using net.boilingwater.BusinessLogic.VoiceReadOut.Service;
-using net.boilingwater.Framework.Common;
 using net.boilingwater.Framework.Common.Http;
-using net.boilingwater.Framework.Common.Logging;
 using net.boilingwater.Framework.Common.Setting;
-using net.boilingwater.Framework.Common.Utils;
+using net.boilingwater.Framework.Core;
+using net.boilingwater.Framework.Core.Logging;
+using net.boilingwater.Framework.Core.Utils;
 
 namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
 {

@@ -4,10 +4,11 @@ using System.Linq;
 
 using net.boilingwater.BusinessLogic.VoiceVoxSpeakerCache.Dto;
 using net.boilingwater.BusinessLogic.VoiceVoxSpeakerCache.Service;
-using net.boilingwater.Framework.Common;
-using net.boilingwater.Framework.Common.Extensions;
 using net.boilingwater.Framework.Common.Setting;
 using net.boilingwater.Framework.Common.Utils;
+using net.boilingwater.Framework.Core;
+using net.boilingwater.Framework.Core.Extensions;
+using net.boilingwater.Framework.Core.Utils;
 
 namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
 {

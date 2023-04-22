@@ -4,7 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <Nullable>enable</Nullable>
-    <Version>9.0.1</Version>
+    <Version>9.1.0</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Framework\net.boilingwater.Framework.Common\net.boilingwater.Framework.Common.csproj" />
+    <ProjectReference Include="..\..\Framework\net.boilingwater.Framework.Core\net.boilingwater.Framework.Core.csproj" />
   </ItemGroup>
 
 </Project>

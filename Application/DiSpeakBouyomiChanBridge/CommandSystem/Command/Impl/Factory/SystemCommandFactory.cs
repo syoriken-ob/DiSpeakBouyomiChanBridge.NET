@@ -6,9 +6,9 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
-using net.boilingwater.Framework.Common.Logging;
 using net.boilingwater.Framework.Common.Setting;
-using net.boilingwater.Framework.Common.Utils;
+using net.boilingwater.Framework.Core.Logging;
+using net.boilingwater.Framework.Core.Utils;
 
 namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Impl.Factory
 {
@@ -36,7 +36,7 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Im
             var list = new List<SystemCommand>();
 
             var regex = $"({string.Join("|", Dic.Keys)})";
-            var matches = Regex.Matches(input, regex);
+            MatchCollection matches = Regex.Matches(input, regex);
 
             foreach (Match match in matches)
             {
@@ -44,7 +44,7 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Im
                 if (Dic.ContainsKey(key))
                 {
                     input = input.Replace(match.Value, "");
-                    var instance = Dic[key];
+                    ExecutableCommand? instance = Dic[key];
                     if (instance != null)
                     {
                         list.Add((SystemCommand)instance);
@@ -68,15 +68,15 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Im
 
                     //読み込み
                     var commandFilePath = Path.Combine(Directory.GetCurrentDirectory(), Settings.GetAppConfig("CommandFileFolder"), Settings.AsString("SystemCommandFile"));
-                    var dic = SerializeUtil.DeserializeYaml<Dictionary<string, string>>(File.ReadAllText(commandFilePath), false);
+                    Dictionary<string, string> dic = SerializeUtil.DeserializeYaml<Dictionary<string, string>>(File.ReadAllText(commandFilePath), false);
                     Log.Logger.Debug($"読み込み：{commandFilePath}");
 
                     if (dic != null)
                     {
-                        var SystemCommandTypes = Assembly.GetExecutingAssembly().GetTypes().Where(type => type.IsSubclassOf(typeof(SystemCommand)));
-                        foreach (var pair in dic)
+                        IEnumerable<Type> SystemCommandTypes = Assembly.GetExecutingAssembly().GetTypes().Where(type => type.IsSubclassOf(typeof(SystemCommand)));
+                        foreach (KeyValuePair<string, string> pair in dic)
                         {
-                            var type = SystemCommandTypes.Where(type => type.Name == pair.Value).FirstOrDefault();
+                            Type? type = SystemCommandTypes.Where(type => type.Name == pair.Value).FirstOrDefault();
                             if (type != null)
                             {
                                 var instance = Activator.CreateInstance(type);

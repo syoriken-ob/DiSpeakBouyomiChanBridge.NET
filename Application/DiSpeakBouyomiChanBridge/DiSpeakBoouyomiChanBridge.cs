@@ -1,6 +1,6 @@
 ﻿using System;
 
-using net.boilingwater.Framework.Common.Logging;
+using net.boilingwater.Framework.Core.Logging;
 
 namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge
 {
@@ -30,7 +30,6 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge
                 Log.Logger.Fatal("エラーが発生したため、実行を終了します。", e);
                 return -1;
             }
-            return 0;
         }
     }
 }

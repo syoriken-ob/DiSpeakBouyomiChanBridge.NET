@@ -4,9 +4,9 @@ using System.Net.Http;
 
 using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Service;
 using net.boilingwater.Framework.Common.Http;
-using net.boilingwater.Framework.Common.Logging;
 using net.boilingwater.Framework.Common.Setting;
-using net.boilingwater.Framework.Common.Utils;
+using net.boilingwater.Framework.Core.Logging;
+using net.boilingwater.Framework.Core.Utils;
 
 namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.Http.Impl
 {
@@ -38,9 +38,9 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.Http.Impl
         /// <inheritdoc/>
         protected override void OnRequestReceived(HttpListenerContext context)
         {
-            var request = context.Request;
+            HttpListenerRequest request = context.Request;
             var message = "";
-            using (var response = context.Response)
+            using (HttpListenerResponse response = context.Response)
             {
                 if (request.HttpMethod != HttpMethod.Get.Method)
                 {

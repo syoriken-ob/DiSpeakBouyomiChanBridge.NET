@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-using net.boilingwater.Framework.Common;
+using net.boilingwater.Framework.Core;
 
 namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem
 {

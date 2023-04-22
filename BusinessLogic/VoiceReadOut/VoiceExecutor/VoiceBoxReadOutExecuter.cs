@@ -21,9 +21,6 @@ namespace net.boilingwater.BusinessLogic.VoiceReadOut.VoiceExecutor
         /// </summary>
         /// <typeparam name="T"><see cref="VoiceVoxReadOutExecutor"/>を継承した型</typeparam>
         /// <returns></returns>
-        public static void Initialize<T>() where T : VoiceVoxReadOutExecutor
-        {
-            Instance = (VoiceVoxReadOutExecutor?)Activator.CreateInstance(typeof(T));
-        }
+        public static void Initialize<T>() where T : VoiceVoxReadOutExecutor => Instance = (VoiceVoxReadOutExecutor?)Activator.CreateInstance(typeof(T));
     }
 }

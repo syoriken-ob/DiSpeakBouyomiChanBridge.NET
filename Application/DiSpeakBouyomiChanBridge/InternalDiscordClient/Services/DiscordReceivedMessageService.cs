@@ -4,9 +4,9 @@ using System.Text.RegularExpressions;
 using Discord.Commands;
 using Discord.WebSocket;
 
-using net.boilingwater.Framework.Common.Extensions;
 using net.boilingwater.Framework.Common.Setting;
-using net.boilingwater.Framework.Common.Utils;
+using net.boilingwater.Framework.Core.Extensions;
+using net.boilingwater.Framework.Core.Utils;
 
 namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.InternalDiscordClient.Services
 {
@@ -227,7 +227,7 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.InternalDiscordC
                 context.Message.MentionedUserIds.ForEach(userId =>
                     {
                         var user = replaceKey.Replace(userKey, CastUtil.ToString(userId));
-                        var guildUser = context.Guild.GetUserAsync(userId, Discord.CacheMode.AllowDownload, Discord.RequestOptions.Default).GetAwaiter().GetResult();
+                        Discord.IGuildUser guildUser = context.Guild.GetUserAsync(userId, Discord.CacheMode.AllowDownload, Discord.RequestOptions.Default).GetAwaiter().GetResult();
 
                         string? name = null;
                         if (guildUser.Nickname != null)

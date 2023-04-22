@@ -5,10 +5,10 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-using net.boilingwater.Framework.Common;
-using net.boilingwater.Framework.Common.Logging;
 using net.boilingwater.Framework.Common.Setting;
-using net.boilingwater.Framework.Common.Utils;
+using net.boilingwater.Framework.Core;
+using net.boilingwater.Framework.Core.Logging;
+using net.boilingwater.Framework.Core.Utils;
 
 namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Impl.Factory
 {
@@ -24,10 +24,7 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Im
 
         private Regex CommandPattern { get; set; }
 
-        private CommandFactory()
-        {
-            CommandPattern = new Regex("{dummy}", RegexOptions.Compiled);
-        }
+        private CommandFactory() => CommandPattern = new Regex("{dummy}", RegexOptions.Compiled);
 
         /// <summary>
         /// <paramref name="input"/>からコマンドを検出します。
@@ -63,7 +60,7 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Im
             foreach (var str in command.ReplacePattern)
             {
                 var replace = str;
-                var group = match.Groups.Values.Where(group => group.Name == replace).FirstOrDefault();
+                Group? group = match.Groups.Values.Where(group => group.Name == replace).FirstOrDefault();
                 if (group != null)
                 {
                     for (var index = 0; index < command.RunCommand.Length; ++index)
@@ -86,11 +83,11 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Im
                     //コマンド辞書初期化
                     Dic.Clear();
 
-                    var dic = LoadCommandDic();
+                    SimpleDic<Command> dic = LoadCommandDic();
 
                     if (dic != null)
                     {
-                        foreach (var pair in dic)
+                        foreach (KeyValuePair<string, Command?> pair in dic)
                         {
                             if (pair.Value == null)
                             {
@@ -152,7 +149,7 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Im
                 return dic;
             }
 
-            foreach (var item in commandDic)
+            foreach (KeyValuePair<string, Command?> item in commandDic)
             {
                 dic[item.Key] = item.Value;
             }
