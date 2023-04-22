@@ -1,12 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Text.RegularExpressions;
 
 using net.boilingwater.BusinessLogic.MessageReplacer.Dao;
-using net.boilingwater.Framework.Common;
-using net.boilingwater.Framework.Common.Extensions;
 using net.boilingwater.Framework.Common.Setting;
-using net.boilingwater.Framework.Common.Utils;
+using net.boilingwater.Framework.Core;
+using net.boilingwater.Framework.Core.Extensions;
+using net.boilingwater.Framework.Core.Utils;
 
 namespace net.boilingwater.BusinessLogic.MessageReplacer.Service
 {
@@ -34,7 +35,7 @@ namespace net.boilingwater.BusinessLogic.MessageReplacer.Service
         public static void Initialize()
         {
             var dao = new MessageReplacerDao();
-            var replaceTable = dao.SelectReplaceSetting();
+            DataTable replaceTable = dao.SelectReplaceSetting();
 
             _replaceSetting.Clear();
 
@@ -99,7 +100,7 @@ namespace net.boilingwater.BusinessLogic.MessageReplacer.Service
         /// <param name="message">メッセージ</param>
         public static void ReplaceMessage(ref string message)
         {
-            foreach (var replace in _replaceSetting)
+            foreach (KeyValuePair<string, string?> replace in _replaceSetting)
             {
                 if (message.Contains(replace.Key, StringComparison.Ordinal))
                 {
@@ -116,7 +117,7 @@ namespace net.boilingwater.BusinessLogic.MessageReplacer.Service
         /// <returns>置換設定を登録したかどうか</returns>
         private static bool DetectAndRegisterReplaceSetting(ref string message)
         {
-            var match = RegisterReplaceSettingRegex.Match(message);
+            Match match = RegisterReplaceSettingRegex.Match(message);
             if (!match.Success)
             {
                 return false;
@@ -125,8 +126,8 @@ namespace net.boilingwater.BusinessLogic.MessageReplacer.Service
             var dao = new MessageReplacerDao();
             do
             {
-                var replaceKey = match.Groups["replace_key"];
-                var replaceValue = match.Groups["replace_value"];
+                Group replaceKey = match.Groups["replace_key"];
+                Group replaceValue = match.Groups["replace_value"];
                 if (replaceKey == null || replaceValue == null)
                 {
                     continue;
@@ -152,7 +153,7 @@ namespace net.boilingwater.BusinessLogic.MessageReplacer.Service
         /// <returns>置換設定を削除したかどうか</returns>
         private static bool DetectAndDeleteReplaceSetting(ref string message)
         {
-            var match = DeleteReplaceSettingRegex.Match(message);
+            Match match = DeleteReplaceSettingRegex.Match(message);
             if (!match.Success)
             {
                 return false;
@@ -162,7 +163,7 @@ namespace net.boilingwater.BusinessLogic.MessageReplacer.Service
             var registered = false;
             do
             {
-                var replaceKey = match.Groups["replace_key"];
+                Group replaceKey = match.Groups["replace_key"];
                 if (replaceKey == null)
                 {
                     continue;

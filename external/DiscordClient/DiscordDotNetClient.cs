@@ -10,7 +10,7 @@ using Discord.WebSocket;
 
 using Microsoft.Extensions.DependencyInjection;
 
-using net.boilingwater.Framework.Common.Utils;
+using net.boilingwater.Framework.Core.Utils;
 
 namespace net.boilingwater.external.DiscordClient
 {
@@ -81,7 +81,7 @@ namespace net.boilingwater.external.DiscordClient
 
             if (TargetGuild != null)
             {
-                var guilds = TargetGuild.Select(guild => InnerClient.GetGuild(CastUtil.ToUnsignedLong(guild)));
+                IEnumerable<SocketGuild> guilds = TargetGuild.Select(guild => InnerClient.GetGuild(CastUtil.ToUnsignedLong(guild)));
                 if (guilds.Any())
                 {
                     await InnerClient.DownloadUsersAsync(guilds).ConfigureAwait(false);
@@ -105,7 +105,7 @@ namespace net.boilingwater.external.DiscordClient
                 return;
             }
             await InnerClient.StopAsync();
-            InnerClient.LogoutAsync();
+            await InnerClient.LogoutAsync();
 
             await Task.CompletedTask;
         }

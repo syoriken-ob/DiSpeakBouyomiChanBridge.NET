@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Framework\net.boilingwater.Framework.Common\net.boilingwater.Framework.Common.csproj" />
+    <ProjectReference Include="..\..\Framework\net.boilingwater.Framework.Core\net.boilingwater.Framework.Core.csproj" />
   </ItemGroup>
 
 </Project>

@@ -6,7 +6,7 @@ using System.Text;
 
 using net.boilingwater.Framework.Common.Http;
 using net.boilingwater.Framework.Common.Setting;
-using net.boilingwater.Framework.Common.Utils;
+using net.boilingwater.Framework.Core.Utils;
 
 namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
 {

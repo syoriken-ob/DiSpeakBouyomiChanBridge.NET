@@ -75,7 +75,7 @@ dotnet_style_allow_statement_immediately_after_block_experimental = true:suggest
 #### C# コーディング規則 ####
 
 # var を優先
-csharp_style_var_elsewhere = true:warning
+csharp_style_var_elsewhere = false:warning
 csharp_style_var_for_built_in_types = true:warning
 csharp_style_var_when_type_is_apparent = true:warning
 
@@ -92,7 +92,7 @@ csharp_style_expression_bodied_properties = when_on_single_line:warning
 # パターン マッチング設定
 csharp_style_pattern_matching_over_as_with_null_check = true:warning
 csharp_style_pattern_matching_over_is_with_cast_check = true:warning
-csharp_style_prefer_extended_property_pattern = true
+csharp_style_prefer_extended_property_pattern = true:suggestion
 csharp_style_prefer_not_pattern = true:warning
 csharp_style_prefer_pattern_matching = true:warning
 csharp_style_prefer_switch_expression = true:silent
@@ -106,7 +106,7 @@ csharp_prefer_static_local_function = true
 csharp_preferred_modifier_order = public,private,protected,internal,static,extern,new,virtual,abstract,sealed,override,readonly,unsafe,volatile,async
 
 # コード ブロックの設定
-csharp_prefer_braces = true
+csharp_prefer_braces = true:silent
 csharp_prefer_simple_using_statement = true:warning
 csharp_style_namespace_declarations = block_scoped:suggestion
 csharp_style_prefer_method_group_conversion = true:suggestion
@@ -221,3 +221,21 @@ dotnet_naming_style.begins_with_i.required_prefix = I
 dotnet_naming_style.begins_with_i.required_suffix = 
 dotnet_naming_style.begins_with_i.word_separator = 
 dotnet_naming_style.begins_with_i.capitalization = pascal_case
+csharp_style_prefer_top_level_statements = true:silent
+
+[*.{cs,vb}]
+tab_width = 4
+indent_size = 4
+dotnet_style_qualification_for_field = false:suggestion
+dotnet_style_qualification_for_property = false:suggestion
+dotnet_style_qualification_for_method = false:suggestion
+dotnet_style_qualification_for_event = true:suggestion
+dotnet_style_parentheses_in_arithmetic_binary_operators = always_for_clarity:suggestion
+dotnet_style_parentheses_in_other_binary_operators = always_for_clarity:suggestion
+dotnet_style_parentheses_in_relational_binary_operators = always_for_clarity:suggestion
+dotnet_style_parentheses_in_other_operators = never_if_unnecessary:silent
+dotnet_style_operator_placement_when_wrapping = beginning_of_line
+dotnet_code_quality_unused_parameters = all:warning
+dotnet_style_readonly_field = true:warning
+end_of_line = crlf
+dotnet_style_require_accessibility_modifiers = for_non_interface_members:silent

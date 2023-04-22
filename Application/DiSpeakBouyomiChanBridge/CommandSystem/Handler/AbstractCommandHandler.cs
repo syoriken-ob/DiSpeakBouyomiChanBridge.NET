@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Impl;
@@ -7,7 +8,7 @@ using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.PipeLi
 using net.boilingwater.Application.DiSpeakBouyomiChanBridge.InternalDiscordClient.Services;
 using net.boilingwater.BusinessLogic.MessageReplacer.Service;
 using net.boilingwater.BusinessLogic.VoiceReadout.HttpClients;
-using net.boilingwater.Framework.Common.Extensions;
+using net.boilingwater.Framework.Core.Extensions;
 
 namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Handle
 {
@@ -20,11 +21,9 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Ha
         /// コマンド検出前処理を実行します。
         /// </summary>
         /// <param name="message">検出するメッセージ</param>
-        internal void ExecutePreProcess(ref string message)
-        {
+        internal void ExecutePreProcess(ref string message) =>
             //メッセージ置換処理(教育・忘却含む)
             MessageReplaceService.ExecuteReplace(ref message);
-        }
 
         /// <summary>
         /// 各種コマンド検出処理を実行します。
@@ -38,9 +37,9 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Ha
             }
 
             //システムコマンド検出
-            var systemCommands = SystemCommandFactory.Factory.CreateExecutableCommands(ref message);
+            IEnumerable<ExecutableCommand> systemCommands = SystemCommandFactory.Factory.CreateExecutableCommands(ref message);
             //コマンド検出
-            var commands = CommandFactory.Factory.CreateExecutableCommands(ref message);
+            IEnumerable<ExecutableCommand> commands = CommandFactory.Factory.CreateExecutableCommands(ref message);
 
             //システムコマンド実行
             systemCommands.ForEach((cmd) => new Task(() => cmd.Execute()).RunSynchronously());

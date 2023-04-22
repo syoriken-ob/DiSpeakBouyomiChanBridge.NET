@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using RegularExpression = System.Text.RegularExpressions.Regex;
 
 using net.boilingwater.BusinessLogic.VoiceReadout.HttpClients;
-using net.boilingwater.Framework.Common.Extensions;
-using net.boilingwater.Framework.Common.Logging;
 using net.boilingwater.Framework.Common.Setting;
-using net.boilingwater.Framework.Common.Utils;
+using net.boilingwater.Framework.Core.Extensions;
+using net.boilingwater.Framework.Core.Logging;
+using net.boilingwater.Framework.Core.Utils;
 
 namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Impl
 {
@@ -133,12 +135,7 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Im
 
             try
             {
-                using var p = Process.Start(info);
-
-                if (p == null)
-                {
-                    throw new ArgumentException("コマンドが不正です");
-                }
+                using Process p = Process.Start(info) ?? throw new ArgumentException("コマンドが不正です");
 
                 ExecuteProcess = p;
 
@@ -154,8 +151,8 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Im
                 p.ErrorDataReceived += ErrorDataReceivedHandler;
                 p.BeginErrorReadLine();
 
-                using var pOutput = p.StandardOutput;
-                using var pInput = p.StandardInput;
+                using StreamReader pOutput = p.StandardOutput;
+                using StreamWriter pInput = p.StandardInput;
                 pInput.AutoFlush = true;
 
                 string? pOut = null;
@@ -167,7 +164,7 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Im
                     {
                         StdInOut.ForEach(regexPair =>
                         {
-                            if (System.Text.RegularExpressions.Regex.IsMatch(pOut, regexPair.Key))
+                            if (RegularExpression.IsMatch(pOut, regexPair.Key))
                             {
                                 pInput.WriteLine(regexPair.Value);
                                 Log.Logger.Debug($"{CommandTitle}({p.ProcessName}-{p.Id}) <- {regexPair.Value}");

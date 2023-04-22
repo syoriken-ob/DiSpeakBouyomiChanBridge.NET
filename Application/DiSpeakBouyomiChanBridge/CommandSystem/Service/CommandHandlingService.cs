@@ -3,8 +3,8 @@
 using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Handle;
 using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Handle.Impl;
 using net.boilingwater.BusinessLogic.VoiceReadout.HttpClients;
-using net.boilingwater.Framework.Common.Logging;
 using net.boilingwater.Framework.Common.Setting;
+using net.boilingwater.Framework.Core.Logging;
 
 namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Service
 {
@@ -18,10 +18,7 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Se
         /// <summary>
         /// コマンド検出サービスの初期化を行います
         /// </summary>
-        public static void Initialize()
-        {
-            _handler = Settings.AsBoolean("Use.InternalDiscordClient") ? new InternalDiscordClientCommandHandler() : new DiSpeakCommandHandler();
-        }
+        public static void Initialize() => _handler = Settings.AsBoolean("Use.InternalDiscordClient") ? new InternalDiscordClientCommandHandler() : new DiSpeakCommandHandler();
 
         /// <summary>
         /// 渡される文字列からコマンドを検出します。

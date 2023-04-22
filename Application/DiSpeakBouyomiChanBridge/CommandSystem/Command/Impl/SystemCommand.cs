@@ -1,7 +1,9 @@
-﻿using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.PipeLine;
+﻿using System.Collections.Generic;
+
+using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.PipeLine;
 using net.boilingwater.BusinessLogic.VoiceReadout.HttpClients;
-using net.boilingwater.Framework.Common.Logging;
 using net.boilingwater.Framework.Common.Setting;
+using net.boilingwater.Framework.Core.Logging;
 
 namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem
 {
@@ -58,7 +60,7 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Im
         /// </summary>
         public override void Execute()
         {
-            var commands = CommandExecuteManager.Instance.GetCommandsInQueue();
+            List<Command> commands = CommandExecuteManager.Instance.GetCommandsInQueue();
             HttpClientForReadOut.Instance?.ReadOut(string.Format(Settings.AsString("Message.CommandsCount"), commands.Count));
             for (var i = 0; i < commands.Count; i++)
             {

@@ -21,6 +21,7 @@ namespace net.boilingwater.external.VBanProtocolEmitter
         public string StreamName { get; private set; }
         public int MaxDataSize { get; private set; }
         public int BufferPacketCount { get; private set; }
+        public TimeSpan EmitInterval { get; private set; }
 
         public EmitterConfig(string host, int port, int audioSamplingRate, int bitDepth, int audioChannelCount, string streamName, string bufferSize)
         {
@@ -34,21 +35,24 @@ namespace net.boilingwater.external.VBanProtocolEmitter
             StreamName = streamName ?? throw new ArgumentNullException(nameof(streamName));
             MaxDataSize = VBanConst.MaxSampleCount * BytePerSample;
             BufferPacketCount = (int)ConvertBufferSize(bufferSize);
+            EmitInterval = CalculateEmitInterval();
         }
 
-        private FormatSamplingRate ConvertSamplingRate(int audioSamplingRate)
-        {
-            return Enum.TryParse<FormatSamplingRate>($"_{audioSamplingRate}Hz", true, out var result) ? result : FormatSamplingRate._24000Hz;
-        }
+        private FormatSamplingRate ConvertSamplingRate(int audioSamplingRate) => Enum.TryParse($"_{audioSamplingRate}Hz", true, out FormatSamplingRate result) ? result : FormatSamplingRate._24000Hz;
 
-        private FormatBitDepth ConvertBitDepth(int bitDepth)
-        {
-            return Enum.TryParse<FormatBitDepth>($"Int{bitDepth}", true, out var result) ? result : FormatBitDepth.Int16;
-        }
+        private FormatBitDepth ConvertBitDepth(int bitDepth) => Enum.TryParse($"Int{bitDepth}", true, out FormatBitDepth result) ? result : FormatBitDepth.Int16;
 
-        private BufferSize ConvertBufferSize(string bufferSize)
+        private BufferSize ConvertBufferSize(string bufferSize) => Enum.TryParse(bufferSize, true, out BufferSize result) ? result : BufferSize.Mediam;
+
+        /// <summary>
+        /// 送信インターバル時間を計算します。
+        /// </summary>
+        /// <returns></returns>
+        private TimeSpan CalculateEmitInterval()
         {
-            return Enum.TryParse<BufferSize>(bufferSize, true, out var result) ? result : BufferSize.Mediam;
+            var packetCountsPerSec = (double)AudioSamplingRate / VBanConst.MaxSampleCount;
+            var timerInterval = (int)(1000 / (packetCountsPerSec / BufferPacketCount));
+            return TimeSpan.FromMilliseconds(timerInterval);
         }
 
         public enum BufferSize

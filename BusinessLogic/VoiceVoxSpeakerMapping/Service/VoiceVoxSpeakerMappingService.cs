@@ -4,8 +4,8 @@ using System.Linq;
 
 using net.boilingwater.BusinessLogic.VoiceVoxSpeakerCache.Dao;
 using net.boilingwater.BusinessLogic.VoiceVoxSpeakerCache.Dto;
-using net.boilingwater.Framework.Common;
-using net.boilingwater.Framework.Common.Utils;
+using net.boilingwater.Framework.Core;
+using net.boilingwater.Framework.Core.Utils;
 
 namespace net.boilingwater.BusinessLogic.VoiceVoxSpeakerCache.Service
 {
@@ -33,10 +33,10 @@ namespace net.boilingwater.BusinessLogic.VoiceVoxSpeakerCache.Service
         public static SimpleDic<SpeakerRemappingDto> GetMapping()
         {
             var dao = new VoiceVoxSpeakerMappingDao();
-            var table = dao.SelectMappingAll();
+            DataTable table = dao.SelectMappingAll();
             var dic = new SimpleDic<SpeakerRemappingDto>();
 
-            foreach (var row in table.Rows.Cast<DataRow>())
+            foreach (DataRow row in table.Rows.Cast<DataRow>())
             {
                 var key = CastUtil.ToString(row["new_id"]);
                 var value = new SpeakerRemappingDto

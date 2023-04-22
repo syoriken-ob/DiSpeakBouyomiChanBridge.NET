@@ -1,14 +1,13 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Net.Sockets;
 
-using System.Timers;
-
-using net.boilingwater.external.VBanProtocolEmitter.Const;
 using net.boilingwater.external.VBanProtocolEmitter.Structs;
+using net.boilingwater.Framework.Core.Timers;
 
 namespace net.boilingwater.external.VBanProtocolEmitter
 {
-    internal class UdpEmitter : Timer
+    internal class UdpEmitter : HighResolutionTimer
     {
         private readonly BlockingCollection<VbanPacket> _vbanPacketsBuffers;
 
@@ -20,17 +19,13 @@ namespace net.boilingwater.external.VBanProtocolEmitter
         ///
         /// </summary>
         /// <param name="config"></param>
-        public UdpEmitter(EmitterConfig config)
+        public UdpEmitter(EmitterConfig config) : base(config.EmitInterval)
         {
             _config = config;
 
             _vbanPacketsBuffers = new(new ConcurrentQueue<VbanPacket>());
             _udpClient = new();
 
-            //タイマーのインターバル時間を計算
-            var packetCountsPerSec = (double)_config.AudioSamplingRate / VBanConst.MaxSampleCount;
-            var timerInterval = (int)(1000 / (packetCountsPerSec / _config.BufferPacketCount));
-            this.Interval = timerInterval;
             this.Elapsed += OnElapsed_EmitVBAN;
         }
 
@@ -40,17 +35,14 @@ namespace net.boilingwater.external.VBanProtocolEmitter
         public void StartEmittion()
         {
             _udpClient.Connect(_config.Host, _config.Port);
-            Start();
+            Start(DateTime.UtcNow);
         }
 
         /// <summary>
         /// 送信用VBANパケットを登録します。
         /// </summary>
         /// <param name="packet"></param>
-        public void RegisterVbanPacket(VbanPacket packet)
-        {
-            _vbanPacketsBuffers.TryAdd(packet, -1);
-        }
+        public void RegisterVbanPacket(VbanPacket packet) => _vbanPacketsBuffers.TryAdd(packet, -1);
 
         /// <summary>
         /// VBANパケットをUDPで送信します。
@@ -66,19 +58,16 @@ namespace net.boilingwater.external.VBanProtocolEmitter
             catch { /* エラーは握りつぶす（TODO:どうにかする） */ }
         }
 
-        private void OnElapsed_EmitVBAN(object? sender, ElapsedEventArgs? e)
+        private void OnElapsed_EmitVBAN(object? sender, EventArgs? e)
         {
-            lock (this.SynchronizingObject ?? new object())
+            for (var i = 0; i < _config.BufferPacketCount; i++)
             {
-                for (var i = 0; i < _config.BufferPacketCount; i++)
+                if (!_vbanPacketsBuffers.TryTake(out VbanPacket? packet, 2))
                 {
-                    if (!_vbanPacketsBuffers.TryTake(out var packet, 2))
-                    {
-                        packet = new VbanPacket(_config);
-                    }
-
-                    SendPacket(packet);
+                    packet = new VbanPacket(_config);
                 }
+
+                SendPacket(packet);
             }
         }
     }
