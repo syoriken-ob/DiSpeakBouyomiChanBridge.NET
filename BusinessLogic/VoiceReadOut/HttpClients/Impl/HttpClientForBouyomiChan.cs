@@ -3,9 +3,9 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 
-using net.boilingwater.Framework.Common.Extensions;
-using net.boilingwater.Framework.Common.Logging;
 using net.boilingwater.Framework.Common.Setting;
+using net.boilingwater.Framework.Core.Extensions;
+using net.boilingwater.Framework.Core.Logging;
 
 namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl
 {
@@ -32,7 +32,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl
             {
                 try
                 {
-                    var responseMessage = Client.Send(CreateBouyomiChanHttpRequest(sendMessage));
+                    HttpResponseMessage responseMessage = Client.Send(CreateBouyomiChanHttpRequest(sendMessage));
                     if (responseMessage.StatusCode == HttpStatusCode.OK)
                     {
                         isValid = true;

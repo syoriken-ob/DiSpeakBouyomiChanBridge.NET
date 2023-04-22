@@ -1,6 +1,6 @@
 ﻿using System;
 
-using net.boilingwater.Framework.Common.Logging;
+using net.boilingwater.Framework.Core.Logging;
 
 namespace net.boilingwater.Application.VoiceVoxReverseProxy
 {
@@ -31,7 +31,6 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy
                 Log.Logger.Fatal("エラーが発生したため、実行を終了します。", e);
                 return -1;
             }
-            return 0;
         }
     }
 }

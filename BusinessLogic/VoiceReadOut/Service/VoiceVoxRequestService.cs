@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -6,11 +8,11 @@ using System.Net.Http;
 using System.Text;
 using System.Web;
 
-using net.boilingwater.Framework.Common;
-using net.boilingwater.Framework.Common.Extensions;
-using net.boilingwater.Framework.Common.Logging;
 using net.boilingwater.Framework.Common.Setting;
-using net.boilingwater.Framework.Common.Utils;
+using net.boilingwater.Framework.Core;
+using net.boilingwater.Framework.Core.Extensions;
+using net.boilingwater.Framework.Core.Logging;
+using net.boilingwater.Framework.Core.Utils;
 
 namespace net.boilingwater.BusinessLogic.VoiceReadOut.Service
 {
@@ -30,7 +32,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadOut.Service
             var result = new MultiDic();
             try
             {
-                using (var speakersResponse = client.Send(CreateVoiceVoxSpeakersHttpRequest(setting)))
+                using (HttpResponseMessage speakersResponse = client.Send(CreateVoiceVoxSpeakersHttpRequest(setting)))
                 {
                     result["valid"] = speakersResponse.IsSuccessStatusCode;
                     result["statusCode"] = speakersResponse.StatusCode;
@@ -52,7 +54,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadOut.Service
                 }
                 else
                 {
-                    using var error = ex.Response.GetResponseStream();
+                    using Stream error = ex.Response.GetResponseStream();
                     using var streamReader = new StreamReader(error);
                     Log.Logger.Error(streamReader.ReadToEnd(), ex);
                 }
@@ -77,7 +79,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadOut.Service
             var result = new MultiDic();
             try
             {
-                using (var speakersResponse = client.Send(CreateVoiceVoxInitializeSpeakerHttpRequest(setting, speaker)))
+                using (HttpResponseMessage speakersResponse = client.Send(CreateVoiceVoxInitializeSpeakerHttpRequest(setting, speaker)))
                 {
                     result["valid"] = speakersResponse.IsSuccessStatusCode;
                     result["statusCode"] = speakersResponse.StatusCode;
@@ -93,7 +95,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadOut.Service
                 }
                 else
                 {
-                    using var error = ex.Response.GetResponseStream();
+                    using Stream error = ex.Response.GetResponseStream();
                     using var streamReader = new StreamReader(error);
                     Log.Logger.Error(streamReader.ReadToEnd(), ex);
                 }
@@ -119,7 +121,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadOut.Service
             var result = new MultiDic();
             try
             {
-                using (var audioQueryResponse = client.Send(CreateVoiceVoxAudioQueryHttpRequest(setting, message, speaker)))
+                using (HttpResponseMessage audioQueryResponse = client.Send(CreateVoiceVoxAudioQueryHttpRequest(setting, message, speaker)))
                 {
                     result["valid"] = audioQueryResponse.IsSuccessStatusCode;
                     result["statusCode"] = audioQueryResponse.StatusCode;
@@ -141,7 +143,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadOut.Service
                 }
                 else
                 {
-                    using var error = ex.Response.GetResponseStream();
+                    using Stream error = ex.Response.GetResponseStream();
                     using var streamReader = new StreamReader(error);
                     Log.Logger.Error(streamReader.ReadToEnd(), ex);
                 }
@@ -167,7 +169,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadOut.Service
             var result = new MultiDic();
             try
             {
-                using (var synthesisResponse = client.Send(CreateVoiceVoxSynthesisHttpRequest(setting, audioQueryDic, speaker)))
+                using (HttpResponseMessage synthesisResponse = client.Send(CreateVoiceVoxSynthesisHttpRequest(setting, audioQueryDic, speaker)))
                 {
                     result["valid"] = synthesisResponse.IsSuccessStatusCode;
                     result["statusCode"] = synthesisResponse.StatusCode;
@@ -190,7 +192,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadOut.Service
                 }
                 else
                 {
-                    using var error = ex.Response.GetResponseStream();
+                    using Stream error = ex.Response.GetResponseStream();
                     using var streamReader = new StreamReader(error);
                     Log.Logger.Error(streamReader.ReadToEnd(), ex);
                 }
@@ -235,7 +237,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadOut.Service
         /// <returns></returns>
         public static HttpRequestMessage CreateVoiceVoxInitializeSpeakerHttpRequest(MultiDic setting, string speaker)
         {
-            var query = HttpUtility.ParseQueryString("");
+            NameValueCollection query = HttpUtility.ParseQueryString("");
             query.Add(Settings.AsString("VoiceVox.Request.InitializeSpeaker.ParamName.Speaker"), speaker);
 
             return new HttpRequestMessage()
@@ -261,7 +263,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadOut.Service
         /// <returns></returns>
         public static HttpRequestMessage CreateVoiceVoxAudioQueryHttpRequest(MultiDic setting, string text, string speaker)
         {
-            var query = HttpUtility.ParseQueryString("");
+            NameValueCollection query = HttpUtility.ParseQueryString("");
             query.Add(Settings.AsString("VoiceVox.Request.AudioQuery.ParamName.Text"), text);
             query.Add(Settings.AsString("VoiceVox.Request.AudioQuery.ParamName.Speaker"), speaker);
 
@@ -288,7 +290,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadOut.Service
         /// <returns></returns>
         public static HttpRequestMessage CreateVoiceVoxSynthesisHttpRequest(MultiDic setting, MultiDic audioQueryDic, string speaker)
         {
-            var query = HttpUtility.ParseQueryString("");
+            NameValueCollection query = HttpUtility.ParseQueryString("");
             query.Add(Settings.AsString("VoiceVox.Request.Synthesis.ParamName.Speaker"), speaker);
 
             var message = new HttpRequestMessage()
@@ -305,7 +307,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadOut.Service
                 }.Uri
             };
 
-            foreach (var pair in Settings.AsMultiDic("VoiceVox.Request.Synthesis.Header"))
+            foreach (KeyValuePair<string, object?> pair in Settings.AsMultiDic("VoiceVox.Request.Synthesis.Header"))
             {
                 message.Headers.Add(pair.Key, CastUtil.ToString(pair.Value));
             }

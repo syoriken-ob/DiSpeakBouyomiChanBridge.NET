@@ -8,9 +8,9 @@ using Discord.WebSocket;
 
 using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Service;
 using net.boilingwater.Application.DiSpeakBouyomiChanBridge.InternalDiscordClient.Services;
-using net.boilingwater.Framework.Common.Extensions;
-using net.boilingwater.Framework.Common.Logging;
 using net.boilingwater.Framework.Common.Setting;
+using net.boilingwater.Framework.Core.Extensions;
+using net.boilingwater.Framework.Core.Logging;
 
 namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.InternalDiscordClient
 {
@@ -111,7 +111,7 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.InternalDiscordC
                 return;
             }
 
-            var state = DiscordUserVoiceStateUpdatedService.DetectVoiceStateUpdate(sourceVoiceState, targetVoiceState);
+            DiscordUserVoiceStateUpdatedService.VoiceState state = DiscordUserVoiceStateUpdatedService.DetectVoiceStateUpdate(sourceVoiceState, targetVoiceState);
 
             switch (state)
             {

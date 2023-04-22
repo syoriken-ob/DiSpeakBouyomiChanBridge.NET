@@ -1,7 +1,7 @@
 ﻿using Discord.WebSocket;
 
 using net.boilingwater.Framework.Common.Setting;
-using net.boilingwater.Framework.Common.Utils;
+using net.boilingwater.Framework.Core.Utils;
 
 namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.InternalDiscordClient.Services
 {

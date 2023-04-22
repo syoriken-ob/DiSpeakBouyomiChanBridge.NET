@@ -23,10 +23,7 @@ namespace net.boilingwater.external.VBanProtocolEmitter
         /// <summary>
         /// 送信を開始する
         /// </summary>
-        public void Start()
-        {
-            _emitter.StartEmittion();
-        }
+        public void Start() => _emitter.StartEmittion();
 
         /// <summary>
         /// 送信を終了する
@@ -34,7 +31,6 @@ namespace net.boilingwater.external.VBanProtocolEmitter
         public void Dispose()
         {
             GC.SuppressFinalize(this);
-            _emitter.Close();
             _emitter.Dispose();
         }
 

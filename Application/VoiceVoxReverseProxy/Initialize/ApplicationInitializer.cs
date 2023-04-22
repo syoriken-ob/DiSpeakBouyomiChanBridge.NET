@@ -1,7 +1,8 @@
 ﻿using net.boilingwater.Application.VoiceVoxReverseProxy.Http;
 using net.boilingwater.Framework.Common.Initialize;
-using net.boilingwater.Framework.Common.Logging;
 using net.boilingwater.Framework.Common.Setting;
+using net.boilingwater.Framework.Core.Initialize;
+using net.boilingwater.Framework.Core.Logging;
 
 namespace net.boilingwater.Application.VoiceVoxReverseProxy
 {
@@ -13,6 +14,7 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy
         /// <exception cref="ApplicationException"></exception>
         internal static void Initialize()
         {
+            CoreInitializer.Initialize();
             CommonInitializer.Initialize();
             Log.Logger.Info(Settings.AsString("Message.Log.Initialize.Start"));
 

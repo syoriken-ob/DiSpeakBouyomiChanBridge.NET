@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Threading;
 
 using net.boilingwater.external.AudioPlay;
-using net.boilingwater.Framework.Common.Logging;
+using net.boilingwater.Framework.Core.Logging;
 
 namespace net.boilingwater.BusinessLogic.VoiceReadOut.VoiceExecutor
 {

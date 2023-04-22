@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 
 using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Impl;
-using net.boilingwater.Framework.Common.Logging;
+using net.boilingwater.Framework.Core.Logging;
 
 namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.PipeLine
 {
