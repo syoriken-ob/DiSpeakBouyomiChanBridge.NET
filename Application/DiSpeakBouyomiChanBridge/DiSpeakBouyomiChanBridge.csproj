@@ -5,15 +5,15 @@
     <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>net.boilingwater.Application.DiSpeakBouyomiChanBridge</RootNamespace>
     <AssemblyName>net.boilingwater.Application.DiSpeakBouyomiChanBridge</AssemblyName>
-    <StartupObject>net.boilingwater.Application.DiSpeakBouyomiChanBridge.DiSpeakBoouyomiChanBridge</StartupObject>
+    <StartupObject>net.boilingwater.Application.DiSpeakBouyomiChanBridge.DiSpeakBouyomiChanBridge</StartupObject>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <Nullable>enable</Nullable>
-    <Version>9.1.0</Version>
+    <Version>9.2.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Discord.Net" Version="3.7.2" />
+    <PackageReference Include="Discord.Net" Version="3.11.0" />
   </ItemGroup>
 
   <ItemGroup>
