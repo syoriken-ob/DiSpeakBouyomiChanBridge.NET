@@ -7,7 +7,7 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge
     /// <summary>
     /// DiSpeakBouyomiChanBridge エントリーポイントのクラス
     /// </summary>
-    public class DiSpeakBoouyomiChanBridge
+    public class DiSpeakBouyomiChanBridge
     {
         /// <summary>
         /// アプリケーションを実行します
