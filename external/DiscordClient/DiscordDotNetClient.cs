@@ -42,6 +42,7 @@ namespace net.boilingwater.external.DiscordClient
                 LogLevel = LogSeverity.Debug,
                 ConnectionTimeout = int.MaxValue,
                 AlwaysDownloadUsers = true,
+                GatewayIntents = GatewayIntents.All
             });
             Commands = new CommandService();
             ServicesProvider = new ServiceCollection().BuildServiceProvider();

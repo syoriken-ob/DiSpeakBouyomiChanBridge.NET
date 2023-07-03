@@ -23,7 +23,7 @@ namespace net.boilingwater.external.VBanProtocolEmitter
         /// <summary>
         /// 送信を開始する
         /// </summary>
-        public void Start() => _emitter.StartEmittion();
+        public void Start() => _emitter.StartEmitting();
 
         /// <summary>
         /// 送信を終了する
@@ -38,12 +38,12 @@ namespace net.boilingwater.external.VBanProtocolEmitter
         /// 送信する音声データを登録します
         /// </summary>
         /// <param name="audioBytes"></param>
-        public void RegisterEmissionData(byte[] audioBytes)
+        public void RegisterEmittingData(byte[] audioBytes)
         {
             var arr = audioBytes.Skip(WaveFileHeaderDataLength).Chunk(Config.MaxDataSize).ToArray();
             foreach (var audioByte in arr)
             {
-                _emitter.RegisterVbanPacket(new VbanPacket(Config, audioByte));
+                _emitter.RegisterVBanPacket(new VBanPacket(Config, audioByte));
             }
         }
     }

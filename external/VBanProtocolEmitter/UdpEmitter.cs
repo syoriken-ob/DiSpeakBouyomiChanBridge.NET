@@ -9,7 +9,7 @@ namespace net.boilingwater.external.VBanProtocolEmitter
 {
     internal class UdpEmitter : HighResolutionTimer
     {
-        private readonly BlockingCollection<VbanPacket> _vbanPacketsBuffers;
+        private readonly BlockingCollection<VBanPacket> _vbanPacketsBuffers;
 
         private readonly EmitterConfig _config;
 
@@ -23,16 +23,16 @@ namespace net.boilingwater.external.VBanProtocolEmitter
         {
             _config = config;
 
-            _vbanPacketsBuffers = new(new ConcurrentQueue<VbanPacket>());
+            _vbanPacketsBuffers = new(new ConcurrentQueue<VBanPacket>());
             _udpClient = new();
 
-            this.Elapsed += OnElapsed_EmitVBAN;
+            this.Elapsed += OnElapsed_EmitVBan;
         }
 
         /// <summary>
         /// 送信を開始する
         /// </summary>
-        public void StartEmittion()
+        public void StartEmitting()
         {
             _udpClient.Connect(_config.Host, _config.Port);
             Start(DateTime.UtcNow);
@@ -42,13 +42,13 @@ namespace net.boilingwater.external.VBanProtocolEmitter
         /// 送信用VBANパケットを登録します。
         /// </summary>
         /// <param name="packet"></param>
-        public void RegisterVbanPacket(VbanPacket packet) => _vbanPacketsBuffers.TryAdd(packet, -1);
+        public void RegisterVBanPacket(VBanPacket packet) => _vbanPacketsBuffers.TryAdd(packet, -1);
 
         /// <summary>
         /// VBANパケットをUDPで送信します。
         /// </summary>
         /// <param name="packet"></param>
-        private void SendPacket(VbanPacket packet)
+        private void SendPacket(VBanPacket packet)
         {
             try
             {
@@ -58,13 +58,13 @@ namespace net.boilingwater.external.VBanProtocolEmitter
             catch { /* エラーは握りつぶす（TODO:どうにかする） */ }
         }
 
-        private void OnElapsed_EmitVBAN(object? sender, EventArgs? e)
+        private void OnElapsed_EmitVBan(object? sender, EventArgs? e)
         {
             for (var i = 0; i < _config.BufferPacketCount; i++)
             {
-                if (!_vbanPacketsBuffers.TryTake(out VbanPacket? packet, 2))
+                if (!_vbanPacketsBuffers.TryTake(out VBanPacket? packet, 2))
                 {
-                    packet = new VbanPacket(_config);
+                    packet = new VBanPacket(_config);
                 }
 
                 SendPacket(packet);

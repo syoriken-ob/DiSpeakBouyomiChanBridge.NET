@@ -8,9 +8,9 @@ namespace net.boilingwater.external.VBanProtocolEmitter.Structs
     /// <summary>
     /// VBANパケットの構造体
     /// </summary>
-    internal class VbanPacket
+    internal class VBanPacket
     {
-        public VbanHeader Header { get; private set; }
+        public VBanHeader Header { get; private set; }
 
         public byte[] Data { get; private set; }
 
@@ -18,10 +18,10 @@ namespace net.boilingwater.external.VBanProtocolEmitter.Structs
         /// 送信用設定からデータ部が空のVBANパケットを作成します。
         ///</summary>
         /// <param name="config">VBANProtocol送信用設定</param>
-        public VbanPacket(EmitterConfig config)
+        public VBanPacket(EmitterConfig config)
         {
             Data = new byte[config.MaxDataSize];
-            Header = CreateVbanHeader(config, Data.Length);
+            Header = CreateVBanHeader(config, Data.Length);
         }
 
         ///<summary>
@@ -29,11 +29,11 @@ namespace net.boilingwater.external.VBanProtocolEmitter.Structs
         ///</summary>
         /// <param name="config">VBANProtocol送信用設定</param>
         /// <param name="audioBytes">送信オーディオデータ配列</param>
-        public VbanPacket(EmitterConfig config, byte[] audioBytes)
+        public VBanPacket(EmitterConfig config, byte[] audioBytes)
         {
             Data = new byte[config.MaxDataSize];
             Buffer.BlockCopy(audioBytes, 0, Data, 0, audioBytes.Length);
-            Header = CreateVbanHeader(config, Data.Length);
+            Header = CreateVBanHeader(config, Data.Length);
         }
 
         /// <summary>
@@ -61,15 +61,15 @@ namespace net.boilingwater.external.VBanProtocolEmitter.Structs
         /// <param name="config">VBANProtocol送信用設定</param>
         /// <param name="dataLength">データ部パケット長さ</param>
         /// <returns></returns>
-        private static VbanHeader CreateVbanHeader(EmitterConfig config, int dataLength)
+        private static VBanHeader CreateVBanHeader(EmitterConfig config, int dataLength)
         {
-            return new VbanHeader(
+            return new VBanHeader(
                 config.FormatSamplingRate,
-                VbanHeader.SubProtocol.Audio,
+                VBanHeader.SubProtocol.Audio,
                 CalculateSampleCount(config, dataLength),
                 config.AudioChannelCount,
                 config.FormatBitDepth,
-                VbanHeader.Codec.PCM,
+                VBanHeader.Codec.PCM,
                 config.StreamName,
                 GetCounterValue()
             );
