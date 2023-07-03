@@ -39,7 +39,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadOut.VoiceExecutor
             {
                 throw new ArgumentNullException(nameof(audioStreamByteArray));
             }
-            _vbanEmitter.RegisterEmissionData(audioStreamByteArray);
+            _vbanEmitter.RegisterEmittingData(audioStreamByteArray);
         }
     }
 }

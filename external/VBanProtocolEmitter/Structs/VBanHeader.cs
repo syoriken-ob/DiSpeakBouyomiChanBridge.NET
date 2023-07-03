@@ -2,7 +2,7 @@
 
 namespace net.boilingwater.external.VBanProtocolEmitter.Stricts
 {
-    public readonly struct VbanHeader
+    public readonly struct VBanHeader
     {
         private readonly char[] vban = { 'V', 'B', 'A', 'N' };
 
@@ -15,7 +15,7 @@ namespace net.boilingwater.external.VBanProtocolEmitter.Stricts
         private readonly char[] streamName;
         private readonly uint counter;
 
-        public VbanHeader(FormatSamplingRate samplingRate, SubProtocol subProtocol, byte sampleCount, byte channel, FormatBitDepth bitDepth, Codec codec, string streamName, uint counter)
+        public VBanHeader(FormatSamplingRate samplingRate, SubProtocol subProtocol, byte sampleCount, byte channel, FormatBitDepth bitDepth, Codec codec, string streamName, uint counter)
         {
             this.samplingRate = samplingRate;
             this.subProtocol = subProtocol;

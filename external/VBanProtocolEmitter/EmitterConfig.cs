@@ -2,7 +2,7 @@
 
 using net.boilingwater.external.VBanProtocolEmitter.Const;
 
-using static net.boilingwater.external.VBanProtocolEmitter.Stricts.VbanHeader;
+using static net.boilingwater.external.VBanProtocolEmitter.Stricts.VBanHeader;
 
 namespace net.boilingwater.external.VBanProtocolEmitter
 {
