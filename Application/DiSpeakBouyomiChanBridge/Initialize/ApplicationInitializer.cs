@@ -85,7 +85,7 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge
         {
             if (_client != null && _client.InnerClient != null)
             {
-                _client.StopAsync().GetAwaiter().GetResult();
+                _ = _client.StopAsync();
             }
 
             if (Settings.AsBoolean("Use.InternalDiscordClient"))

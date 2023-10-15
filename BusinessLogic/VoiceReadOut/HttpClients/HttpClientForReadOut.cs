@@ -26,6 +26,10 @@ namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients
         /// </summary>
         /// <typeparam name="T"><see cref="HttpClientForReadOut"/>を継承した型</typeparam>
         /// <returns></returns>
-        public static void Initialize<T>() where T : HttpClientForReadOut => Instance = (HttpClientForReadOut?)Activator.CreateInstance(typeof(T));
+        public static void Initialize<T>() where T : HttpClientForReadOut
+        {
+            Instance?.Dispose();
+            Instance = (HttpClientForReadOut?)Activator.CreateInstance(typeof(T));
+        }
     }
 }

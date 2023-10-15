@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
@@ -173,14 +172,15 @@ namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl
         /// <summary>
         /// VoiceVoxAPI[initialize_speaker]に通信し、話者の初期化を行います。
         /// </summary>
+        /// <remarks>
+        /// 既定話者のみ初期化を行います。
+        /// </remarks>
         private void InitializeVoiceVoxSpeaker()
         {
-            foreach (KeyValuePair<string, string?> pair in VoiceVoxSpeakers)
-            {
-                Log.Logger.Debug($"VoiceVox話者：{pair.Key}を初期化します。");
-                MultiDic result = VoiceVoxRequestService.SendVoiceVoxInitializeSpeakerRequest(Client, RequestSetting, CastUtil.ToString(pair.Value));
-                Log.Logger.Debug($"VoiceVox話者：{pair.Key}の初期化に{(result.GetAsBoolean("valid") ? "成功" : "失敗")}しました。");
-            }
+            var defaultSpeakerId = Settings.AsString("VoiceVox.DefaultSpeaker");
+            Log.Logger.Debug($"VoiceVox既定話者(id={defaultSpeakerId})を初期化します。");
+            MultiDic result = VoiceVoxRequestService.SendVoiceVoxInitializeSpeakerRequest(Client, RequestSetting, defaultSpeakerId);
+            Log.Logger.Debug($"VoiceVox既定話者(id={defaultSpeakerId})の初期化に{(result.GetAsBoolean("valid") ? "成功" : "失敗")}しました。");
         }
 
         /// <summary>

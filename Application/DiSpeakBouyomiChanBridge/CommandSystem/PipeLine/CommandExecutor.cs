@@ -70,7 +70,7 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Pi
         /// <summary>
         /// リソースを解放します
         /// </summary>
-        void IDisposable.Dispose()
+        public void Dispose()
         {
             if (_thread != null)
             {
