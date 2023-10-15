@@ -60,15 +60,33 @@ namespace net.boilingwater.external.VBanProtocolEmitter
 
         private void OnElapsed_EmitVBan(object? sender, EventArgs? e)
         {
-            for (var i = 0; i < _config.BufferPacketCount; i++)
+            lock (_vbanPacketsBuffers)
             {
-                if (!_vbanPacketsBuffers.TryTake(out VBanPacket? packet, 2))
+                for (var i = 0; i < _config.BufferPacketCount; i++)
                 {
-                    packet = new VBanPacket(_config);
-                }
+                    if (!_vbanPacketsBuffers.TryTake(out VBanPacket? packet, 2))
+                    {
+                        packet = new VBanPacket(_config);
+                    }
 
-                SendPacket(packet);
+                    SendPacket(packet);
+                }
             }
+        }
+
+        public override void Dispose()
+        {
+            try
+            {
+                base.Dispose();
+                _udpClient.Dispose();
+                _udpClient.Close();
+                lock (_vbanPacketsBuffers)
+                {
+                    _vbanPacketsBuffers.Dispose();
+                }
+            }
+            catch { }
         }
     }
 }

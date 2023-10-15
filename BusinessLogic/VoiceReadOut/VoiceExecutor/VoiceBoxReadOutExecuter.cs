@@ -2,12 +2,14 @@
 
 namespace net.boilingwater.BusinessLogic.VoiceReadOut.VoiceExecutor
 {
-    public abstract class VoiceVoxReadOutExecutor
+    public abstract class VoiceVoxReadOutExecutor : IDisposable
     {
         /// <summary>
         /// シングルトンインスタンス
         /// </summary>
         public static VoiceVoxReadOutExecutor? Instance { get; private set; }
+
+        public abstract void Dispose();
 
         /// <summary>
         /// VoiceVoxで生成した音声データのバイト配列を再生キューに追加します。
@@ -21,6 +23,10 @@ namespace net.boilingwater.BusinessLogic.VoiceReadOut.VoiceExecutor
         /// </summary>
         /// <typeparam name="T"><see cref="VoiceVoxReadOutExecutor"/>を継承した型</typeparam>
         /// <returns></returns>
-        public static void Initialize<T>() where T : VoiceVoxReadOutExecutor => Instance = (VoiceVoxReadOutExecutor?)Activator.CreateInstance(typeof(T));
+        public static void Initialize<T>() where T : VoiceVoxReadOutExecutor
+        {
+            Instance?.Dispose();
+            Instance = (VoiceVoxReadOutExecutor?)Activator.CreateInstance(typeof(T));
+        }
     }
 }

@@ -53,5 +53,21 @@ namespace net.boilingwater.BusinessLogic.VoiceReadOut.VoiceExecutor
             }
             _audioStreamByteArrays.Add(audioStreamByteArray);
         }
+
+        public override void Dispose()
+        {
+            try
+            {
+                _thread.Interrupt();
+            }
+            catch
+            {
+                //何もしない
+            }
+            finally
+            {
+                _audioStreamByteArrays.Dispose();
+            }
+        }
     }
 }
