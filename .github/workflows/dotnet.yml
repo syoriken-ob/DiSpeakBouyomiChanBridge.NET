@@ -17,6 +17,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
       with:
+        token: ${{ secrets.TOKEN_FOR_GITHUB_ACTION }}
         submodules: true
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
