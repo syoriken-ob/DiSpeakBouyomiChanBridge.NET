@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 using net.boilingwater.external.VBanProtocolEmitter;
 using net.boilingwater.Framework.Common.Setting;
@@ -40,6 +41,18 @@ namespace net.boilingwater.BusinessLogic.VoiceReadOut.VoiceExecutor
                 throw new ArgumentNullException(nameof(audioStreamByteArray));
             }
             _vbanEmitter.RegisterEmittingData(audioStreamByteArray);
+        }
+
+        public override void Dispose()
+        {
+            try
+            {
+                _vbanEmitter.Dispose();
+            }
+            catch
+            {
+                //何もしない
+            }
         }
     }
 }
