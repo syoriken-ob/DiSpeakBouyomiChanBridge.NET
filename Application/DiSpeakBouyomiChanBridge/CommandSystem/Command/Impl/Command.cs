@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using RegularExpression = System.Text.RegularExpressions.Regex;
 
-using net.boilingwater.BusinessLogic.VoiceReadout.HttpClients;
+using net.boilingwater.BusinessLogic.VoiceReadOut.Service;
 using net.boilingwater.Framework.Common.Setting;
 using net.boilingwater.Framework.Core.Extensions;
 using net.boilingwater.Framework.Core.Logging;
 using net.boilingwater.Framework.Core.Utils;
+
+using RegularExpression = System.Text.RegularExpressions.Regex;
 
 namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Impl
 {
@@ -145,7 +146,7 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Im
                 if (!string.IsNullOrEmpty(ExecutionComment))
                 {
                     Log.Logger.Info($"{CommandTitle} - {ExecutionComment}");
-                    HttpClientForReadOut.Instance?.ReadOut(ExecutionComment);
+                    MessageReadOutService.ReadOutMessage(ExecutionComment);
                 }
 
                 p.ErrorDataReceived += ErrorDataReceivedHandler;
@@ -181,19 +182,19 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Im
 
                 if (!string.IsNullOrEmpty(CompleteComment))
                 {
-                    HttpClientForReadOut.Instance?.ReadOut(CompleteComment);
+                    MessageReadOutService.ReadOutMessage(CompleteComment);
                 }
                 ExecuteProcess = null;
             }
             catch (InvalidOperationException e)
             {
                 Log.Logger.Info($"\"{CommandTitle}\" Command has been Killed.", e);
-                HttpClientForReadOut.Instance?.ReadOut(Settings.AsString("Message.ErrorOccurrence"));
+                MessageReadOutService.ReadOutMessage(Settings.AsString("Message.ErrorOccurrence"));
             }
             catch (Exception e)
             {
                 Log.Logger.Error($"Couldn't run \"{CommandTitle}\" Command", e);
-                HttpClientForReadOut.Instance?.ReadOut(Settings.AsString("Message.ErrorOccurrence"));
+                MessageReadOutService.ReadOutMessage(Settings.AsString("Message.ErrorOccurrence"));
             }
         }
 

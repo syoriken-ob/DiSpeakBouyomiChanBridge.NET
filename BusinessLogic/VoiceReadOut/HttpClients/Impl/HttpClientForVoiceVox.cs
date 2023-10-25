@@ -2,9 +2,9 @@
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Net;
-using System.Text.RegularExpressions;
-using System.Threading;
+using System.Threading.Tasks;
 
+using net.boilingwater.BusinessLogic.VoiceReadOut.Dto;
 using net.boilingwater.BusinessLogic.VoiceReadOut.Service;
 using net.boilingwater.BusinessLogic.VoiceReadOut.VoiceExecutor;
 using net.boilingwater.Framework.Common.Setting;
@@ -20,9 +20,8 @@ namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl
     /// </summary>
     public class HttpClientForVoiceVox : HttpClientForReadOut
     {
-        private static Regex SpeakerRegex { get; set; } = new Regex(@"^(?<speaker_id>\w{1,2})\)", RegexOptions.Compiled);
-        private readonly Thread _thread;
-        private readonly BlockingCollection<string> _receivedMessages = new();
+        private Task Task { get; init; }
+        private BlockingCollection<MessageDto> ReceivedMessages { get; init; } = new();
         private MultiDic RequestSetting { get; set; }
         private SimpleDic<string> VoiceVoxSpeakers { get; set; }
 
@@ -40,21 +39,24 @@ namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl
             VoiceVoxSpeakers = FetchEnableVoiceVoxSpeaker();
             InitializeVoiceVoxSpeaker();
 
-            _thread = new Thread(() =>
+            Task = Task.Factory.StartNew((obj) =>
             {
-                foreach (var message in _receivedMessages.GetConsumingEnumerable())
+                foreach (MessageDto message in ReceivedMessages.GetConsumingEnumerable())
                 {
                     try
                     {
-                        var tempMessage = message;
-
-                        foreach (var splittedMessage in tempMessage.Split(new[] { '\n', '。' }))
+                        foreach (InlineMessageDto inlineMessage in message.InlineMessages)
                         {
-                            var trimmed = splittedMessage.Trim();
-                            if (trimmed.HasValue())
+                            var speakerKey = inlineMessage.SpeakerKey.HasValue() ? inlineMessage.SpeakerKey : message.UserDefaultSpeakerKey;
+
+                            if (!VoiceVoxSpeakers.ContainsKey(speakerKey))
                             {
-                                ExecuteReadOut(trimmed);
+                                //マッピングされた話者がいなかったら既定設定で読み上げ
+                                ExecuteReadOut(inlineMessage.Message, Settings.AsString("VoiceVox.DefaultSpeaker"), "");
+                                continue;
                             }
+
+                            ExecuteReadOut(inlineMessage.Message, VoiceVoxSpeakers[speakerKey]!, speakerKey);
                         }
                     }
                     catch (Exception ex)
@@ -62,44 +64,35 @@ namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl
                         Log.Logger.Error(ex);
                     }
                 }
-            })
-            {
-                IsBackground = true
-            };
-            _thread.Start();
+            }, null, TaskCreationOptions.LongRunning);
         }
 
-        /// <summary>
-        /// メッセージを読み上げます
-        /// <para>読み上げ処理に時間がかかるため、受付以降のVOICEVOXとの通信・メッセージ生成処理・再生処理は別スレッドで実行します。</para>
-        /// </summary>
-        /// <param name="text">読み上げたいテキスト</param>
-        public override void ReadOut(string text)
+        /// <inheritdoc/>
+        public override void ReadOut(MessageDto message)
         {
-            var message = text.Trim();
-            if (message.HasValue())
+            if (ReceivedMessages.IsAddingCompleted)
             {
-                _receivedMessages.Add(message);
+                return;
             }
+            ReceivedMessages.Add(message);
         }
 
         /// <summary>
         /// VOICEVOXと通信して読み上げます。
         /// </summary>
         /// <param name="message">VOICEVOXに読み上げるメッセージ</param>
-        private void ExecuteReadOut(string message)
+        private void ExecuteReadOut(string message, string speakerId, string speakerKey)
         {
             var retryCount = 0L;
             while (true)
             {
-                var speaker = ExtractVoiceVoxSpeaker(ref message, out var speakerKey);
-
-                MultiDic audioQueryResult = VoiceVoxRequestService.SendVoiceVoxAudioQueryRequest(Client, RequestSetting, message, speaker);
+                MultiDic audioQueryResult = VoiceVoxRequestService.SendVoiceVoxAudioQueryRequest(Client, RequestSetting, message, speakerId);
                 if (audioQueryResult.ContainsKey("statusCode"))
                 {
                     HttpStatusCode statusCode = audioQueryResult.GetAsObject<HttpStatusCode>("statusCode");
                     Log.Logger.Debug($"Send AudioQuery: {(int)statusCode}-{statusCode}");
                 }
+
                 if (!audioQueryResult.GetAsBoolean("valid"))
                 {
                     Log.Logger.Fatal($"Fail to Send Message to VoiceVox[audio_query]: {message}");
@@ -113,7 +106,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl
                 MultiDic audioQuery = audioQueryResult.GetAsMultiDic("audioQuery");
                 VoiceVoxRequestService.ReplaceAudioQueryJson(audioQuery, speakerKey);
 
-                MultiDic synthesisResult = VoiceVoxRequestService.SendVoiceVoxSynthesisRequest(Client, RequestSetting, audioQuery, speaker);
+                MultiDic synthesisResult = VoiceVoxRequestService.SendVoiceVoxSynthesisRequest(Client, RequestSetting, audioQuery, speakerId);
                 if (synthesisResult.ContainsKey("statusCode"))
                 {
                     HttpStatusCode statusCode = synthesisResult.GetAsObject<HttpStatusCode>("statusCode");
@@ -173,6 +166,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl
         /// VoiceVoxAPI[initialize_speaker]に通信し、話者の初期化を行います。
         /// </summary>
         /// <remarks>
+        ///
         /// 既定話者のみ初期化を行います。
         /// </remarks>
         private void InitializeVoiceVoxSpeaker()
@@ -183,35 +177,12 @@ namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl
             Log.Logger.Debug($"VoiceVox既定話者(id={defaultSpeakerId})の初期化に{(result.GetAsBoolean("valid") ? "成功" : "失敗")}しました。");
         }
 
-        /// <summary>
-        /// メッセージ中のVoiceVox話者を抽出します。
-        /// </summary>
-        /// <param name="message">読み上げメッセージ</param>
-        /// <returns>VoiceVox話者ID</returns>
-        private string ExtractVoiceVoxSpeaker(ref string message, out string speakerKey)
+        public override void Dispose()
         {
-            speakerKey = "";
-            Match match = SpeakerRegex.Match(message);
-            if (!match.Success)
-            {
-                return Settings.AsString("VoiceVox.DefaultSpeaker");
-            }
-
-            Group speakerId = match.Groups["speaker_id"];
-
-            if (speakerId == null)
-            {
-                return Settings.AsString("VoiceVox.DefaultSpeaker");
-            }
-
-            if (!VoiceVoxSpeakers.ContainsKey(speakerId.Value))
-            {
-                return Settings.AsString("VoiceVox.DefaultSpeaker");
-            }
-
-            message = message.Replace(match.Value, "");
-            speakerKey = speakerId.Value;
-            return VoiceVoxSpeakers[speakerId.Value] ?? Settings.AsString("VoiceVox.DefaultSpeaker");
+            ReceivedMessages.CompleteAdding();
+            ReceivedMessages.TakeWhile(m => true);
+            Task.Dispose();
+            base.Dispose();
         }
     }
 }

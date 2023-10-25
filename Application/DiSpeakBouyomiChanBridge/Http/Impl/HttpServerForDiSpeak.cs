@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Net.Http;
 
+using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Dto;
 using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Service;
 using net.boilingwater.Framework.Common.Http;
 using net.boilingwater.Framework.Common.Setting;
@@ -46,7 +47,7 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.Http.Impl
 
             Log.Logger.Debug($"Receive({GetType().Name}) :{message}");
 
-            CommandHandlingService.Handle(message);
+            CommandHandlingService.Handle(new CommandHandlingContext(message));
         }
     }
 

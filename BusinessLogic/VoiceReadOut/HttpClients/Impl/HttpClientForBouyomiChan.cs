@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 
+using net.boilingwater.BusinessLogic.VoiceReadOut.Dto;
 using net.boilingwater.Framework.Common.Setting;
 using net.boilingwater.Framework.Core.Extensions;
 using net.boilingwater.Framework.Core.Logging;
@@ -18,7 +19,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl
         /// 棒読みちゃんにメッセージを送信します。
         /// </summary>
         /// <param name="text">送信するメッセージ</param>
-        public override void ReadOut(string text)
+        public void ReadOut(string text)
         {
             var sendMessage = text.Trim();
             if (sendMessage.HasValue())
@@ -66,5 +67,8 @@ namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl
             Method = HttpMethod.Get,
             RequestUri = new Uri($"http://{Settings.AsString("BouyomiChanHost")}:{Settings.AsString("BouyomiChanPort")}/talk?text={Uri.EscapeDataString(text)}")
         };
+
+        /// <inheritdoc/>
+        public override void ReadOut(MessageDto message) => ReadOut(string.Join("\n", message.InlineMessages));
     }
 }

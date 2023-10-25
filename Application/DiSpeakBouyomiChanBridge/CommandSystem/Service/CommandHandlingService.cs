@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Threading.Tasks;
 
+using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Dto;
 using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Handle;
 using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Handle.Impl;
-using net.boilingwater.BusinessLogic.VoiceReadout.HttpClients;
+using net.boilingwater.BusinessLogic.VoiceReadOut.Service;
 using net.boilingwater.Framework.Common.Setting;
 using net.boilingwater.Framework.Core.Logging;
 
@@ -23,27 +25,32 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Se
         /// <summary>
         /// 渡される文字列からコマンドを検出します。
         /// </summary>
-        /// <param name="message"></param>
+        /// <param name="context">コマンド検出コンテキスト</param>
         /// <exception cref="InvalidOperationException">
         ///     <see cref="Initialize()"/>を先に呼び出していない場合発生します
         /// </exception>
-        public static void Handle(string message)
+        public static void Handle(CommandHandlingContext context)
         {
             if (_handler == null)
             {
                 throw new InvalidOperationException("コマンドハンドラの初期化が行われていません。");
             }
-            try
+
+            // コマンドハンドリング処理は別スレッドにて非同期実行
+            Task.Run(() =>
             {
-                _handler.ExecutePreProcess(ref message);
-                _handler.Handle(ref message);
-                _handler.ExecutePostProcess(ref message);
-            }
-            catch (Exception ex)
-            {
-                Log.Logger.Error("Error！", ex);
-                HttpClientForReadOut.Instance?.ReadOut(Settings.AsString("Message.ErrorOccurrence.CommandHandle"));
-            }
+                try
+                {
+                    _handler.ExecutePreProcess(context);
+                    _handler.Handle(context);
+                    _handler.ExecutePostProcess(context);
+                }
+                catch (Exception ex)
+                {
+                    Log.Logger.Error("Error！", ex);
+                    MessageReadOutService.ReadOutMessage(Settings.AsString("Message.ErrorOccurrence.CommandHandle"));
+                }
+            });
         }
     }
 }
