@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    ==========================
+    == ユーザー固有処理設定 ==
+    ==========================
+-->
+<Settings>
+  <!--
+      ################################
+      ## 各種読み上げメッセージ定義 ##
+      ################################
+  -->
+  <Item key="Format.User.RegisterUserSpeakerSetting"         value="ユーザーID（{0}）の既定話者情報として{1}を登録しました。次回以降自動的にその話者で読み上げが実行されます。" />
+  <Item key="Format.User.DeleteUserSpeakerSetting"           value="ユーザーID（{0}）の既定話者情報の登録を解除しました。" />
+  <Item key="Format.User.NotRegisteredUserSpeakerSetting"    value="ユーザーID（{0}）の既定話者情報は登録されていません。" />
+</Settings>

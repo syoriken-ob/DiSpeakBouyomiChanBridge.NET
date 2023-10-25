@@ -6,6 +6,7 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 
+using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Dto;
 using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Service;
 using net.boilingwater.Application.DiSpeakBouyomiChanBridge.InternalDiscordClient.Services;
 using net.boilingwater.Framework.Common.Setting;
@@ -77,7 +78,7 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.InternalDiscordC
 
             var formattedMessage = DiscordReceivedMessageService.GetFormattedMessage(context);
 
-            CommandHandlingService.Handle(formattedMessage);
+            CommandHandlingService.Handle(new CommandHandlingContext(formattedMessage, context.User.Id.ToString()));
 
             await Task.CompletedTask;
         }
@@ -116,33 +117,38 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.InternalDiscordC
             switch (state)
             {
                 case DiscordUserVoiceStateUpdatedService.VoiceState.JOIN:
-                    CommandHandlingService.Handle(
-                        DiscordUserVoiceStateUpdatedService.GetJoinVoiceChannelMessage(guildUser, sourceVoiceState, targetVoiceState)
-                    );
+                    CommandHandlingService.Handle(new CommandHandlingContext(
+                        DiscordUserVoiceStateUpdatedService.GetJoinVoiceChannelMessage(guildUser, sourceVoiceState, targetVoiceState),
+                        guildUser.Id.ToString()
+                    ));
                     break;
 
                 case DiscordUserVoiceStateUpdatedService.VoiceState.LEAVE:
-                    CommandHandlingService.Handle(
-                        DiscordUserVoiceStateUpdatedService.GetLeaveVoiceChannelMessage(guildUser, sourceVoiceState, targetVoiceState)
-                    );
+                    CommandHandlingService.Handle(new CommandHandlingContext(
+                        DiscordUserVoiceStateUpdatedService.GetLeaveVoiceChannelMessage(guildUser, sourceVoiceState, targetVoiceState),
+                        guildUser.Id.ToString()
+                    ));
                     break;
 
                 case DiscordUserVoiceStateUpdatedService.VoiceState.MOVE:
-                    CommandHandlingService.Handle(
-                        DiscordUserVoiceStateUpdatedService.GetMoveVoiceChannelMessage(guildUser, sourceVoiceState, targetVoiceState)
-                    );
+                    CommandHandlingService.Handle(new CommandHandlingContext(
+                        DiscordUserVoiceStateUpdatedService.GetMoveVoiceChannelMessage(guildUser, sourceVoiceState, targetVoiceState),
+                        guildUser.Id.ToString()
+                    ));
                     break;
 
                 case DiscordUserVoiceStateUpdatedService.VoiceState.START_STREAMING:
-                    CommandHandlingService.Handle(
-                        DiscordUserVoiceStateUpdatedService.GetStartStreamingVoiceChannelMessage(guildUser, sourceVoiceState, targetVoiceState)
-                    );
+                    CommandHandlingService.Handle(new CommandHandlingContext(
+                        DiscordUserVoiceStateUpdatedService.GetStartStreamingVoiceChannelMessage(guildUser, sourceVoiceState, targetVoiceState),
+                        guildUser.Id.ToString()
+                    ));
                     break;
 
                 case DiscordUserVoiceStateUpdatedService.VoiceState.END_STREAMING:
-                    CommandHandlingService.Handle(
-                        DiscordUserVoiceStateUpdatedService.GetEndStreamingVoiceChannelMessage(guildUser, sourceVoiceState, targetVoiceState)
-                    );
+                    CommandHandlingService.Handle(new CommandHandlingContext(
+                        DiscordUserVoiceStateUpdatedService.GetEndStreamingVoiceChannelMessage(guildUser, sourceVoiceState, targetVoiceState),
+                        guildUser.Id.ToString()
+                    ));
                     break;
 
                 default:

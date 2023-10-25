@@ -7,9 +7,11 @@ using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Impl.F
 using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Service;
 using net.boilingwater.Application.DiSpeakBouyomiChanBridge.Http.Impl;
 using net.boilingwater.Application.DiSpeakBouyomiChanBridge.InternalDiscordClient;
+using net.boilingwater.BusinessLogic.Common.User.Service;
 using net.boilingwater.BusinessLogic.MessageReplacer.Service;
 using net.boilingwater.BusinessLogic.VoiceReadout.HttpClients;
 using net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl;
+using net.boilingwater.BusinessLogic.VoiceReadOut.Service;
 using net.boilingwater.BusinessLogic.VoiceReadOut.VoiceExecutor;
 using net.boilingwater.external.DiscordClient;
 using net.boilingwater.Framework.Common.Initialize;
@@ -34,13 +36,16 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge
             CommonInitializer.Initialize();
             Log.Logger.Info("アプリケーションの初期化処理を開始します。");
 
-            InitializeCommand();
-            InitializeReadOutService();
-            InitializeHttpServer();
-            CommandHandlingService.Initialize();
-            MessageReplaceService.Initialize();
+            InitializeBusinessLogic();
 
-            HttpClientForReadOut.Instance?.ReadOut(Settings.AsString("Message.FinishInitialize"));
+
+            InitializeCommand();
+            InitializeHttpServer();
+
+
+            CommandHandlingService.Initialize();
+
+            MessageReadOutService.ReadOutMessage(Settings.AsString("Message.FinishInitialize"));
             Log.Logger.Info("アプリケーションの初期化処理が完了しました。");
         }
 
@@ -51,6 +56,16 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge
         {
             CommandFactory.Factory.Initialize();
             SystemCommandFactory.Factory.Initialize();
+        }
+
+        /// <summary>
+        /// ビジネスロジック領域の初期化を行います。
+        /// </summary>
+        private static void InitializeBusinessLogic()
+        {
+            UserService.Initialize();
+            MessageReplaceService.Initialize();
+            InitializeReadOutService();
         }
 
         /// <summary>
@@ -90,7 +105,7 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge
 
             if (Settings.AsBoolean("Use.InternalDiscordClient"))
             {
-                HttpClientForReadOut.Instance?.ReadOut(Settings.AsString("Message.TryLoginToDiscord"));
+                MessageReadOutService.ReadOutMessage(Settings.AsString("Message.TryLoginToDiscord"));
 
                 _client = new();
                 _client.InitializeAsync().GetAwaiter().GetResult();
@@ -118,7 +133,7 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge
                     _client.UserVoiceStatusUpdated = discordEventHandler.UserVoiceStatusUpdated;
                 }
 
-                HttpClientForReadOut.Instance?.ReadOut(Settings.AsString("Message.SuccessLoginToDiscord"));
+                MessageReadOutService.ReadOutMessage(Settings.AsString("Message.SuccessLoginToDiscord"));
             }
             else
             {
@@ -155,7 +170,7 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge
                 HttpServerForCommon.Instance.Start();
             }
 
-            HttpClientForReadOut.Instance?.ReadOut(Settings.AsString("Message.Welcome"));
+            MessageReadOutService.ReadOutMessage(Settings.AsString("Message.Welcome"));
             awaiter?.GetResult();
         }
     }
