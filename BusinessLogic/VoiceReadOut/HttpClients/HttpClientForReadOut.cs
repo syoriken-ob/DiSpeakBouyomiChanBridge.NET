@@ -1,5 +1,6 @@
 ﻿using System;
 
+using net.boilingwater.BusinessLogic.VoiceReadOut.Dto;
 using net.boilingwater.Framework.Common.Http;
 
 namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients
@@ -7,7 +8,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients
     /// <summary>
     /// 読み上げ処理用の基底HttpClientクラス
     /// </summary>
-    public abstract class HttpClientForReadOut : AbstractHttpClient
+    public abstract class HttpClientForReadOut : AbstractHttpClient , IDisposable
     {
         /// <summary>
         /// シングルトンインスタンス
@@ -17,8 +18,8 @@ namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients
         /// <summary>
         /// メッセージを読み上げます。
         /// </summary>
-        /// <param name="text"></param>
-        public abstract void ReadOut(string text);
+        /// <param name="message">メッセージと話者キーを含んだDto</param>
+        public abstract void ReadOut(MessageDto message);
 
         /// <summary>
         /// 初期化処理

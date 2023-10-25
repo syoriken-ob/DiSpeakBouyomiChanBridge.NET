@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\BusinessLogic\Common.User\net.boilingwater.BusinessLogic.Common.User.csproj" />
     <ProjectReference Include="..\..\BusinessLogic\MessageReplacer\net.boilingwater.BusinessLogic.MessageReplacer.csproj" />
     <ProjectReference Include="..\..\BusinessLogic\VoiceReadOut\net.boilingwater.BusinessLogic.VoiceReadOut.csproj" />
     <ProjectReference Include="..\..\external\VBanProtocolEmitter\net.boilingwater.external.VBanProtocolEmitter.csproj" />
@@ -52,6 +53,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="settings\config\VoiceReadOut-Application-Setting.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="settings\config\User-Definition-Setting.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="settings\config\VoiceReadOut-Definition-Setting.xml">

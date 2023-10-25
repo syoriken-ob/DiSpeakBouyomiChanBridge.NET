@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 
 using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.PipeLine;
-using net.boilingwater.BusinessLogic.VoiceReadout.HttpClients;
+using net.boilingwater.BusinessLogic.VoiceReadOut.Service;
 using net.boilingwater.Framework.Common.Setting;
 using net.boilingwater.Framework.Core.Logging;
 
@@ -30,7 +30,7 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Im
             ApplicationInitializer.Initialize();
             ApplicationInitializer.Start();
             Log.Logger.Info("Reload SystemConfig...");
-            HttpClientForReadOut.Instance?.ReadOut(Settings.AsString("Message.ReloadConfig"));
+            MessageReadOutService.ReadOutMessage(Settings.AsString("Message.ReloadConfig"));
         }
     }
 
@@ -46,7 +46,7 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Im
         {
             CommandExecuteManager.Instance.ShutdownThreads();
             Log.Logger.Info("Shutdown CommandThreads...");
-            HttpClientForReadOut.Instance?.ReadOut(Settings.AsString("Message.DeleteAllExecutionQueues"));
+            MessageReadOutService.ReadOutMessage(Settings.AsString("Message.DeleteAllExecutionQueues"));
         }
     }
 
@@ -61,10 +61,10 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Im
         public override void Execute()
         {
             List<Command> commands = CommandExecuteManager.Instance.GetCommandsInQueue();
-            HttpClientForReadOut.Instance?.ReadOut(string.Format(Settings.AsString("Message.CommandsCount"), commands.Count));
+            MessageReadOutService.ReadOutMessage(string.Format(Settings.AsString("Message.CommandsCount"), commands.Count));
             for (var i = 0; i < commands.Count; i++)
             {
-                HttpClientForReadOut.Instance?.ReadOut(
+                MessageReadOutService.ReadOutMessage(
                     string.Format(
                         Settings.AsString("Message.CommandDetail"),
                         i,

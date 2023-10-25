@@ -342,7 +342,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadOut.Service
         public static void ReplaceAudioQueryJson(MultiDic audioQueryDic, string speakerKey)
         {
             MultiDic paramDic;
-            if (Settings.Get($"VoiceVox.Request.AudioQuery.ReplaceJsonParam.{speakerKey}").HasValue())
+            if (speakerKey.HasValue() && Settings.Get($"VoiceVox.Request.AudioQuery.ReplaceJsonParam.{speakerKey}").HasValue())
             {
                 //話者固有設定
                 paramDic = Settings.AsMultiDic($"VoiceVox.Request.AudioQuery.ReplaceJsonParam.{speakerKey}");
