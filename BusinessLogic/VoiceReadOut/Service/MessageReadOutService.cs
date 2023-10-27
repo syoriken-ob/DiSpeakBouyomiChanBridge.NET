@@ -70,28 +70,14 @@ namespace net.boilingwater.BusinessLogic.VoiceReadOut.Service
         /// <returns></returns>
         private static List<string> SplitMessage(string message)
         {
-            var messages = new List<string>() { message };
+            IEnumerable<string> messages = new List<string>() { message.Replace("\r", "") };
 
             foreach (var splitChar in MessageDelimiter)
             {
-                var beforeLen = messages.Count;
-                messages = messages.SelectMany(m => m.Split(splitChar)).ToList();
-
-                var afterLen = messages.Count;
-                if (beforeLen >= afterLen)
-                {
-                    break;
-                }
-
-                IEnumerable<string> enumerable = messages;
-                if (!char.IsControl(splitChar))
-                {
-                    enumerable = enumerable.Select((m, i) => (i < (messages.Count - 1)) ? m + splitChar : m); //末尾には分割文字を指定しない
-                }
-                messages = enumerable.Where(m => m.HasValue()).ToList();
+                messages = messages.SelectMany(m => m.Split(splitChar)).Where(m => m.HasValue());
             }
 
-            return messages;
+            return messages.ToList();
         }
 
         /// <summary>
