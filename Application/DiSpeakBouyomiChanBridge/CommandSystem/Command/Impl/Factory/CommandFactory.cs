@@ -63,9 +63,9 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Im
                 Group? group = match.Groups.Values.Where(group => group.Name == replace).FirstOrDefault();
                 if (group != null)
                 {
-                    for (var index = 0; index < command.RunCommand.Length; ++index)
+                    for (var index = 0; index < command.Arguments.Length; ++index)
                     {
-                        command.RunCommand[index] = command.RunCommand[index].Replace($"__{replace}__", group.Value);
+                        command.Arguments[index] = command.Arguments[index].Replace($"__{replace}__", group.Value);
                     }
                 }
             }

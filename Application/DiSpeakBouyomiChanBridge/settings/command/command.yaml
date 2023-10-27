@@ -3,8 +3,8 @@
   regex: 'test\((?<path>.*?)\)'
   replacePattern:
     - path
-  runCommand:
-    - 'C:\Users\hoge\Desktop\Yomiage\run.bat'
+  fileName: 'C:\Users\hoge\Desktop\Yomiage\run.bat'
+  arguments:
     - '"__path__"'
   env:
     PATH: 'C:\Windows\System32\;C:\Windows\'
@@ -21,8 +21,8 @@ test_im:
   regex: 'testim\((?<path>.*?)\)'
   replacePattern:
     - path
-  runCommand:
-    - '"C:\Users\hoge\Desktop\Yomiage\run2.bat"'
+  fileName: '"C:\Users\hoge\Desktop\Yomiage\run2.bat"'
+  arguments:
     - __path__
   env:
     PATH: 'C:\windows\system32'

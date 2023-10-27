@@ -45,9 +45,14 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Im
         public string[] ReplacePattern { get; set; } = Array.Empty<string>();
 
         /// <summary>
-        /// 実行コマンド
+        /// 実行ファイル名
         /// </summary>
-        public string[] RunCommand { get; set; } = Array.Empty<string>();
+        public string FileName { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 実行時引数
+        /// </summary>
+        public string[] Arguments { get; set; } = Array.Empty<string>();
 
         /// <summary>
         /// 環境変数
@@ -96,7 +101,8 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Im
             CommandTitle = CommandTitle,
             Regex = new(Regex),
             ReplacePattern = (string[])ReplacePattern.Clone(),
-            RunCommand = (string[])RunCommand.Clone(),
+            FileName = new(FileName),
+            Arguments = (string[])Arguments.Clone(),
             Env = new Dictionary<string, string?>(Env),
             Path = new(Path),
             StdInOut = new Dictionary<string, string>(StdInOut),
@@ -117,9 +123,11 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Im
                 RedirectStandardOutput = true,
                 UseShellExecute = false,
                 CreateNoWindow = false,
-                FileName = Settings.AsString("ShellPath"),
-                Arguments = $"{Settings.AsString("ShellOption")} \"{string.Join(" ", RunCommand)}\""
+                FileName = FileName,
             };
+
+            //引数指定
+            Arguments.ForEach(info.ArgumentList.Add);
 
             //環境変数設定
             if (Env.Any())
@@ -143,7 +151,7 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Im
                 Log.Logger.Info($"Run \"{CommandTitle}\" Command.");
                 Log.Logger.Debug($"Env with({string.Join(",", info.Environment.Select(e => $"{e.Key}:{e.Value}"))})");
 
-                if (!string.IsNullOrEmpty(ExecutionComment))
+                if (ExecutionComment.HasValue())
                 {
                     Log.Logger.Info($"{CommandTitle} - {ExecutionComment}");
                     MessageReadOutService.ReadOutMessage(ExecutionComment);
@@ -180,7 +188,7 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Im
 
                 Log.Logger.Info($"Finish \"{CommandTitle}\" Command.");
 
-                if (!string.IsNullOrEmpty(CompleteComment))
+                if (CompleteComment.HasValue())
                 {
                     MessageReadOutService.ReadOutMessage(CompleteComment);
                 }
