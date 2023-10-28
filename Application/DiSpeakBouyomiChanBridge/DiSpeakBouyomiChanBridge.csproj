@@ -9,7 +9,7 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <Nullable>enable</Nullable>
-    <Version>9.3.0</Version>
+    <Version>9.4.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -62,6 +62,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="settings\config\VoiceVox-Application-Setting.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="settings\_override\command.yaml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="settings\_override\EnvironmentSetting.xml">

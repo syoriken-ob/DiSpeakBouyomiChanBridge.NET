@@ -12,9 +12,6 @@
   <Item key="RetryCount"                     value="5" />
   <Item key="RetrySleepTime.Milliseconds"    value="5000" />
 
-  <Item key="ShellPath"                      value="C:\Windows\System32\cmd.exe" />
-  <Item key="ShellOption"                    value="/C" />
-
   <Item key="CommandFile"                    value="command.yaml" />
   <Item key="SystemCommandFile"              value="system-command.yaml" />
 
