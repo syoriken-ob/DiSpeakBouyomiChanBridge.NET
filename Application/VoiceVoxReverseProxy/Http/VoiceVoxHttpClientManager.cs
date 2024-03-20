@@ -183,11 +183,14 @@ public static class VoiceVoxHttpClientManager
     /// </summary>
     private static void CreateHttpClients()
     {
-        IMultiDic mappingDic = Settings.AsMultiDic("Map.VoiceVox.Application.HostAndPort");
+        IEnumerable<string[]> mappingPairList = Settings.AsMultiList("Map.VoiceVox.Application.HostAndPort")
+                                                        .CastMulti<string>()
+                                                        .Select(pairStr => pairStr.Split(','))
+                                                        .Where(pair => pair.Length == 2);
 
-        foreach (var key in mappingDic.Keys)
+        foreach (var pair in mappingPairList)
         {
-            HttpClientList.Add(new HttpClientForVoiceVoxBridge(key, mappingDic.GetAsInteger(key)));
+            HttpClientList.Add(new HttpClientForVoiceVoxBridge(pair[0], CastUtil.ToInteger(pair[1])));
         }
     }
 
