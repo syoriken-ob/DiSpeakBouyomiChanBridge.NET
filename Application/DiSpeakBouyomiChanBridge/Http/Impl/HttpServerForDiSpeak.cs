@@ -8,51 +8,50 @@ using net.boilingwater.Framework.Common.Setting;
 using net.boilingwater.Framework.Core.Logging;
 using net.boilingwater.Framework.Core.Utils;
 
-namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.Http.Impl
+namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.Http.Impl;
+
+/// <summary>
+/// DiSpeakからメッセージを受信するHttpServer
+/// </summary>
+public class HttpServerForDiSpeak : AbstractHttpServer
 {
     /// <summary>
-    /// DiSpeakからメッセージを受信するHttpServer
+    /// シングルトンインスタンス
     /// </summary>
-    public class HttpServerForDiSpeak : AbstractHttpServer
+    public static HttpServerForDiSpeak Instance { get; private set; }
+
+    static HttpServerForDiSpeak() => Instance = new();
+
+    /// <inheritdoc/>
+    protected override void RegisterListeningUrlPrefix(HttpListenerPrefixCollection prefixes)
     {
-        /// <summary>
-        /// シングルトンインスタンス
-        /// </summary>
-        public static HttpServerForDiSpeak Instance { get; private set; }
+        var url = $"http://localhost:{Settings.AsString("ListeningPort")}/";
+        prefixes.Add(url);
+    }
 
-        static HttpServerForDiSpeak() => Instance = new();
-
-        /// <inheritdoc/>
-        protected override void RegisterListeningUrlPrefix(HttpListenerPrefixCollection prefixes)
+    /// <inheritdoc/>
+    protected override void OnRequestReceived(HttpListenerContext context)
+    {
+        HttpListenerRequest request = context.Request;
+        var message = "";
+        using (HttpListenerResponse response = context.Response)
         {
-            var url = $"http://localhost:{Settings.AsString("ListeningPort")}/";
-            prefixes.Add(url);
-        }
-
-        /// <inheritdoc/>
-        protected override void OnRequestReceived(HttpListenerContext context)
-        {
-            HttpListenerRequest request = context.Request;
-            var message = "";
-            using (HttpListenerResponse response = context.Response)
+            if (request.HttpMethod != HttpMethod.Get.Method)
             {
-                if (request.HttpMethod != HttpMethod.Get.Method)
-                {
-                    return;
-                }
-
-                message = CastUtil.ToString(request.GetDiscordMessage());
-                response.StatusCode = (int)HttpStatusCode.OK;
+                return;
             }
 
-            Log.Logger.Debug($"Receive({GetType().Name}) :{message}");
-
-            CommandHandlingService.Handle(new CommandHandlingContext(message));
+            message = CastUtil.ToString(request.GetDiscordMessage());
+            response.StatusCode = (int)HttpStatusCode.OK;
         }
-    }
 
-    internal static partial class HttpListenerRequestExtension
-    {
-        public static string? GetDiscordMessage(this HttpListenerRequest request) => request.QueryString["text"];
+        Log.Logger.Debug($"Receive({GetType().Name}) :{message}");
+
+        CommandHandlingService.Handle(new CommandHandlingContext(message));
     }
+}
+
+internal static partial class HttpListenerRequestExtension
+{
+    public static string? GetDiscordMessage(this HttpListenerRequest request) => request.QueryString["text"];
 }
