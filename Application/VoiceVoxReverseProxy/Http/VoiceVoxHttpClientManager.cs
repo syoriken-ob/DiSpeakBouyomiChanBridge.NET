@@ -185,7 +185,7 @@ public static class VoiceVoxHttpClientManager
     {
         IEnumerable<string[]> mappingPairList = Settings.AsMultiList("Map.VoiceVox.Application.HostAndPort")
                                                         .CastMulti<string>()
-                                                        .Select(pairStr => pairStr.Split(','))
+                                                        .Select(pairStr => pairStr.Split(';'))
                                                         .Where(pair => pair.Length == 2);
 
         foreach (var pair in mappingPairList)
