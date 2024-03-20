@@ -94,6 +94,7 @@ public class MessageReplacerDao : SQLiteDBDao
     public DataTable SelectReplaceSetting()
     {
         var sql = "";
+
         sql += " SELECT ";
         sql += "   replace_key ";
         sql += " , replace_value ";

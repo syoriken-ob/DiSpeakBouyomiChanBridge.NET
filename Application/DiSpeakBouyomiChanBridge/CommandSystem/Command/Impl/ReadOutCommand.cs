@@ -17,16 +17,10 @@ public class ReadOutCommand : SystemCommand
     public override void Execute()
     {
         List<Command> commands = CommandExecuteManager.Instance.GetCommandsInQueue();
-        MessageReadOutService.ReadOutMessage(string.Format(Settings.AsString("Message.CommandsCount"), commands.Count));
+        MessageReadOutService.ReadOutMessage(Settings.AsMessage("Message.CommandsCount", commands.Count.ToString()));
         for (var i = 0; i < commands.Count; i++)
         {
-            MessageReadOutService.ReadOutMessage(
-                string.Format(
-                    Settings.AsString("Message.CommandDetail"),
-                    i,
-                    commands[i].CommandTitle
-                )
-            );
+            MessageReadOutService.ReadOutMessage(Settings.AsMessage("Message.CommandDetail", i.ToString(), commands[i].CommandTitle));
         }
     }
 }

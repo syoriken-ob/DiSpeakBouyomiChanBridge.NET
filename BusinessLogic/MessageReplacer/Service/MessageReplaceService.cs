@@ -3,26 +3,23 @@ using System.Collections.Generic;
 using System.Data;
 using System.Text.RegularExpressions;
 
+using net.boilingwater.BusinessLogic.MessageReplacer.Const;
 using net.boilingwater.BusinessLogic.MessageReplacer.Dao;
 using net.boilingwater.Framework.Common.Setting;
 using net.boilingwater.Framework.Core;
 using net.boilingwater.Framework.Core.Extensions;
-using net.boilingwater.Framework.Core.Utils;
 
 namespace net.boilingwater.BusinessLogic.MessageReplacer.Service;
 
 /// <summary>
 /// メッセージ置換処理サービス
 /// </summary>
-public class MessageReplaceService
+public static class MessageReplaceService
 {
     /// <summary>
     /// メッセージ置換辞書
     /// </summary>
     private static readonly SimpleDic<string> _replaceSetting = [];
-
-    private static readonly Regex RegisterReplaceSettingRegex = new("(教育|学習)[(（](?<replace_key>.+?)=(?<replace_value>.+?)[)）]", RegexOptions.Compiled | RegexOptions.Singleline);
-    private static readonly Regex DeleteReplaceSettingRegex = new("(忘却|消去)[(（](?<replace_key>.+?)[)）]", RegexOptions.Compiled | RegexOptions.Singleline);
 
     /// <summary>
     /// メッセージ置換処理実行後初期化処理が必要かどうか
@@ -41,7 +38,7 @@ public class MessageReplaceService
 
         foreach (DataRow row in replaceTable.Rows)
         {
-            _replaceSetting[CastUtil.ToString(row["replace_key"])] = CastUtil.ToString(row["replace_value"]);
+            _replaceSetting[row.GetAsString("replace_key")] = row.GetAsString("replace_value");
         }
     }
 
@@ -117,7 +114,7 @@ public class MessageReplaceService
     /// <returns>置換設定を登録したかどうか</returns>
     private static bool DetectAndRegisterReplaceSetting(ref string message)
     {
-        Match match = RegisterReplaceSettingRegex.Match(message);
+        Match match = RegexSet.RegisterReplaceSettingRegex().Match(message);
         if (!match.Success)
         {
             return false;
@@ -140,7 +137,7 @@ public class MessageReplaceService
             }
             _ = dao.UpdateOrRegisterReplaceSetting(key, replaceValue.Value);
             registered = true;
-            message = message.Replace(match.Value, string.Format(Settings.AsString("Format.Replace.RegisterReplaceSetting"), key, replaceValue.Value));
+            message = message.Replace(match.Value, Settings.AsMessage("Format.Replace.RegisterReplaceSetting", key, replaceValue.Value));
         } while ((match = match.NextMatch()).Success);
 
         return registered;
@@ -153,7 +150,7 @@ public class MessageReplaceService
     /// <returns>置換設定を削除したかどうか</returns>
     private static bool DetectAndDeleteReplaceSetting(ref string message)
     {
-        Match match = DeleteReplaceSettingRegex.Match(message);
+        Match match = RegexSet.DeleteReplaceSettingRegex().Match(message);
         if (!match.Success)
         {
             return false;
@@ -179,11 +176,11 @@ public class MessageReplaceService
             {
                 _ = dao.DeleteReplaceSetting(key);
                 registered = true;
-                message = message.Replace(match.Value, string.Format(Settings.AsString("Format.Replace.DeleteReplaceSetting"), key));
+                message = message.Replace(match.Value, Settings.AsMessage("Format.Replace.DeleteReplaceSetting", key));
             }
             else
             {
-                message = message.Replace(match.Value, string.Format(Settings.AsString("Format.Replace.NotRegisteredReplaceSetting"), key));
+                message = message.Replace(match.Value, Settings.AsMessage("Format.Replace.NotRegisteredReplaceSetting", key));
             }
         } while ((match = match.NextMatch()).Success);
 

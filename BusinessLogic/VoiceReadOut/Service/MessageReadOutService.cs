@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 
 using net.boilingwater.BusinessLogic.Common.User.Service;
 using net.boilingwater.BusinessLogic.VoiceReadout.HttpClients;
+using net.boilingwater.BusinessLogic.VoiceReadOut.Const;
 using net.boilingwater.BusinessLogic.VoiceReadOut.Dto;
 using net.boilingwater.Framework.Core.Extensions;
 
@@ -14,11 +15,6 @@ namespace net.boilingwater.BusinessLogic.VoiceReadOut.Service;
 /// </summary>
 public static class MessageReadOutService
 {
-    /// <summary>
-    /// メッセージ中から話者を抽出する正規表現
-    /// </summary>
-    private static Regex SpeakerRegex { get; set; } = new Regex(@"^(?<speaker_id>\w{1,4})\)", RegexOptions.Compiled);
-
     /// <summary>
     /// メッセージを分割する文字集合
     /// </summary>
@@ -84,7 +80,7 @@ public static class MessageReadOutService
     /// <returns></returns>
     private static (string speakerKey, string extractedMessage) ExtractSpeakerKey(string messagePerLine, string speakerKeyInContext = "")
     {
-        Match match = SpeakerRegex.Match(messagePerLine);
+        Match match = RegexSet.SpeakerRegex().Match(messagePerLine);
         if (!match.Success)
         {
             return (speakerKeyInContext, messagePerLine);

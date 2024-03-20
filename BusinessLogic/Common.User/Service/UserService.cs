@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using System.Text.RegularExpressions;
 
+using net.boilingwater.BusinessLogic.Common.User.Const;
 using net.boilingwater.BusinessLogic.Common.User.Dao;
 using net.boilingwater.Framework.Common.Setting;
 using net.boilingwater.Framework.Core;
@@ -11,15 +12,12 @@ namespace net.boilingwater.BusinessLogic.Common.User.Service;
 /// <summary>
 /// ユーザー固有処理サービス
 /// </summary>
-public class UserService
+public static class UserService
 {
     /// <summary>
     /// ユーザー話者キー辞書
     /// </summary>
     private static readonly SimpleDic<string> _userSpeakerDic = [];
-
-    private static readonly Regex RegisterUserSpeakerRegex = new(@"(話者登録)[(（](?<speaker_key>\w{1,4})(,(?<user_id>\d+?))?[)）]", RegexOptions.Compiled | RegexOptions.Singleline);
-    private static readonly Regex DeleteUserSpeakerRegex = new(@"(話者解除)[(（](?<user_id>\d*?)[)）]", RegexOptions.Compiled | RegexOptions.Singleline);
 
     /// <summary>
     /// 初期化を行います。
@@ -80,7 +78,7 @@ public class UserService
     /// <returns>既定話者を登録したかどうか</returns>
     private static bool DetectAndRegisterUserSpeaker(ref string message, string messageUserId)
     {
-        Match match = RegisterUserSpeakerRegex.Match(message);
+        Match match = RegexSet.RegisterUserSpeakerRegex().Match(message);
         if (!match.Success)
         {
             return false;
@@ -120,7 +118,7 @@ public class UserService
     /// <returns>既定話者を削除したかどうか</returns>
     private static bool DetectAndDeleteUserSpeaker(ref string message, string messageUserId)
     {
-        Match match = DeleteUserSpeakerRegex.Match(message);
+        Match match = RegexSet.DeleteUserSpeakerRegex().Match(message);
         if (!match.Success)
         {
             return false;
