@@ -8,8 +8,13 @@ namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients;
 /// <summary>
 /// 読み上げ処理用の基底HttpClientクラス
 /// </summary>
-public abstract class HttpClientForReadOut : AbstractHttpClient, IDisposable
+public abstract class HttpClientForReadOut : AbstractHttpClient
 {
+    /// <summary>
+    /// インスタンスが破棄されているか
+    /// </summary>
+    public bool IsDisposed { get; protected set; } = false;
+
     /// <summary>
     /// シングルトンインスタンス
     /// </summary>
@@ -31,5 +36,12 @@ public abstract class HttpClientForReadOut : AbstractHttpClient, IDisposable
     {
         Instance?.Dispose();
         Instance = (HttpClientForReadOut?)Activator.CreateInstance(typeof(T));
+    }
+
+    /// <inheritdoc/>
+    public override void Dispose()
+    {
+        IsDisposed = true;
+        base.Dispose();
     }
 }

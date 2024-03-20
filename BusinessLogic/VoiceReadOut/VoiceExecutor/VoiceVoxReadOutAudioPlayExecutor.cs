@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Threading;
+using System.Threading.Tasks;
 
 using net.boilingwater.external.AudioPlay;
 using net.boilingwater.Framework.Core.Logging;
@@ -12,32 +13,38 @@ namespace net.boilingwater.BusinessLogic.VoiceReadOut.VoiceExecutor;
 /// </summary>
 public class VoiceVoxReadOutAudioPlayExecutor : VoiceVoxReadOutExecutor
 {
-    private readonly Thread _thread;
-    private readonly BlockingCollection<byte[]> _audioStreamByteArrays = [];
+    private Task Task { get; init; }
+    private CancellationTokenSource CancellationTokenSource { get; init; }
+    private BlockingCollection<byte[]> AudioStreamBytes { get; init; } = [];
 
     /// <summary>
     /// コンストラクタ
     /// </summary>
     public VoiceVoxReadOutAudioPlayExecutor()
     {
-        _thread = new Thread(() =>
+        CancellationTokenSource = new CancellationTokenSource();
+
+        Task = Task.Factory.StartNew((obj) =>
         {
-            foreach (var voiceStreamByteArr in _audioStreamByteArrays.GetConsumingEnumerable())
+            foreach (var voiceStreamByteArr in AudioStreamBytes.GetConsumingEnumerable())
             {
                 try
                 {
-                    AudioPlayer.Play(voiceStreamByteArr);
+                    AudioPlayer.PlayAsync(voiceStreamByteArr, CancellationTokenSource.Token).GetAwaiter().GetResult();
+
+                    if (CancellationTokenSource.IsCancellationRequested) //キャンセル処理
+                    {
+                        break;
+                    }
                 }
                 catch (Exception ex)
                 {
                     Log.Logger.Error(ex);
                 }
             }
-        })
-        {
-            IsBackground = true
-        };
-        _thread.Start();
+            Log.Logger.Debug("Finished AudioStreamBytes.GetConsumingEnumerable.");
+            AudioStreamBytes.Dispose();
+        }, null, TaskCreationOptions.LongRunning);
     }
 
     /// <summary>
@@ -51,22 +58,20 @@ public class VoiceVoxReadOutAudioPlayExecutor : VoiceVoxReadOutExecutor
         {
             throw new ArgumentNullException(nameof(audioStreamByteArray));
         }
-        _audioStreamByteArrays.Add(audioStreamByteArray);
+        AudioStreamBytes.Add(audioStreamByteArray);
     }
 
     public override void Dispose()
     {
-        try
+        lock (AudioStreamBytes)
         {
-            _thread.Interrupt();
-        }
-        catch
-        {
-            //何もしない
-        }
-        finally
-        {
-            _audioStreamByteArrays.Dispose();
+            AudioStreamBytes.CompleteAdding();
+            while (AudioStreamBytes.Count > 0)
+            {
+                AudioStreamBytes.Take(); //中身を空にするまでTakeする
+            }
+            CancellationTokenSource.Cancel();
+            GC.SuppressFinalize(this);
         }
     }
 }

@@ -40,8 +40,7 @@ public class VBanEmitter : IDisposable
     /// <param name="audioBytes"></param>
     public void RegisterEmittingData(byte[] audioBytes)
     {
-        var arr = audioBytes.Skip(WaveFileHeaderDataLength).Chunk(Config.MaxDataSize).ToArray();
-        foreach (var audioByte in arr)
+        foreach (var audioByte in audioBytes.Skip(WaveFileHeaderDataLength).Chunk(Config.MaxDataSize)) //Waveファイルのヘッダーを除去
         {
             _emitter.RegisterVBanPacket(new VBanPacket(Config, audioByte));
         }

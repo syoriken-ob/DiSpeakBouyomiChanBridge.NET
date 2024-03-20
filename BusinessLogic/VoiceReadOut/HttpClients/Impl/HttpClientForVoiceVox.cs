@@ -65,14 +65,17 @@ public class HttpClientForVoiceVox : HttpClientForReadOut
                     Log.Logger.Error(ex);
                 }
             }
+            Log.Logger.Debug("Finished ReceivedMessages.GetConsumingEnumerable.");
+            ReceivedMessages.Dispose();
         }, null, TaskCreationOptions.LongRunning);
     }
 
     /// <inheritdoc/>
     public override void ReadOut(MessageDto message)
     {
-        if (ReceivedMessages.IsAddingCompleted)
+        if (ReceivedMessages.IsAddingCompleted || IsDisposed)
         {
+            Log.Logger.WarnFormat("オブジェクトが破棄されているため、読み上げ処理が実行されませんでした。メッセージ：{0}",string.Join(' ', message.InlineMessages));
             return;
         }
         ReceivedMessages.Add(message);
@@ -180,9 +183,14 @@ public class HttpClientForVoiceVox : HttpClientForReadOut
 
     public override void Dispose()
     {
-        ReceivedMessages.CompleteAdding();
-        ReceivedMessages.TakeWhile(m => true);
-        Task.Dispose();
-        base.Dispose();
+        lock (ReceivedMessages)
+        {
+            ReceivedMessages.CompleteAdding();
+            while (ReceivedMessages.Count > 0)
+            {
+                ReceivedMessages.Take(); //中身を空にするまでTakeする
+            }
+            base.Dispose();
+        }
     }
 }
