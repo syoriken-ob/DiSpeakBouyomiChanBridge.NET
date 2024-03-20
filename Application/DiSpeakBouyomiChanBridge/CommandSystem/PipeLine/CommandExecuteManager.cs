@@ -3,55 +3,54 @@
 using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Impl;
 using net.boilingwater.Framework.Core.Logging;
 
-namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.PipeLine
+namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.PipeLine;
+
+internal class CommandExecuteManager
 {
-    internal class CommandExecuteManager
+    internal static CommandExecuteManager Instance { get; private set; } = new();
+
+    //------------------------------------------------//
+    private readonly CommandExecutor CommonCommandExecutor;
+
+    private readonly CommandExecutor ImmediateCommandExecutor;
+
+    internal CommandExecuteManager()
     {
-        internal static CommandExecuteManager Instance { get; private set; } = new();
+        CommonCommandExecutor = new();
+        ImmediateCommandExecutor = new();
+    }
 
-        //------------------------------------------------//
-        private readonly CommandExecutor CommonCommandExecutor;
-
-        private readonly CommandExecutor ImmediateCommandExecutor;
-
-        internal CommandExecuteManager()
+    /// <summary>
+    /// 実行キューに<paramref name="command"/> を追加します
+    /// </summary>
+    /// <param name="command">追加したいコマンド</param>
+    internal void AddCommand(Command command)
+    {
+        if (command.Immediate)
         {
-            CommonCommandExecutor = new();
-            ImmediateCommandExecutor = new();
+            ImmediateCommandExecutor.Add(command);
+            Log.Logger.Debug("Add Command Emergency Execute Queue.");
         }
-
-        /// <summary>
-        /// 実行キューに<paramref name="command"/> を追加します
-        /// </summary>
-        /// <param name="command">追加したいコマンド</param>
-        internal void AddCommand(Command command)
+        else
         {
-            if (command.Immediate)
-            {
-                ImmediateCommandExecutor.Add(command);
-                Log.Logger.Debug("Add Command Emergency Execute Queue.");
-            }
-            else
-            {
-                CommonCommandExecutor.Add(command);
-                Log.Logger.Debug("Add Command Execute Queue.");
-            }
+            CommonCommandExecutor.Add(command);
+            Log.Logger.Debug("Add Command Execute Queue.");
         }
+    }
 
-        /// <summary>
-        /// キューに入っているコマンドを取得します
-        /// </summary>
-        /// <returns></returns>
-        internal List<Command> GetCommandsInQueue() => CommonCommandExecutor.GetCommandsInQueue();
+    /// <summary>
+    /// キューに入っているコマンドを取得します
+    /// </summary>
+    /// <returns></returns>
+    internal List<Command> GetCommandsInQueue() => CommonCommandExecutor.GetCommandsInQueue();
 
-        /// <summary>
-        /// コマンドを停止し、実行キューをクリアします
-        /// </summary>
-        internal void ShutdownThreads()
-        {
-            Command.KillProcess();
-            ImmediateCommandExecutor?.ClearTask();
-            CommonCommandExecutor?.ClearTask();
-        }
+    /// <summary>
+    /// コマンドを停止し、実行キューをクリアします
+    /// </summary>
+    internal void ShutdownThreads()
+    {
+        Command.KillProcess();
+        ImmediateCommandExecutor?.ClearTask();
+        CommonCommandExecutor?.ClearTask();
     }
 }

@@ -2,34 +2,32 @@
 
 using net.boilingwater.Framework.Core.Logging;
 
-namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge
+namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge;
+
+/// <summary>
+/// DiSpeakBouyomiChanBridge エントリーポイントのクラス
+/// </summary>
+public class DiSpeakBouyomiChanBridge
 {
     /// <summary>
-    /// DiSpeakBouyomiChanBridge エントリーポイントのクラス
+    /// アプリケーションを実行します
     /// </summary>
-    public class DiSpeakBouyomiChanBridge
+    /// <param name="args">実行時引数</param>
+    public static int Main(string[] args)
     {
-        /// <summary>
-        /// アプリケーションを実行します
-        /// </summary>
-        /// <param name="args">実行時引数</param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:未使用のパラメーターを削除します", Justification = "<保留中>")]
-        public static int Main(string[] args)
+        try
         {
-            try
+            ApplicationInitializer.Initialize();
+            ApplicationInitializer.Start();
+            while (true)
             {
-                ApplicationInitializer.Initialize();
-                ApplicationInitializer.Start();
-                while (true)
-                {
-                    Console.ReadLine();
-                }
+                Console.ReadLine();
             }
-            catch (Exception e)
-            {
-                Log.Logger.Fatal("エラーが発生したため、実行を終了します。", e);
-                return -1;
-            }
+        }
+        catch (Exception e)
+        {
+            Log.Logger.Fatal("エラーが発生したため、実行を終了します。", e);
+            return -1;
         }
     }
 }

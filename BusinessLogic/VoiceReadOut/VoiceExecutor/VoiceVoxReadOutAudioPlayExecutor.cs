@@ -1,73 +1,77 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Threading;
+using System.Threading.Tasks;
 
 using net.boilingwater.external.AudioPlay;
 using net.boilingwater.Framework.Core.Logging;
 
-namespace net.boilingwater.BusinessLogic.VoiceReadOut.VoiceExecutor
-{
-    /// <summary>
-    /// VoiceVoxで生成した音声を順次再生します。
-    /// </summary>
-    public class VoiceVoxReadOutAudioPlayExecutor : VoiceVoxReadOutExecutor
-    {
-        private readonly Thread _thread;
-        private readonly BlockingCollection<byte[]> _audioStreamByteArrays = new();
+namespace net.boilingwater.BusinessLogic.VoiceReadOut.VoiceExecutor;
 
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        public VoiceVoxReadOutAudioPlayExecutor()
+/// <summary>
+/// VoiceVoxで生成した音声を順次再生します。
+/// </summary>
+public class VoiceVoxReadOutAudioPlayExecutor : VoiceVoxReadOutExecutor
+{
+    private Task Task { get; init; }
+    private CancellationTokenSource CancellationTokenSource { get; init; }
+    private BlockingCollection<byte[]> AudioStreamBytes { get; init; } = [];
+
+    /// <summary>
+    /// コンストラクタ
+    /// </summary>
+    public VoiceVoxReadOutAudioPlayExecutor()
+    {
+        CancellationTokenSource = new CancellationTokenSource();
+
+        Task = Task.Factory.StartNew((obj) =>
         {
-            _thread = new Thread(() =>
+            foreach (var voiceStreamByteArr in AudioStreamBytes.GetConsumingEnumerable())
             {
-                foreach (var voiceStreamByteArr in _audioStreamByteArrays.GetConsumingEnumerable())
+                try
                 {
-                    try
+                    AudioPlayer.PlayAsync(voiceStreamByteArr, CancellationTokenSource.Token).GetAwaiter().GetResult();
+
+                    if (CancellationTokenSource.IsCancellationRequested) //キャンセル処理
                     {
-                        AudioPlayer.Play(voiceStreamByteArr);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Logger.Error(ex);
+                        break;
                     }
                 }
-            })
-            {
-                IsBackground = true
-            };
-            _thread.Start();
-        }
+                catch (Exception ex)
+                {
+                    Log.Logger.Error(ex);
+                }
+            }
+            Log.Logger.Debug("Finished AudioStreamBytes.GetConsumingEnumerable.");
+            AudioStreamBytes.Dispose();
+        }, null, TaskCreationOptions.LongRunning);
+    }
 
-        /// <summary>
-        /// VoiceVoxで生成した音声データのバイト配列を再生キューに追加します。
-        /// </summary>
-        /// <param name="audioStreamByteArray"></param>
-        /// <exception cref="ArgumentNullException"></exception>
-        public override void AddQueue(byte[] audioStreamByteArray)
+    /// <summary>
+    /// VoiceVoxで生成した音声データのバイト配列を再生キューに追加します。
+    /// </summary>
+    /// <param name="audioStreamByteArray"></param>
+    /// <exception cref="ArgumentNullException"></exception>
+    public override void AddQueue(byte[] audioStreamByteArray)
+    {
+        if (audioStreamByteArray == null)
         {
-            if (audioStreamByteArray == null)
-            {
-                throw new ArgumentNullException(nameof(audioStreamByteArray));
-            }
-            _audioStreamByteArrays.Add(audioStreamByteArray);
+            throw new ArgumentNullException(nameof(audioStreamByteArray));
         }
+        AudioStreamBytes.Add(audioStreamByteArray);
+    }
 
-        public override void Dispose()
+    public override void Dispose()
+    {
+        lock (AudioStreamBytes)
         {
-            try
+            AudioStreamBytes.CompleteAdding();
+            while (AudioStreamBytes.Count > 0)
             {
-                _thread.Interrupt();
+                AudioStreamBytes.Take(); //中身を空にするまでTakeする
             }
-            catch
-            {
-                //何もしない
-            }
-            finally
-            {
-                _audioStreamByteArrays.Dispose();
-            }
+            CancellationTokenSource.Cancel();
+            GC.SuppressFinalize(this);
         }
     }
 }
