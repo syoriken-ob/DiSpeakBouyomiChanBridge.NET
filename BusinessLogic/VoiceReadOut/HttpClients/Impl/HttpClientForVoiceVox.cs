@@ -93,7 +93,7 @@ public class HttpClientForVoiceVox : HttpClientForReadOut
             IMultiDic audioQueryResult = VoiceVoxRequestService.SendVoiceVoxAudioQueryRequest(Client, RequestSetting, message, speakerId);
             if (audioQueryResult.ContainsKey("statusCode"))
             {
-                HttpStatusCode statusCode = audioQueryResult.GetAsObject<string, HttpStatusCode>("statusCode");
+                HttpStatusCode statusCode = audioQueryResult.GetAsObject<HttpStatusCode>("statusCode");
                 Log.Logger.Debug($"Send AudioQuery: {(int)statusCode}-{statusCode}");
             }
 

@@ -215,8 +215,7 @@ public static class VoiceVoxHttpClientManager
 
         if (SpeakerRemappingDic.TryGetValue(id, out SpeakerRemappingDto dto))
         {
-            SpeakerRemappingDto key = dto;
-            return (key.Id, client);
+            return (dto.Id, client);
         }
 
         return (id, client);
