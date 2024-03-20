@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 using net.boilingwater.BusinessLogic.Common.User.Service;
 using net.boilingwater.BusinessLogic.VoiceReadout.HttpClients;
 using net.boilingwater.BusinessLogic.VoiceReadOut.Dto;
-using net.boilingwater.Framework.Common.Setting;
 using net.boilingwater.Framework.Core.Extensions;
 
 namespace net.boilingwater.BusinessLogic.VoiceReadOut.Service
@@ -26,7 +22,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadOut.Service
         /// <summary>
         /// メッセージを分割する文字集合
         /// </summary>
-        private static readonly char[] MessageDelimiter = { '\n', '。' };
+        private static readonly char[] MessageDelimiter = ['\n', '。'];
 
         /// <summary>
         /// メッセージを読み上げます。

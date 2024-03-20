@@ -6,6 +6,8 @@ using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Dto;
 using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Service;
 using net.boilingwater.Framework.Common.Http;
 using net.boilingwater.Framework.Common.Setting;
+using net.boilingwater.Framework.Core;
+using net.boilingwater.Framework.Core.Extensions;
 using net.boilingwater.Framework.Core.Logging;
 using net.boilingwater.Framework.Core.Utils;
 
@@ -26,7 +28,8 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.Http.Impl
         /// <inheritdoc/>
         protected override void RegisterListeningUrlPrefix(HttpListenerPrefixCollection prefixes)
         {
-            Settings.AsStringList("List.CommonVoiceReadoutServer.ListeningHost")
+            Settings.AsMultiList("List.CommonVoiceReadoutServer.ListeningHost")
+                    .CastMulti<string>()
                     .ForEach(host => prefixes.Add(new UriBuilder()
                     {
                         Scheme = "http",

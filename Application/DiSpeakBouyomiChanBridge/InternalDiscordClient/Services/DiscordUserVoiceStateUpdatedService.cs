@@ -1,6 +1,9 @@
-﻿using Discord.WebSocket;
+﻿using System.Collections.Generic;
+
+using Discord.WebSocket;
 
 using net.boilingwater.Framework.Common.Setting;
+using net.boilingwater.Framework.Core;
 using net.boilingwater.Framework.Core.Utils;
 
 namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.InternalDiscordClient.Services
@@ -18,14 +21,14 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.InternalDiscordC
             {
                 return false;
             }
-
+            IList<string> targetGuilds = Settings.AsMultiList("List.ReadOutTarget.Guild").CastMulti<string>();
             if (sourceVoiceState.VoiceChannel != null &&
-                !Settings.AsStringList("List.ReadOutTarget.Guild").Contains(CastUtil.ToString(sourceVoiceState.VoiceChannel.Guild.Id)))
+                !targetGuilds.Contains(CastUtil.ToString(sourceVoiceState.VoiceChannel.Guild.Id)))
             {
                 return false;
             }
             if (targetVoiceState.VoiceChannel != null &&
-                !Settings.AsStringList("List.ReadOutTarget.Guild").Contains(CastUtil.ToString(targetVoiceState.VoiceChannel.Guild.Id)))
+                !targetGuilds.Contains(CastUtil.ToString(targetVoiceState.VoiceChannel.Guild.Id)))
             {
                 return false;
             }
@@ -40,8 +43,9 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.InternalDiscordC
                 return false;
             }
 
+            IList<string> targetGuildChannels = Settings.AsMultiList("List.ReadOutTarget.GuildChannel.Voice").CastMulti<string>();
             if (sourceVoiceState.VoiceChannel != null &&
-                !Settings.AsStringList("List.ReadOutTarget.GuildChannel.Voice").Contains(CastUtil.ToString(sourceVoiceState.VoiceChannel.Id)))
+                !targetGuildChannels.Contains(CastUtil.ToString(sourceVoiceState.VoiceChannel.Id)))
             {
                 if (!Settings.AsBoolean("Use.ReadOutTarget.GuildChannel.Voice.WhiteList"))
                 {
@@ -49,7 +53,7 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.InternalDiscordC
                 }
             }
             if (targetVoiceState.VoiceChannel != null &&
-                !Settings.AsStringList("List.ReadOutTarget.GuildChannel.Voice").Contains(CastUtil.ToString(targetVoiceState.VoiceChannel.Id)))
+                !targetGuildChannels.Contains(CastUtil.ToString(targetVoiceState.VoiceChannel.Id)))
             {
                 if (!Settings.AsBoolean("Use.ReadOutTarget.GuildChannel.Voice.WhiteList"))
                 {

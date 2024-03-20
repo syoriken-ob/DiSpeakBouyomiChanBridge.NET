@@ -19,7 +19,7 @@ namespace net.boilingwater.BusinessLogic.MessageReplacer.Service
         /// <summary>
         /// メッセージ置換辞書
         /// </summary>
-        private static readonly SimpleDic<string> _replaceSetting = new();
+        private static readonly SimpleDic<string> _replaceSetting = [];
 
         private static readonly Regex RegisterReplaceSettingRegex = new("(教育|学習)[(（](?<replace_key>.+?)=(?<replace_value>.+?)[)）]", RegexOptions.Compiled | RegexOptions.Singleline);
         private static readonly Regex DeleteReplaceSettingRegex = new("(忘却|消去)[(（](?<replace_key>.+?)[)）]", RegexOptions.Compiled | RegexOptions.Singleline);

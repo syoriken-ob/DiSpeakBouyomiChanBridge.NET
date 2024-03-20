@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <RootNamespace>net.boilingwater.Application.VoiceVoxReverseProxy</RootNamespace>
     <AssemblyName>net.boilingwater.Application.VoiceVoxReverseProxy</AssemblyName>
     <StartupObject>net.boilingwater.Application.VoiceVoxReverseProxy.VoiceVoxReverseProxy</StartupObject>

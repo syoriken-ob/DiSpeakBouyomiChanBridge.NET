@@ -42,7 +42,7 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Im
         /// <summary>
         /// 正規表現中の置換パターン
         /// </summary>
-        public string[] ReplacePattern { get; set; } = Array.Empty<string>();
+        public string[] ReplacePattern { get; set; } = [];
 
         /// <summary>
         /// 実行ファイル名
@@ -52,12 +52,12 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Im
         /// <summary>
         /// 実行時引数
         /// </summary>
-        public string[] Arguments { get; set; } = Array.Empty<string>();
+        public string[] Arguments { get; set; } = [];
 
         /// <summary>
         /// 環境変数
         /// </summary>
-        public Dictionary<string, string?> Env { get; set; } = new();
+        public Dictionary<string, string?> Env { get; set; } = [];
 
         /// <summary>
         /// コマンド実行時のカレントディレクトリ
@@ -67,7 +67,7 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Im
         /// <summary>
         /// コマンド実行時の標準出力に応じた標準入力
         /// </summary>
-        public Dictionary<string, string> StdInOut { get; set; } = new();
+        public Dictionary<string, string> StdInOut { get; set; } = [];
 
         /// <summary>
         /// コマンド実行時の開始メッセージ

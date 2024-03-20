@@ -10,6 +10,7 @@ using net.boilingwater.BusinessLogic.VoiceReadOut.VoiceExecutor;
 using net.boilingwater.Framework.Common.Setting;
 using net.boilingwater.Framework.Core;
 using net.boilingwater.Framework.Core.Extensions;
+using net.boilingwater.Framework.Core.Interface;
 using net.boilingwater.Framework.Core.Logging;
 using net.boilingwater.Framework.Core.Utils;
 
@@ -21,8 +22,8 @@ namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl
     public class HttpClientForVoiceVox : HttpClientForReadOut
     {
         private Task Task { get; init; }
-        private BlockingCollection<MessageDto> ReceivedMessages { get; init; } = new();
-        private MultiDic RequestSetting { get; set; }
+        private BlockingCollection<MessageDto> ReceivedMessages { get; init; } = [];
+        private IMultiDic RequestSetting { get; set; }
         private SimpleDic<string> VoiceVoxSpeakers { get; set; }
 
         /// <summary>
@@ -86,10 +87,10 @@ namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl
             var retryCount = 0L;
             while (true)
             {
-                MultiDic audioQueryResult = VoiceVoxRequestService.SendVoiceVoxAudioQueryRequest(Client, RequestSetting, message, speakerId);
+                IMultiDic audioQueryResult = VoiceVoxRequestService.SendVoiceVoxAudioQueryRequest(Client, RequestSetting, message, speakerId);
                 if (audioQueryResult.ContainsKey("statusCode"))
                 {
-                    HttpStatusCode statusCode = audioQueryResult.GetAsObject<HttpStatusCode>("statusCode");
+                    HttpStatusCode statusCode = audioQueryResult.GetAsObject<string, HttpStatusCode>("statusCode");
                     Log.Logger.Debug($"Send AudioQuery: {(int)statusCode}-{statusCode}");
                 }
 
@@ -103,10 +104,10 @@ namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl
                     continue;
                 }
 
-                MultiDic audioQuery = audioQueryResult.GetAsMultiDic("audioQuery");
+                IMultiDic audioQuery = audioQueryResult.GetAsMultiDic("audioQuery");
                 VoiceVoxRequestService.ReplaceAudioQueryJson(audioQuery, speakerKey);
 
-                MultiDic synthesisResult = VoiceVoxRequestService.SendVoiceVoxSynthesisRequest(Client, RequestSetting, audioQuery, speakerId);
+                IMultiDic synthesisResult = VoiceVoxRequestService.SendVoiceVoxSynthesisRequest(Client, RequestSetting, audioQuery, speakerId);
                 if (synthesisResult.ContainsKey("statusCode"))
                 {
                     HttpStatusCode statusCode = synthesisResult.GetAsObject<HttpStatusCode>("statusCode");
@@ -140,17 +141,17 @@ namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl
         {
             var dic = new SimpleDic<string>();
 
-            MultiDic result = VoiceVoxRequestService.SendVoiceVoxSpeakersRequest(Client, RequestSetting);
+            IMultiDic result = VoiceVoxRequestService.SendVoiceVoxSpeakersRequest(Client, RequestSetting);
 
             if (result.GetAsBoolean("valid"))
             {
-                MultiDic baseSpeakerDic = Settings.AsMultiDic("VoiceVox.InlineSpeakersMapping");
+                IMultiDic baseSpeakerDic = Settings.AsMultiDic("VoiceVox.InlineSpeakersMapping");
                 var fetchedSpeakerList = result.GetAsMultiList("speakers")
-                                               .Select(s => CastUtil.ToObject<MultiDic>(s))
-                                               .Where(s => s != null)
+                                               .Select(CastUtil.ToObject<MultiDic>)
+                                               .Where(s => s != null).Cast<MultiDic>()
                                                .SelectMany(s => s!.GetAsMultiList("styles"))
-                                               .Select(s => CastUtil.ToObject<MultiDic>(s))
-                                               .Where(s => s != null)
+                                               .Select(CastUtil.ToObject<MultiDic>)
+                                               .Where(s => s != null).Cast<MultiDic>()
                                                .Select(s => s!.GetAsString("id"))
                                                .Intersect(baseSpeakerDic.Keys)
                                                .ToList();
@@ -173,7 +174,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl
         {
             var defaultSpeakerId = Settings.AsString("VoiceVox.DefaultSpeaker");
             Log.Logger.Debug($"VoiceVox既定話者(id={defaultSpeakerId})を初期化します。");
-            MultiDic result = VoiceVoxRequestService.SendVoiceVoxInitializeSpeakerRequest(Client, RequestSetting, defaultSpeakerId);
+            IMultiDic result = VoiceVoxRequestService.SendVoiceVoxInitializeSpeakerRequest(Client, RequestSetting, defaultSpeakerId);
             Log.Logger.Debug($"VoiceVox既定話者(id={defaultSpeakerId})の初期化に{(result.GetAsBoolean("valid") ? "成功" : "失敗")}しました。");
         }
 

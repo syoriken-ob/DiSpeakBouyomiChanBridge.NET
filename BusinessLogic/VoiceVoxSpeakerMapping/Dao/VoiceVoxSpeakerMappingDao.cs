@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Data;
 
+using Microsoft.Data.Sqlite;
+
 using net.boilingwater.Framework.Common.SQLite;
 
 namespace net.boilingwater.BusinessLogic.VoiceVoxSpeakerCache.Dao
@@ -37,9 +39,9 @@ namespace net.boilingwater.BusinessLogic.VoiceVoxSpeakerCache.Dao
             var sql = "";
             var param = new SQLiteParameterList()
             {
-                {"speaker_uuid", DbType.String, speakerUuid.ToString() },
-                {"speaker_id", DbType.String, speakerId },
-                {"new_id", DbType.String, newId }
+                {"speaker_uuid", SqliteType.Text, speakerUuid.ToString() },
+                {"speaker_id", SqliteType.Text, speakerId },
+                {"new_id", SqliteType.Text, newId }
             };
 
             sql += " INSERT INTO voicevox_speaker_mapping ( ";

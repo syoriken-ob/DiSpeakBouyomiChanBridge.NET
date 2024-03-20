@@ -15,7 +15,7 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Pi
     public sealed class CommandExecutor : IDisposable
     {
         private Thread? _thread;
-        private BlockingCollection<Command>? _commands = new();
+        private BlockingCollection<Command>? _commands = [];
         private Command? _active;
 
         /// <summary>

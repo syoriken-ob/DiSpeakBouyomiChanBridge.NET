@@ -5,6 +5,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 
 using net.boilingwater.Framework.Common.Setting;
+using net.boilingwater.Framework.Core;
 using net.boilingwater.Framework.Core.Extensions;
 using net.boilingwater.Framework.Core.Utils;
 
@@ -47,7 +48,7 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.InternalDiscordC
                 return false;
             }
 
-            if (Settings.AsStringList("List.ReadOutTarget.Guild").Contains(CastUtil.ToString(guildChannel.Guild.Id)))
+            if (Settings.AsMultiList("List.ReadOutTarget.Guild").CastMulti<ulong>().Contains(guildChannel.Guild.Id))
             {
                 return true;
             }
@@ -62,12 +63,7 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.InternalDiscordC
                 return false;
             }
 
-            if (guildChannel == null)
-            {
-                return false;
-            }
-
-            if (Settings.AsStringList("List.ReadOutTarget.GuildChannel.Text").Contains(CastUtil.ToString(guildChannel.Id)))
+            if (Settings.AsMultiList("List.ReadOutTarget.GuildChannel.Text").CastMulti<ulong>().Contains(guildChannel.Id))
             {
                 if (Settings.AsBoolean("Use.ReadOutTarget.GuildChannel.Text.WhiteList"))
                 {

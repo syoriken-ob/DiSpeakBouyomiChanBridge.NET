@@ -16,7 +16,7 @@ namespace net.boilingwater.BusinessLogic.Common.User.Service
         /// <summary>
         /// ユーザー話者キー辞書
         /// </summary>
-        private static readonly SimpleDic<string> _userSpeakerDic = new();
+        private static readonly SimpleDic<string> _userSpeakerDic = [];
 
         private static readonly Regex RegisterUserSpeakerRegex = new(@"(話者登録)[(（](?<speaker_key>\w{1,4})(,(?<user_id>\d+?))?[)）]", RegexOptions.Compiled | RegexOptions.Singleline);
         private static readonly Regex DeleteUserSpeakerRegex = new(@"(話者解除)[(（](?<user_id>\d*?)[)）]", RegexOptions.Compiled | RegexOptions.Singleline);

@@ -1,5 +1,7 @@
 ﻿using System.Data;
 
+using Microsoft.Data.Sqlite;
+
 using net.boilingwater.Framework.Common.SQLite;
 
 namespace net.boilingwater.BusinessLogic.Common.User.Dao
@@ -35,8 +37,8 @@ namespace net.boilingwater.BusinessLogic.Common.User.Dao
             var sql = "";
             var sqlParams = new SQLiteParameterList
             {
-                { "user_id", DbType.String, userId },
-                { "speaker_key", DbType.String, speakerKey }
+                { "user_id", SqliteType.Text, userId },
+                { "speaker_key", SqliteType.Text, speakerKey }
             };
 
             //UPSERT
@@ -63,7 +65,7 @@ namespace net.boilingwater.BusinessLogic.Common.User.Dao
             var sql = "";
             var sqlParams = new SQLiteParameterList
             {
-                { "user_id", DbType.String, userId }
+                { "user_id", SqliteType.Text, userId }
             };
 
             sql += " DELETE FROM user_speaker ";

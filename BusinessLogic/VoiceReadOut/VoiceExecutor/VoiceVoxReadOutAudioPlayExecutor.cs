@@ -13,7 +13,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadOut.VoiceExecutor
     public class VoiceVoxReadOutAudioPlayExecutor : VoiceVoxReadOutExecutor
     {
         private readonly Thread _thread;
-        private readonly BlockingCollection<byte[]> _audioStreamByteArrays = new();
+        private readonly BlockingCollection<byte[]> _audioStreamByteArrays = [];
 
         /// <summary>
         /// コンストラクタ

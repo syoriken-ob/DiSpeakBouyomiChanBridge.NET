@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 
@@ -7,6 +6,8 @@ using net.boilingwater.BusinessLogic.VoiceReadOut.Service;
 using net.boilingwater.Framework.Common.Http;
 using net.boilingwater.Framework.Common.Setting;
 using net.boilingwater.Framework.Core;
+using net.boilingwater.Framework.Core.Extensions;
+using net.boilingwater.Framework.Core.Interface;
 using net.boilingwater.Framework.Core.Logging;
 using net.boilingwater.Framework.Core.Utils;
 
@@ -25,7 +26,7 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
         /// <summary>
         /// <see cref="VoiceVoxRequestService.CreateRequestSettingDic(string, string, int)"/>で生成した通信用共通設定辞書
         /// </summary>
-        private MultiDic RequestSetting { get; set; }
+        private IMultiDic RequestSetting { get; set; }
 
         /// <summary>
         /// コンストラクタ
@@ -48,7 +49,7 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
         /// VoiceVoxAPI[speakers]から利用可能な話者のリストを取得します。
         /// </summary>
         /// <returns></returns>
-        public MultiDic SendVoiceVoxSpeakersRequest() => VoiceVoxRequestService.SendVoiceVoxSpeakersRequest(Client, RequestSetting);
+        public IMultiDic SendVoiceVoxSpeakersRequest() => VoiceVoxRequestService.SendVoiceVoxSpeakersRequest(Client, RequestSetting);
 
         /// <summary>
         /// VoiceVoxAPI[initialize_speaker]にリクエストを送信します。
@@ -57,10 +58,10 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
         /// <returns>正常にVoiceVox話者を初期化できたか</returns>
         public bool SendVoiceVoxInitializeSpeakerRequest(string speaker)
         {
-            var result = VoiceVoxRequestService.SendVoiceVoxInitializeSpeakerRequest(Client, RequestSetting, speaker);
+            IMultiDic result = VoiceVoxRequestService.SendVoiceVoxInitializeSpeakerRequest(Client, RequestSetting, speaker);
             if (result.ContainsKey("statusCode"))
             {
-                var statusCode = result.GetAsObject<HttpStatusCode>("statusCode");
+                HttpStatusCode statusCode = result.GetAsObject<HttpStatusCode>("statusCode");
                 Log.Logger.Debug(message: $"Send Initialize Speaker: {(int)statusCode}-{statusCode}");
             }
             if (!result.GetAsBoolean("valid"))
@@ -77,15 +78,15 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
         /// <param name="speaker">VoiceVox話者ID</param>
         /// <param name="audioQuery">VoiceVoxAPI[audio_query]で生成した音声合成パラメータ</param>
         /// <returns>取得できたかどうか</returns>
-        public bool SendVoiceVoxAudioQueryRequest(string message, string speaker, out MultiDic audioQuery)
+        public bool SendVoiceVoxAudioQueryRequest(string message, string speaker, out IMultiDic audioQuery)
         {
             var retryCount = 0L;
             while (true)
             {
-                var audioQueryResult = VoiceVoxRequestService.SendVoiceVoxAudioQueryRequest(Client, RequestSetting, message, speaker);
+                IMultiDic audioQueryResult = VoiceVoxRequestService.SendVoiceVoxAudioQueryRequest(Client, RequestSetting, message, speaker);
                 if (audioQueryResult.ContainsKey("statusCode"))
                 {
-                    var statusCode = audioQueryResult.GetAsObject<HttpStatusCode>("statusCode");
+                    HttpStatusCode statusCode = audioQueryResult.GetAsObject<HttpStatusCode>("statusCode");
                     Log.Logger.Debug(message: $"Send AudioQuery: {(int)statusCode}-{statusCode}");
                 }
                 if (!audioQueryResult.GetAsBoolean("valid"))
@@ -115,10 +116,10 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
             var retryCount = 0L;
             while (true)
             {
-                var synthesisResult = VoiceVoxRequestService.SendVoiceVoxSynthesisRequest(Client, RequestSetting, audioQuery, speaker);
+                IMultiDic synthesisResult = VoiceVoxRequestService.SendVoiceVoxSynthesisRequest(Client, RequestSetting, audioQuery, speaker);
                 if (synthesisResult.ContainsKey("statusCode"))
                 {
-                    var statusCode = synthesisResult.GetAsObject<HttpStatusCode>("statusCode");
+                    HttpStatusCode statusCode = synthesisResult.GetAsObject<HttpStatusCode>("statusCode");
                     Log.Logger.Debug($"Send Synthesis: {(int)statusCode}-{statusCode}");
                 }
                 if (!synthesisResult.GetAsBoolean("valid"))
@@ -126,7 +127,7 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
                     Log.Logger.Fatal($"Fail to Send Message to VoiceVox[synthesis]: {audioQuery.GetAsString("kana")}");
                     if (!WaitRetry(retryCount++))
                     {
-                        voice = Array.Empty<byte>();
+                        voice = [];
                         return false;
                     }
                     continue;
@@ -145,17 +146,17 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
         /// <returns></returns>
         private List<string> FetchEnableVoiceVoxSpeakers()
         {
-            var result = SendVoiceVoxSpeakersRequest();
+            IMultiDic result = SendVoiceVoxSpeakersRequest();
 
             if (result.GetAsBoolean("valid"))
             {
                 var speakers = result.GetAsMultiList("speakers")
-                                 .Select(s => CastUtil.ToObject<MultiDic>(s))
-                                 .Where(s => s != null)
-                                 .SelectMany(s => s!.GetAsMultiList("styles"))
-                                 .Select(s => CastUtil.ToObject<MultiDic>(s))
-                                 .Where(s => s != null)
-                                 .Select(s => s!.GetAsString("id"))
+                                 .Select(CastUtil.ToObject<MultiDic>)
+                                 .Where(s => s != null).Cast<MultiDic>()
+                                 .SelectMany(s => s.GetAsMultiList("styles"))
+                                 .Select(CastUtil.ToObject<MultiDic>)
+                                 .Where(s => s != null).Cast<MultiDic>()
+                                 .Select(s => s.GetAsString("id"))
                                  .ToList();
 
                 speakers.ForEach(pair => Log.Logger.Debug($"話者登録：{pair}"));
@@ -172,7 +173,7 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
             foreach (var id in Speakers)
             {
                 Log.Logger.Debug($"VoiceVox話者：{id}を初期化します。");
-                var result = VoiceVoxRequestService.SendVoiceVoxInitializeSpeakerRequest(Client, RequestSetting, CastUtil.ToString(id));
+                IMultiDic result = VoiceVoxRequestService.SendVoiceVoxInitializeSpeakerRequest(Client, RequestSetting, CastUtil.ToString(id));
                 Log.Logger.Debug($"VoiceVox話者：{id}の初期化に{(result.GetAsBoolean("valid") ? "成功" : "失敗")}しました。");
             }
         }

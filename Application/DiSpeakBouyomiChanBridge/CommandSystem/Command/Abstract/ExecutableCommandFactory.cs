@@ -12,7 +12,7 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem
         /// <summary>
         /// コマンドを保持する辞書
         /// </summary>
-        public SimpleDic<ExecutableCommand> Dic { get; protected set; } = new();
+        public SimpleDic<ExecutableCommand> Dic { get; protected set; } = [];
 
         /// <summary>
         /// コマンドファクトリの初期化を行います

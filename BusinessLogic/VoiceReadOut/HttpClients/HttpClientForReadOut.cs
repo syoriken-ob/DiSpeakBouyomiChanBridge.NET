@@ -8,7 +8,7 @@ namespace net.boilingwater.BusinessLogic.VoiceReadout.HttpClients
     /// <summary>
     /// 読み上げ処理用の基底HttpClientクラス
     /// </summary>
-    public abstract class HttpClientForReadOut : AbstractHttpClient , IDisposable
+    public abstract class HttpClientForReadOut : AbstractHttpClient, IDisposable
     {
         /// <summary>
         /// シングルトンインスタンス

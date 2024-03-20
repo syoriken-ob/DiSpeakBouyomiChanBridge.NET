@@ -1,5 +1,7 @@
 ﻿using System.Data;
 
+using Microsoft.Data.Sqlite;
+
 using net.boilingwater.Framework.Common.SQLite;
 
 namespace net.boilingwater.BusinessLogic.MessageReplacer.Dao
@@ -38,9 +40,9 @@ namespace net.boilingwater.BusinessLogic.MessageReplacer.Dao
 
             var sqlParams = new SQLiteParameterList
             {
-                { "replace_key", DbType.String, replaceKey },
-                { "replace_value", DbType.String, replaceValue },
-                { "user", DbType.String, user }
+                { "replace_key", SqliteType.Text, replaceKey },
+                { "replace_value", SqliteType.Text, replaceValue },
+                { "user", SqliteType.Text, user }
             };
 
             //更新
@@ -76,7 +78,7 @@ namespace net.boilingwater.BusinessLogic.MessageReplacer.Dao
             var sql = "";
             var sqlParams = new SQLiteParameterList
             {
-                { "replace_key", DbType.String, replaceKey }
+                { "replace_key", SqliteType.Text, replaceKey }
             };
 
             sql += " DELETE FROM replace_setting ";

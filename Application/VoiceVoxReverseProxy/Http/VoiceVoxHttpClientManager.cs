@@ -8,6 +8,7 @@ using net.boilingwater.Framework.Common.Setting;
 using net.boilingwater.Framework.Common.Utils;
 using net.boilingwater.Framework.Core;
 using net.boilingwater.Framework.Core.Extensions;
+using net.boilingwater.Framework.Core.Interface;
 using net.boilingwater.Framework.Core.Utils;
 
 namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
@@ -17,9 +18,9 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
     /// </summary>
     public static class VoiceVoxHttpClientManager
     {
-        private static List<HttpClientForVoiceVoxBridge> HttpClientList { get; set; } = new();
-        private static SimpleDic<HttpClientForVoiceVoxBridge> HttpClientDic { get; set; } = new();
-        private static SimpleDic<SpeakerRemappingDto> SpeakerRemappingDic { get; set; } = new();
+        private static List<HttpClientForVoiceVoxBridge> HttpClientList { get; set; } = [];
+        private static SimpleDic<HttpClientForVoiceVoxBridge> HttpClientDic { get; set; } = [];
+        private static SimpleDic<SpeakerRemappingDto> SpeakerRemappingDic { get; set; } = [];
 
         /// <summary>
         /// 初期化処理
@@ -48,22 +49,22 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
             }
 
             var succeeded = false;
-            speakers = new MultiList();
+            speakers = [];
             HttpClientDic.Clear();
 
             var uniqueSpeakers = new HashSet<string>(128);
-            foreach (var client in HttpClientList)
+            foreach (HttpClientForVoiceVoxBridge client in HttpClientList)
             {
-                var result = client.SendVoiceVoxSpeakersRequest();
+                IMultiDic result = client.SendVoiceVoxSpeakersRequest();
                 if (!result.GetAsBoolean("valid"))
                 {
                     continue;
                 }
                 succeeded = true;
-                var currentClientSpeakers = result.GetAsMultiList("speakers");
-                foreach (var speaker in currentClientSpeakers.Cast<MultiDic?>())//VOICEVOX話者ごと
+                IMultiList currentClientSpeakers = result.GetAsMultiList("speakers");
+                foreach (MultiDic speaker in currentClientSpeakers.CastMulti<MultiDic>())//VOICEVOX話者ごと
                 {
-                    foreach (var style in speaker!.GetAsMultiList("styles").Cast<MultiDic?>().Where(d => d is not null))//話者のスタイルこと
+                    foreach (MultiDic style in speaker!.GetAsMultiList("styles").CastMulti<MultiDic>())//話者のスタイルこと
                     {
                         var id = style!.GetAsString("id");
                         if (uniqueSpeakers.Add(id))
@@ -83,7 +84,7 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
                         }
 
                         var newId = RandomUtil.CreateRandomNumber(9);
-                        style["id"] = newId; //VOICEVOXのレスポンスは数値型
+                        style!["id"] = newId; //VOICEVOXのレスポンスは数値型
 
                         VoiceVoxSpeakerMappingService.InsertMapping(
                             speaker.GetAsGuid("speaker_uuid"),
@@ -109,7 +110,7 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
         /// <returns>正常にVoiceVox話者を初期化できたか</returns>
         public static bool SendVoiceVoxInitializeSpeakerRequest(string speaker)
         {
-            var (speakerId, client) = FindActualVoiceVoxSpeakerIdAndHttpClient(speaker);
+            (var speakerId, HttpClientForVoiceVoxBridge client) = FindActualVoiceVoxSpeakerIdAndHttpClient(speaker);
             return client.SendVoiceVoxInitializeSpeakerRequest(speakerId);
         }
 
@@ -120,7 +121,7 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
         /// <param name="speaker">VoiceVox話者ID</param>
         /// <param name="audioQuery">VoiceVoxAPI[audio_query]で生成した音声合成パラメータ</param>
         /// <returns>取得できたかどうか</returns>
-        public static bool SendVoiceVoxAudioQueryRequest(string message, string speaker, out MultiDic audioQuery)
+        public static bool SendVoiceVoxAudioQueryRequest(string message, string speaker, out IMultiDic audioQuery)
         {
             const string CacheKey = "VoiceVoxHttpClientManager#AudioQuery";
             var key = $"{CacheKey}#{speaker}#{message}";
@@ -132,7 +133,7 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
                 return true;
             }
 
-            var (speakerId, client) = FindActualVoiceVoxSpeakerIdAndHttpClient(speaker);
+            (var speakerId, HttpClientForVoiceVoxBridge client) = FindActualVoiceVoxSpeakerIdAndHttpClient(speaker);
 
             var result = client.SendVoiceVoxAudioQueryRequest(message, speakerId, out audioQuery);
 
@@ -163,7 +164,7 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
                 return true;
             }
 
-            var (speakerId, client) = FindActualVoiceVoxSpeakerIdAndHttpClient(speaker);
+            (var speakerId, HttpClientForVoiceVoxBridge client) = FindActualVoiceVoxSpeakerIdAndHttpClient(speaker);
 
             var result = client.SendVoiceVoxSynthesisRequest(audioQuery, speakerId, out voice);
 
@@ -182,7 +183,7 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
         /// </summary>
         private static void CreateHttpClients()
         {
-            var d = Settings.AsStringList("Map.VoiceVox.Application.HostAndPort");
+            IList<string> d = Settings.AsMultiList("Map.VoiceVox.Application.HostAndPort").CastMulti<string>();
 
             foreach (var p in d)
             {
@@ -212,18 +213,18 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
         /// <returns></returns>
         private static (string speakerId, HttpClientForVoiceVoxBridge client) FindActualVoiceVoxSpeakerIdAndHttpClient(string id)
         {
-            if (!HttpClientDic.ContainsKey(id) || HttpClientDic[id] == null)
+            if (!HttpClientDic.TryGetValue(id, out HttpClientForVoiceVoxBridge? client) || client == null)
             {
                 throw new ArgumentException("不正なVOICEVOX話者IDが指定されました。");
             }
 
-            if (SpeakerRemappingDic.ContainsKey(id))
+            if (SpeakerRemappingDic.TryGetValue(id, out SpeakerRemappingDto dto))
             {
-                var key = SpeakerRemappingDic[id];
-                return (key.Id, HttpClientDic[id]!);
+                SpeakerRemappingDto key = dto;
+                return (key.Id, client);
             }
 
-            return (id, HttpClientDic[id]!);
+            return (id, client);
         }
 
         #endregion private

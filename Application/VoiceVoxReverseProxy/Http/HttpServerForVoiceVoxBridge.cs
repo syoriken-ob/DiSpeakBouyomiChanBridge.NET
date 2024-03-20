@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -6,6 +7,8 @@ using System.Text;
 
 using net.boilingwater.Framework.Common.Http;
 using net.boilingwater.Framework.Common.Setting;
+using net.boilingwater.Framework.Core;
+using net.boilingwater.Framework.Core.Interface;
 using net.boilingwater.Framework.Core.Utils;
 
 namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
@@ -80,11 +83,11 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
         /// <param name="context"><see cref="HttpListenerContext"/></param>
         private static void SetResponseFromSpeakersRequest(HttpListenerContext context)
         {
-            if (!VoiceVoxHttpClientManager.FetchAllVoiceVoxSpeakers(out var speakers))
+            if (!VoiceVoxHttpClientManager.FetchAllVoiceVoxSpeakers(out MultiList? speakers))
             {
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
             }
-            var response = context.Response;
+            HttpListenerResponse response = context.Response;
             response.StatusCode = (int)HttpStatusCode.OK;
             response.ContentEncoding = Encoding.UTF8;
 
@@ -100,8 +103,8 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
         /// <param name="context"><see cref="HttpListenerContext"/></param>
         private static void SetResponseFromInitializeSpeakerRequest(HttpListenerContext context)
         {
-            var query = context.Request.QueryString;
-            var response = context.Response;
+            NameValueCollection query = context.Request.QueryString;
+            HttpListenerResponse response = context.Response;
 
             if (!query.AllKeys.Contains(Settings.AsString("VoiceVox.Request.InitializeSpeaker.ParamName.Speaker")))
             {
@@ -128,8 +131,8 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
         /// <param name="context"><see cref="HttpListenerContext"/></param>
         private static void SetResponseFromAudioQueryRequest(HttpListenerContext context)
         {
-            var query = context.Request.QueryString;
-            var response = context.Response;
+            NameValueCollection query = context.Request.QueryString;
+            HttpListenerResponse response = context.Response;
 
             if (!query.AllKeys.Contains("speaker") || !query.AllKeys.Contains("text"))
             {
@@ -144,7 +147,7 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
                 if (!VoiceVoxHttpClientManager.SendVoiceVoxAudioQueryRequest(
                     CastUtil.ToString(query.Get("text")),
                     CastUtil.ToString(query.Get("speaker")),
-                    out var audioQuery
+                    out IMultiDic? audioQuery
                 ))
                 {
                     response.StatusCode = (int)HttpStatusCode.BadRequest;
@@ -168,9 +171,9 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
         /// <param name="context"><see cref="HttpListenerContext"/></param>
         private static void SetResponseFromSynthesisRequest(HttpListenerContext context)
         {
-            var query = context.Request.QueryString;
-            var request = context.Request;
-            var response = context.Response;
+            NameValueCollection query = context.Request.QueryString;
+            HttpListenerRequest request = context.Request;
+            HttpListenerResponse response = context.Response;
 
             if (!query.AllKeys.Contains("speaker"))
             {
@@ -179,7 +182,7 @@ namespace net.boilingwater.Application.VoiceVoxReverseProxy.Http
             }
 
             using var stream = new StreamReader(request.InputStream);
-            var input = SerializeUtil.JsonToMultiDic(stream.ReadToEnd());
+            MultiDic input = SerializeUtil.JsonToMultiDic(stream.ReadToEnd());
 
             if (!input.Any())
             {

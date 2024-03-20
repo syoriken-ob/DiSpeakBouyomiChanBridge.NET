@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 
 using net.boilingwater.external.VBanProtocolEmitter;
 using net.boilingwater.Framework.Common.Setting;

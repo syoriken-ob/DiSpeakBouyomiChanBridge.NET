@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
@@ -16,9 +15,9 @@ using net.boilingwater.BusinessLogic.VoiceReadOut.VoiceExecutor;
 using net.boilingwater.external.DiscordClient;
 using net.boilingwater.Framework.Common.Initialize;
 using net.boilingwater.Framework.Common.Setting;
+using net.boilingwater.Framework.Core;
 using net.boilingwater.Framework.Core.Initialize;
 using net.boilingwater.Framework.Core.Logging;
-using net.boilingwater.Framework.Core.Utils;
 
 namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge
 {
@@ -38,10 +37,8 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge
 
             InitializeBusinessLogic();
 
-
             InitializeCommand();
             InitializeHttpServer();
-
 
             CommandHandlingService.Initialize();
 
@@ -117,8 +114,7 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge
                     _client.Logging = discordEventHandler.Logging;
                 }
 
-                List<string> guilds = Settings.AsStringList("List.ReadOutTarget.Guild") ?? throw new ApplicationException("DiscordサーバーIDが間違っています");
-                if (!guilds.All(guild => CastUtil.ToUnsignedLong(guild) > 0UL))
+                if (!Settings.AsMultiList("List.ReadOutTarget.Guild").CastMulti<ulong>().All(guild => guild > 0UL))
                 {
                     throw new ApplicationException("DiscordサーバーIDが間違っています");
                 }
