@@ -1,8 +1,10 @@
 ﻿using System;
 
+using static net.boilingwater.external.VBanProtocolEmitter.Stricts.VBanHeader;
+
 namespace net.boilingwater.external.VBanProtocolEmitter.Stricts;
 
-public readonly struct VBanHeader(VBanHeader.FormatSamplingRate samplingRate, VBanHeader.SubProtocol subProtocol, byte sampleCount, byte channel, VBanHeader.FormatBitDepth bitDepth, VBanHeader.Codec codec, string streamName, uint counter)
+public readonly struct VBanHeader(FormatSamplingRate samplingRate, SubProtocol subProtocol, byte sampleCount, byte channel, FormatBitDepth bitDepth, Codec codec, string streamName, uint counter)
 {
     private readonly char[] vban = ['V', 'B', 'A', 'N'];
 
