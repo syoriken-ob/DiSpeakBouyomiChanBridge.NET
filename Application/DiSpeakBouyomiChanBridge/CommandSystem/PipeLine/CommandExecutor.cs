@@ -7,123 +7,122 @@ using System.Threading;
 using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Impl;
 using net.boilingwater.Framework.Core.Logging;
 
-namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.PipeLine
+namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.PipeLine;
+
+/// <summary>
+/// コマンドを順次実行する
+/// </summary>
+public sealed class CommandExecutor : IDisposable
 {
+    private Thread? _thread;
+    private BlockingCollection<Command>? _commands = [];
+    private Command? _active;
+
     /// <summary>
-    /// コマンドを順次実行する
+    /// コンストラクタ
     /// </summary>
-    public sealed class CommandExecutor : IDisposable
+    public CommandExecutor()
     {
-        private Thread? _thread;
-        private BlockingCollection<Command>? _commands = new();
-        private Command? _active;
-
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        public CommandExecutor()
+        _thread = new Thread(() =>
         {
-            _thread = new Thread(() =>
-            {
-                foreach (Command command in _commands.GetConsumingEnumerable())
-                {
-                    try
-                    {
-                        command.Execute();
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Logger.Error(ex);
-                    }
-                    finally
-                    {
-                        if (_active != null)
-                        {
-                            lock (_active)
-                            {
-                                _active = null;
-                            }
-                        }
-                    }
-                }
-            })
-            {
-                IsBackground = true
-            };
-            _thread.Start();
-        }
-
-        /// <summary>
-        /// コマンドを実行キューに追加します
-        /// </summary>
-        /// <param name="command">追加するコマンド</param>
-        /// <exception cref="InvalidOperationException"></exception>
-        internal void Add(Command command)
-        {
-            if (_commands == null)
-            {
-                throw new InvalidOperationException();
-            }
-            _commands.Add(command);
-        }
-
-        /// <summary>
-        /// リソースを解放します
-        /// </summary>
-        public void Dispose()
-        {
-            if (_thread != null)
+            foreach (Command command in _commands.GetConsumingEnumerable())
             {
                 try
                 {
-                    _thread.Interrupt();
+                    command.Execute();
                 }
-                catch (Exception) { }
-                if (_commands != null)
+                catch (Exception ex)
                 {
-                    _commands.CompleteAdding();
-                    _commands.Dispose();
+                    Log.Logger.Error(ex);
                 }
-                _thread.Join();
-                _commands = null;
-                _thread = null;
+                finally
+                {
+                    if (_active != null)
+                    {
+                        lock (_active)
+                        {
+                            _active = null;
+                        }
+                    }
+                }
             }
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// キュー中のコマンドの複製を取得します
-        /// </summary>
-        /// <returns></returns>
-        internal List<Command> GetCommandsInQueue()
+        })
         {
-            var commands = new List<Command>();
+            IsBackground = true
+        };
+        _thread.Start();
+    }
 
-            if (_active != null)
+    /// <summary>
+    /// コマンドを実行キューに追加します
+    /// </summary>
+    /// <param name="command">追加するコマンド</param>
+    /// <exception cref="InvalidOperationException"></exception>
+    internal void Add(Command command)
+    {
+        if (_commands == null)
+        {
+            throw new InvalidOperationException();
+        }
+        _commands.Add(command);
+    }
+
+    /// <summary>
+    /// リソースを解放します
+    /// </summary>
+    public void Dispose()
+    {
+        if (_thread != null)
+        {
+            try
             {
-                commands.Add((Command)_active.Clone());
+                _thread.Interrupt();
             }
+            catch (Exception) { }
             if (_commands != null)
             {
-                commands.AddRange(_commands.Select(command => (Command)command.Clone()));
+                _commands.CompleteAdding();
+                _commands.Dispose();
             }
+            _thread.Join();
+            _commands = null;
+            _thread = null;
+        }
+        GC.SuppressFinalize(this);
+    }
 
-            return commands;
+    /// <summary>
+    /// キュー中のコマンドの複製を取得します
+    /// </summary>
+    /// <returns></returns>
+    internal List<Command> GetCommandsInQueue()
+    {
+        var commands = new List<Command>();
+
+        if (_active != null)
+        {
+            commands.Add((Command)_active.Clone());
+        }
+        if (_commands != null)
+        {
+            commands.AddRange(_commands.Select(command => (Command)command.Clone()));
         }
 
-        /// <summary>
-        /// すべてのコマンドを終了する
-        /// </summary>
-        internal void ClearTask()
+        return commands;
+    }
+
+    /// <summary>
+    /// すべてのコマンドを終了する
+    /// </summary>
+    internal void ClearTask()
+    {
+        if (_commands == null)
         {
-            if (_commands == null)
-            {
-                return;
-            }
-            while (_commands.Count > 0)
-            {
-                _ = _commands.TryTake(out _);
-            }
+            return;
+        }
+        while (_commands.Count > 0)
+        {
+            _ = _commands.TryTake(out _);
         }
     }
 }

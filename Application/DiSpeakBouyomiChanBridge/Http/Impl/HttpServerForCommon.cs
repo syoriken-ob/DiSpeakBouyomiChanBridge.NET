@@ -6,60 +6,62 @@ using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Dto;
 using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Service;
 using net.boilingwater.Framework.Common.Http;
 using net.boilingwater.Framework.Common.Setting;
+using net.boilingwater.Framework.Core;
+using net.boilingwater.Framework.Core.Extensions;
 using net.boilingwater.Framework.Core.Logging;
 using net.boilingwater.Framework.Core.Utils;
 
-namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.Http.Impl
+namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.Http.Impl;
+
+/// <summary>
+/// メッセージを受信する共通HttpServer
+/// </summary>
+public class HttpServerForCommon : AbstractHttpServer
 {
     /// <summary>
-    /// メッセージを受信する共通HttpServer
+    /// シングルトンインスタンス
     /// </summary>
-    public class HttpServerForCommon : AbstractHttpServer
+    public static HttpServerForCommon Instance { get; private set; }
+
+    static HttpServerForCommon() => Instance = new();
+
+    /// <inheritdoc/>
+    protected override void RegisterListeningUrlPrefix(HttpListenerPrefixCollection prefixes)
     {
-        /// <summary>
-        /// シングルトンインスタンス
-        /// </summary>
-        public static HttpServerForCommon Instance { get; private set; }
-
-        static HttpServerForCommon() => Instance = new();
-
-        /// <inheritdoc/>
-        protected override void RegisterListeningUrlPrefix(HttpListenerPrefixCollection prefixes)
-        {
-            Settings.AsStringList("List.CommonVoiceReadoutServer.ListeningHost")
-                    .ForEach(host => prefixes.Add(new UriBuilder()
-                    {
-                        Scheme = "http",
-                        Host = host,
-                        Port = Settings.AsInteger("CommonVoiceReadoutServer.ListeningPort"),
-                        Path = "/"
-                    }.Uri.ToString()));
-        }
-
-        /// <inheritdoc/>
-        protected override void OnRequestReceived(HttpListenerContext context)
-        {
-            HttpListenerRequest request = context.Request;
-            var message = "";
-            using (HttpListenerResponse response = context.Response)
-            {
-                if (request.HttpMethod != HttpMethod.Get.Method)
+        Settings.AsMultiList("List.CommonVoiceReadoutServer.ListeningHost")
+                .CastMulti<string>()
+                .ForEach(host => prefixes.Add(new UriBuilder()
                 {
-                    return;
-                }
+                    Scheme = "http",
+                    Host = host,
+                    Port = Settings.AsInteger("CommonVoiceReadoutServer.ListeningPort"),
+                    Path = "/"
+                }.Uri.ToString()));
+    }
 
-                message = CastUtil.ToString(request.GetTextMessage("text"));
-                response.StatusCode = (int)HttpStatusCode.OK;
+    /// <inheritdoc/>
+    protected override void OnRequestReceived(HttpListenerContext context)
+    {
+        HttpListenerRequest request = context.Request;
+        var message = "";
+        using (HttpListenerResponse response = context.Response)
+        {
+            if (request.HttpMethod != HttpMethod.Get.Method)
+            {
+                return;
             }
 
-            Log.Logger.Debug($"Receive({GetType().Name}) :{message}");
-
-            CommandHandlingService.Handle(new CommandHandlingContext(message));
+            message = CastUtil.ToString(request.GetTextMessage("text"));
+            response.StatusCode = (int)HttpStatusCode.OK;
         }
-    }
 
-    internal static partial class HttpListenerRequestExtension
-    {
-        public static string? GetTextMessage(this HttpListenerRequest request, string parameterName) => request.QueryString[parameterName];
+        Log.Logger.Debug($"Receive({GetType().Name}) :{message}");
+
+        CommandHandlingService.Handle(new CommandHandlingContext(message));
     }
+}
+
+internal static partial class HttpListenerRequestExtension
+{
+    public static string? GetTextMessage(this HttpListenerRequest request, string parameterName) => request.QueryString[parameterName];
 }
