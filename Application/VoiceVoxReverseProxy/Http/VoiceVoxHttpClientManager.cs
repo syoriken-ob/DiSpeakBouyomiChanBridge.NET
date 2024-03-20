@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using net.boilingwater.BusinessLogic.VoiceVoxSpeakerCache.Dto;
-using net.boilingwater.BusinessLogic.VoiceVoxSpeakerCache.Service;
+using net.boilingwater.BusinessLogic.VoiceVoxSpeakerMapping.Dto;
+using net.boilingwater.BusinessLogic.VoiceVoxSpeakerMapping.Service;
 using net.boilingwater.Framework.Common.Setting;
 using net.boilingwater.Framework.Common.Utils;
 using net.boilingwater.Framework.Core;

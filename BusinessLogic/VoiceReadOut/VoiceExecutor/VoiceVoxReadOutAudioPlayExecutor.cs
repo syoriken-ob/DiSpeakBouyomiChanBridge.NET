@@ -5,69 +5,68 @@ using System.Threading;
 using net.boilingwater.external.AudioPlay;
 using net.boilingwater.Framework.Core.Logging;
 
-namespace net.boilingwater.BusinessLogic.VoiceReadOut.VoiceExecutor
+namespace net.boilingwater.BusinessLogic.VoiceReadOut.VoiceExecutor;
+
+/// <summary>
+/// VoiceVoxで生成した音声を順次再生します。
+/// </summary>
+public class VoiceVoxReadOutAudioPlayExecutor : VoiceVoxReadOutExecutor
 {
+    private readonly Thread _thread;
+    private readonly BlockingCollection<byte[]> _audioStreamByteArrays = [];
+
     /// <summary>
-    /// VoiceVoxで生成した音声を順次再生します。
+    /// コンストラクタ
     /// </summary>
-    public class VoiceVoxReadOutAudioPlayExecutor : VoiceVoxReadOutExecutor
+    public VoiceVoxReadOutAudioPlayExecutor()
     {
-        private readonly Thread _thread;
-        private readonly BlockingCollection<byte[]> _audioStreamByteArrays = [];
-
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        public VoiceVoxReadOutAudioPlayExecutor()
+        _thread = new Thread(() =>
         {
-            _thread = new Thread(() =>
+            foreach (var voiceStreamByteArr in _audioStreamByteArrays.GetConsumingEnumerable())
             {
-                foreach (var voiceStreamByteArr in _audioStreamByteArrays.GetConsumingEnumerable())
+                try
                 {
-                    try
-                    {
-                        AudioPlayer.Play(voiceStreamByteArr);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Logger.Error(ex);
-                    }
+                    AudioPlayer.Play(voiceStreamByteArr);
                 }
-            })
-            {
-                IsBackground = true
-            };
-            _thread.Start();
-        }
-
-        /// <summary>
-        /// VoiceVoxで生成した音声データのバイト配列を再生キューに追加します。
-        /// </summary>
-        /// <param name="audioStreamByteArray"></param>
-        /// <exception cref="ArgumentNullException"></exception>
-        public override void AddQueue(byte[] audioStreamByteArray)
+                catch (Exception ex)
+                {
+                    Log.Logger.Error(ex);
+                }
+            }
+        })
         {
-            if (audioStreamByteArray == null)
-            {
-                throw new ArgumentNullException(nameof(audioStreamByteArray));
-            }
-            _audioStreamByteArrays.Add(audioStreamByteArray);
-        }
+            IsBackground = true
+        };
+        _thread.Start();
+    }
 
-        public override void Dispose()
+    /// <summary>
+    /// VoiceVoxで生成した音声データのバイト配列を再生キューに追加します。
+    /// </summary>
+    /// <param name="audioStreamByteArray"></param>
+    /// <exception cref="ArgumentNullException"></exception>
+    public override void AddQueue(byte[] audioStreamByteArray)
+    {
+        if (audioStreamByteArray == null)
         {
-            try
-            {
-                _thread.Interrupt();
-            }
-            catch
-            {
-                //何もしない
-            }
-            finally
-            {
-                _audioStreamByteArrays.Dispose();
-            }
+            throw new ArgumentNullException(nameof(audioStreamByteArray));
+        }
+        _audioStreamByteArrays.Add(audioStreamByteArray);
+    }
+
+    public override void Dispose()
+    {
+        try
+        {
+            _thread.Interrupt();
+        }
+        catch
+        {
+            //何もしない
+        }
+        finally
+        {
+            _audioStreamByteArrays.Dispose();
         }
     }
 }
