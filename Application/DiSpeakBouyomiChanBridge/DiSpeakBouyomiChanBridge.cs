@@ -19,10 +19,7 @@ public class DiSpeakBouyomiChanBridge
         {
             ApplicationInitializer.Initialize();
             ApplicationInitializer.Start();
-            while (true)
-            {
-                Console.ReadLine();
-            }
+            return 0;
         }
         catch (Exception e)
         {

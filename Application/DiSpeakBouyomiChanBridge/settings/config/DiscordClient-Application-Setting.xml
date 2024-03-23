@@ -11,21 +11,21 @@
       ####################
   -->
 
-  <!-- Discord.Netのログ出力をリダイレクトする(True:する,False:しない) -->
-  <Item key="Use.RedirectLogDiscord.Net"       value="False" />
+  <!-- Discordログ出力をリダイレクトする(True:する,False:しない) -->
+  <Item key="Use.InternalDiscordClient.RedirectLog"                           value="False" />
 
   <!-- サーバーのテキストチャンネルの読み上げ機能を利用する(True:利用する,False:利用しない) -->
-  <Item key="Use.ReadOut.GuildChannel.Text"    value="True" />
+  <Item key="Use.InternalDiscordClient.ReadOut.GuildTextChannel"              value="True" />
   <!-- サーバーのボイスチャンネルの読み上げ機能を利用する(True:利用する,False:利用しない) -->
-  <Item key="Use.ReadOut.GuildChannel.Voice"   value="True" />
+  <Item key="Use.InternalDiscordClient.ReadOut.GuildVoiceChannel"             value="True" />
 
   <!-- メッセージ中のスポイラー読み上げ省略機能を利用する(True:利用する,False:利用しない) -->
-  <Item key="Use.ReadOutReplace.Spoiler"       value="True" />
+  <Item key="Use.InternalDiscordClient.ReadOutReplace.Spoiler"                value="True" />
 
-  <!-- List.ReadOutTarget.GuildChannel.Textの指定をホワイトリスト方式とする(True:ホワイトリスト,False:ブラックリスト) -->
-  <Item key="Use.ReadOutTarget.GuildChannel.Text.WhiteList"     value="True" />
-  <!-- List.ReadOutTarget.GuildChannel.Voiceの指定をホワイトリスト方式とする(True:ホワイトリスト,False:ブラックリスト) -->
-  <Item key="Use.ReadOutTarget.GuildChannel.Voice.WhiteList"    value="True" />
+  <!-- List.InternalDiscordClient.ReadOutTarget.GuildTextChannelの指定をホワイトリスト方式とする(True:ホワイトリスト,False:ブラックリスト) -->
+  <Item key="Use.InternalDiscordClient.ReadOut.GuildTextChannel.WhiteList"    value="True" />
+  <!-- List.InternalDiscordClient.ReadOutTarget.GuildVoiceChannelの指定をホワイトリスト方式とする(True:ホワイトリスト,False:ブラックリスト) -->
+  <Item key="Use.InternalDiscordClient.ReadOut.GuildVoiceChannel.WhiteList"   value="True" />
 
   <!--
       ##################
@@ -33,19 +33,19 @@
       ##################
   -->
   <!-- メッセージ監視用DiscordBOTトークン（BOTが読み上げさせたいサーバーに参加している必要があります） -->
-  <Item key="DiscordToken"                           value="{DISCORD_TOKEN}" />
+  <Item key="InternalDiscordClient.DiscordToken"                            value="{DISCORD_TOKEN}" />
   <!-- 読み上げさせたいサーバーID（カンマ区切りで複数設定可,カンマ前後のスペースはトリムされます） -->
-  <Item key="List.ReadOutTarget.Guild"               value="{DISCORD_READOUT_GUILD_LIST}" />
+  <Item key="List.InternalDiscordClient.ReadOutTarget.Guild"                value="{DISCORD_READOUT_GUILD_LIST}" />
   <!-- 対象とするサーバーのテキストチャンネルID（カンマ区切りで複数設定可,カンマ前後のスペースはトリムされます） -->
-  <Item key="List.ReadOutTarget.GuildChannel.Text"   value="{DISCORD_READOUT_GUILD_TEXT_CHANNEL_LIST}" />
+  <Item key="List.InternalDiscordClient.ReadOutTarget.GuildTextChannel"     value="{DISCORD_READOUT_GUILD_TEXT_CHANNEL_LIST}" />
   <!-- 対象とするサーバーのボイスチャンネルID（カンマ区切りで複数設定可,カンマ前後のスペースはトリムされます） -->
-  <Item key="List.ReadOutTarget.GuildChannel.Voice"  value="{DISCORD_READOUT_GUILD_VOICE_CHANNEL_LIST}" />
+  <Item key="List.InternalDiscordClient.ReadOutTarget.GuildVoiceChannel"    value="{DISCORD_READOUT_GUILD_VOICE_CHANNEL_LIST}" />
 
   <!--
       ##############
       ## ログ設定 ##
       ##############
   -->
-  <!-- Discord.Netのログ出力をリダイレクトする最低レベル(Critical,Error,Warning,Info,Verbose,Debugのうちどれかを記入,空欄の場合はDebug扱い) -->
-  <Item key="RedirectLogDiscord.Net.LogSeverity"   value="Info" />
+  <!-- Discordログ出力をリダイレクトする最低レベル(Critical,Error,Warning,Information,Debug,Traceのうちどれかを記入,空欄の場合はTrace扱い) -->
+  <Item key="InternalDiscordClient.RedirectLog.LogSeverity"   value="Information" />
 </Settings>

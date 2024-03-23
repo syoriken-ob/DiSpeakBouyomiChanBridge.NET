@@ -85,7 +85,7 @@ public static class MessageReplaceService
 
         message = Regex.Replace(
             message,
-            Settings.AsString("RegularExpression.URLShortener"),
+            Settings.AsString("Regex.URLShortener"),
             Settings.AsString("Format.Replace.URLShortener"),
             RegexOptions.Singleline
         );

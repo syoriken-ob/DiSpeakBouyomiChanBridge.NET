@@ -13,16 +13,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Discord.Net" Version="3.11.0" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\BusinessLogic\Common.User\net.boilingwater.BusinessLogic.Common.User.csproj" />
     <ProjectReference Include="..\..\BusinessLogic\MessageReplacer\net.boilingwater.BusinessLogic.MessageReplacer.csproj" />
     <ProjectReference Include="..\..\BusinessLogic\VoiceReadOut\net.boilingwater.BusinessLogic.VoiceReadOut.csproj" />
     <ProjectReference Include="..\..\external\VBanProtocolEmitter\net.boilingwater.external.VBanProtocolEmitter.csproj" />
     <ProjectReference Include="..\..\Framework\net.boilingwater.Framework.Common\net.boilingwater.Framework.Common.csproj" />
-    <ProjectReference Include="..\..\external\DiscordClient\net.boilingwater.external.DiscordClient.csproj" />
     <ProjectReference Include="..\..\Framework\net.boilingwater.Framework.Core\net.boilingwater.Framework.Core.csproj" />
   </ItemGroup>
 
@@ -83,5 +78,11 @@
 
   <ItemGroup>
     <Folder Include="Initialize\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DSharpPlus" Version="4.4.6" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Log4Net.AspNetCore" Version="8.0.0" />
   </ItemGroup>
 </Project>

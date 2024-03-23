@@ -1,34 +1,67 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 
-using Discord.WebSocket;
+using DSharpPlus.Entities;
 
 using net.boilingwater.Framework.Common.Setting;
 using net.boilingwater.Framework.Core;
-using net.boilingwater.Framework.Core.Utils;
 
 namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge.InternalDiscordClient.Services;
 
+/// <summary>
+/// Discordから取得したボイスステータス更新情報に対して行う処理を定義します
+/// </summary>
 internal class DiscordUserVoiceStateUpdatedService
 {
+    #region 列挙型
+
+    /// <summary>
+    /// ボイスチャンネルでユーザーが行った操作を示す列挙子
+    /// </summary>
     internal enum VoiceState
     {
-        JOIN, LEAVE, MOVE, START_STREAMING, END_STREAMING, UNKNOWN
+        /// <summary>ボイスチャンネルに参加</summary>
+        JOIN,
+
+        /// <summary>ボイスチャンネルから退出</summary>
+        LEAVE,
+
+        /// <summary>ボイスチャンネルを移動</summary>
+        MOVE,
+
+        /// <summary>画面共有を開始</summary>
+        START_STREAMING,
+
+        /// <summary>画面共有を終了</summary>
+        END_STREAMING,
+
+        /// <summary>未定義</summary>
+        UNKNOWN
     }
 
-    internal static bool IsReadOutTargetGuild(SocketVoiceState sourceVoiceState, SocketVoiceState targetVoiceState)
+    #endregion 列挙型
+
+    #region 判定処理
+
+    /// <summary>
+    /// イベントが読み上げ対象のサーバーで発生したかどうか判定します
+    /// </summary>
+    /// <param name="beforeState">イベント発生前のボイス状態</param>
+    /// <param name="afterState">イベント発生後のボイス状態</param>
+    /// <returns><see langword="true"/>：読み上げ対象、<see langword="false"/>：読み上げ対象以外</returns>
+    internal static bool IsReadOutTargetGuild(DiscordVoiceState beforeState, DiscordVoiceState afterState)
     {
-        if (sourceVoiceState.VoiceChannel == null && targetVoiceState.VoiceChannel == null)
+        if (beforeState?.Channel == null && afterState?.Channel == null)
         {
             return false;
         }
-        IList<string> targetGuilds = Settings.AsMultiList("List.ReadOutTarget.Guild").CastMulti<string>();
-        if (sourceVoiceState.VoiceChannel != null &&
-            !targetGuilds.Contains(CastUtil.ToString(sourceVoiceState.VoiceChannel.Guild.Id)))
+
+        IList<ulong> targetGuilds = Settings.AsMultiList("List.InternalDiscordClient.ReadOutTarget.Guild").CastMulti<ulong>();
+        if (beforeState?.Channel != null && !targetGuilds.Contains(beforeState.Channel.Guild.Id))
         {
             return false;
         }
-        if (targetVoiceState.VoiceChannel != null &&
-            !targetGuilds.Contains(CastUtil.ToString(targetVoiceState.VoiceChannel.Guild.Id)))
+        if (afterState?.Channel != null && !targetGuilds.Contains(afterState.Channel.Guild.Id))
         {
             return false;
         }
@@ -36,26 +69,30 @@ internal class DiscordUserVoiceStateUpdatedService
         return true;
     }
 
-    internal static bool IsReadOutTargetGuildChannel(SocketVoiceState sourceVoiceState, SocketVoiceState targetVoiceState)
+    /// <summary>
+    /// イベントが読み上げ対象のサーバーのボイスチャンネルで発生したかどうか判定します
+    /// </summary>
+    /// <param name="beforeState">イベント発生前のボイス状態</param>
+    /// <param name="afterState">イベント発生後のボイス状態</param>
+    /// <returns><see langword="true"/>：読み上げ対象、<see langword="false"/>：読み上げ対象以外</returns>
+    internal static bool IsReadOutTargetGuildChannel(DiscordVoiceState beforeState, DiscordVoiceState afterState)
     {
-        if (sourceVoiceState.VoiceChannel == null && targetVoiceState.VoiceChannel == null)
+        if (beforeState?.Channel == null && afterState?.Channel == null)
         {
             return false;
         }
 
-        IList<string> targetGuildChannels = Settings.AsMultiList("List.ReadOutTarget.GuildChannel.Voice").CastMulti<string>();
-        if (sourceVoiceState.VoiceChannel != null &&
-            !targetGuildChannels.Contains(CastUtil.ToString(sourceVoiceState.VoiceChannel.Id)))
+        IList<ulong> targetGuildChannels = Settings.AsMultiList("List.InternalDiscordClient.ReadOutTarget.GuildVoiceChannel").CastMulti<ulong>();
+        if (beforeState?.Channel != null && !targetGuildChannels.Contains(beforeState.Channel.Id))
         {
-            if (!Settings.AsBoolean("Use.ReadOutTarget.GuildChannel.Voice.WhiteList"))
+            if (!Settings.AsBoolean("Use.InternalDiscordClient.ReadOut.GuildVoiceChannel.WhiteList"))
             {
                 return false;
             }
         }
-        if (targetVoiceState.VoiceChannel != null &&
-            !targetGuildChannels.Contains(CastUtil.ToString(targetVoiceState.VoiceChannel.Id)))
+        if (afterState?.Channel != null && !targetGuildChannels.Contains(afterState.Channel.Id))
         {
-            if (!Settings.AsBoolean("Use.ReadOutTarget.GuildChannel.Voice.WhiteList"))
+            if (!Settings.AsBoolean("Use.InternalDiscordClient.ReadOut.GuildVoiceChannel.WhiteList"))
             {
                 return false;
             }
@@ -64,29 +101,35 @@ internal class DiscordUserVoiceStateUpdatedService
         return true;
     }
 
-    internal static VoiceState DetectVoiceStateUpdate(SocketVoiceState sourceVoiceState, SocketVoiceState targetVoiceState)
+    /// <summary>
+    /// ボイス状態からユーザーが行った操作を特定します。
+    /// </summary>
+    /// <param name="beforeState">イベント発生前のボイス状態</param>
+    /// <param name="afterState">イベント発生後のボイス状態</param>
+    /// <returns><see cref="VoiceState"/>：特定したユーザー操作列挙子</returns>
+    internal static VoiceState DetectVoiceStateUpdate(DiscordVoiceState beforeState, DiscordVoiceState afterState)
     {
-        if (sourceVoiceState.VoiceChannel == null)
+        if (beforeState?.Channel == null)
         {
             return VoiceState.JOIN;
         }
 
-        if (targetVoiceState.VoiceChannel == null)
+        if (afterState?.Channel == null)
         {
             return VoiceState.LEAVE;
         }
 
-        if (sourceVoiceState.VoiceChannel.Id != targetVoiceState.VoiceChannel.Id)
+        if (beforeState?.Channel?.Id != afterState?.Channel?.Id)
         {
             return VoiceState.MOVE;
         }
 
-        if (sourceVoiceState.IsStreaming == false && targetVoiceState.IsStreaming == true)
+        if (beforeState?.IsSelfStream == false && afterState?.IsSelfStream == true)
         {
             return VoiceState.START_STREAMING;
         }
 
-        if (sourceVoiceState.IsStreaming == true && targetVoiceState.IsStreaming == false)
+        if (beforeState?.IsSelfStream == true && afterState?.IsSelfStream == false)
         {
             return VoiceState.END_STREAMING;
         }
@@ -94,79 +137,117 @@ internal class DiscordUserVoiceStateUpdatedService
         return VoiceState.UNKNOWN;
     }
 
-    private static string ReplaceCommonVoiceStateInfo(string format, SocketGuildUser guildUser, SocketVoiceState sourceVoiceState, SocketVoiceState targetVoiceState)
+    #endregion 判定処理
+
+    #region メッセージ生成処理
+
+    /// <summary>
+    /// ユーザーがボイスチャンネルに参加した時の読み上げメッセージを生成します。
+    /// </summary>
+    /// <param name="user">Discordユーザー（Discordサーバーメンバー）</param>
+    /// <param name="beforeState">イベント発生前のボイス状態</param>
+    /// <param name="afterState">イベント発生後のボイス状態</param>
+    /// <returns>読み上げメッセージ</returns>
+    internal static string GetJoinVoiceChannelMessage(DiscordUser user, DiscordVoiceState beforeState, DiscordVoiceState afterState)
     {
-        if (format.Contains(Settings.AsString("ReplaceKey.DiscordMessage.UserName")))
+        var format = new StringBuilder(Settings.AsString("Format.InternalDiscordClient.JoinVoiceChannleMessage"));
+        return ReplaceCommonVoiceStateInfo(format, user, beforeState, afterState).ToString();
+    }
+
+    /// <summary>
+    /// ユーザーがボイスチャンネルから退出した時の読み上げメッセージを生成します。
+    /// </summary>
+    /// <param name="user">Discordユーザー（Discordサーバーメンバー）</param>
+    /// <param name="beforeState">イベント発生前のボイス状態</param>
+    /// <param name="afterState">イベント発生後のボイス状態</param>
+    /// <returns>読み上げメッセージ</returns>
+    internal static string GetLeaveVoiceChannelMessage(DiscordUser user, DiscordVoiceState beforeState, DiscordVoiceState afterState)
+    {
+        var format = new StringBuilder(Settings.AsString("Format.InternalDiscordClient.LeaveVoiceChannleMessage"));
+        return ReplaceCommonVoiceStateInfo(format, user, beforeState, afterState).ToString();
+    }
+
+    /// <summary>
+    /// ユーザーがボイスチャンネルを移動した時の読み上げメッセージを生成します。
+    /// </summary>
+    /// <param name="user">Discordユーザー（Discordサーバーメンバー）</param>
+    /// <param name="beforeState">イベント発生前のボイス状態</param>
+    /// <param name="afterState">イベント発生後のボイス状態</param>
+    /// <returns>読み上げメッセージ</returns>
+    internal static string GetMoveVoiceChannelMessage(DiscordUser user, DiscordVoiceState beforeState, DiscordVoiceState afterState)
+    {
+        var format = new StringBuilder(Settings.AsString("Format.InternalDiscordClient.MoveVoiceChannleMessage"));
+        return ReplaceCommonVoiceStateInfo(format, user, beforeState, afterState).ToString();
+    }
+
+    /// <summary>
+    /// ユーザーが画面共有を開始した時の読み上げメッセージを生成します。
+    /// </summary>
+    /// <param name="user">Discordユーザー（Discordサーバーメンバー）</param>
+    /// <param name="beforeState">イベント発生前のボイス状態</param>
+    /// <param name="afterState">イベント発生後のボイス状態</param>
+    /// <returns>読み上げメッセージ</returns>
+    internal static string GetStartStreamingVoiceChannelMessage(DiscordUser user, DiscordVoiceState beforeState, DiscordVoiceState afterState)
+    {
+        var format = new StringBuilder(Settings.AsString("Format.InternalDiscordClient.StartStreamingVoiceChannleMessage"));
+        return ReplaceCommonVoiceStateInfo(format, user, beforeState, afterState).ToString();
+    }
+
+    /// <summary>
+    /// ユーザーが画面共有を終了した時の読み上げメッセージを生成します。
+    /// </summary>
+    /// <param name="user">Discordユーザー（Discordサーバーメンバー）</param>
+    /// <param name="beforeState">イベント発生前のボイス状態</param>
+    /// <param name="afterState">イベント発生後のボイス状態</param>
+    /// <returns>読み上げメッセージ</returns>
+    internal static string GetEndStreamingVoiceChannelMessage(DiscordUser user, DiscordVoiceState beforeState, DiscordVoiceState afterState)
+    {
+        var format = new StringBuilder(Settings.AsString("Format.InternalDiscordClient.EndStreamingVoiceChannleMessage"));
+        return ReplaceCommonVoiceStateInfo(format, user, beforeState, afterState).ToString();
+    }
+
+    #endregion メッセージ生成処理
+
+    #region テキスト置換処理
+
+    /// <summary>
+    /// テキスト中に含まれる読み上げ用共通パラメータを置換します。
+    /// </summary>
+    /// <param name="format">置換対象のテキスト</param>
+    /// <param name="user">Discordユーザー（Discordサーバーメンバー）</param>
+    /// <param name="beforeState">イベント発生前のボイス状態</param>
+    /// <param name="afterState">イベント発生後のボイス状態</param>
+    /// <returns>置換後のテキスト</returns>
+    /// <remarks>
+    /// 置換対象
+    /// <list type="bullet">
+    /// <item>ユーザー名</item>
+    /// <item>チャンネル名（イベント発生前）</item>
+    /// <item>チャンネル名（イベント発生後）</item>
+    /// </list>
+    /// </remarks>
+    private static StringBuilder ReplaceCommonVoiceStateInfo(StringBuilder format, DiscordUser user, DiscordVoiceState beforeState, DiscordVoiceState afterState)
+    {
+        format.Replace(Settings.AsString("InternalDiscordClient.FormatReplaceKey.UserName"), user.Username);
+
+        string name;
+        if (user is DiscordMember member)
         {
-            format = format.Replace(
-                Settings.AsString("ReplaceKey.DiscordMessage.UserName"),
-                guildUser.Username
-            );
+            name = member.DisplayName;
+        }
+        else
+        {
+            name = user.Username;
         }
 
-        if (format.Contains(Settings.AsString("ReplaceKey.DiscordMessage.NickName")))
-        {
-            string name;
-            if (guildUser.Nickname != null)
-            {
-                name = guildUser.Nickname;
-            }
-            else
-            {
-                name = guildUser.Username;
-            }
+        format.Replace(Settings.AsString("InternalDiscordClient.FormatReplaceKey.NickName"), name);
 
-            format = format.Replace(
-                Settings.AsString("ReplaceKey.DiscordMessage.NickName"),
-                name
-            );
-        }
+        format.Replace(Settings.AsString("InternalDiscordClient.FormatReplaceKey.BeforeChannel"), beforeState?.Channel?.Name);
 
-        if (format.Contains(Settings.AsString("ReplaceKey.DiscordMessage.SourceChannel")))
-        {
-            format = format.Replace(
-                Settings.AsString("ReplaceKey.DiscordMessage.SourceChannel"),
-                sourceVoiceState.VoiceChannel.Name
-            );
-        }
+        format.Replace(Settings.AsString("InternalDiscordClient.FormatReplaceKey.AfterChannel"), afterState?.Channel?.Name);
 
-        if (format.Contains(Settings.AsString("ReplaceKey.DiscordMessage.TargetChannel")))
-        {
-            format = format.Replace(
-                Settings.AsString("ReplaceKey.DiscordMessage.TargetChannel"),
-                targetVoiceState.VoiceChannel.Name
-            );
-        }
         return format;
     }
 
-    internal static string GetJoinVoiceChannelMessage(SocketGuildUser guildUser, SocketVoiceState sourceVoiceState, SocketVoiceState targetVoiceState)
-    {
-        var format = Settings.AsString("Format.DiscordMessage.JoinVoiceChannleMessage");
-        return ReplaceCommonVoiceStateInfo(format, guildUser, sourceVoiceState, targetVoiceState);
-    }
-
-    internal static string GetLeaveVoiceChannelMessage(SocketGuildUser guildUser, SocketVoiceState sourceVoiceState, SocketVoiceState targetVoiceState)
-    {
-        var format = Settings.AsString("Format.DiscordMessage.LeaveVoiceChannleMessage");
-        return ReplaceCommonVoiceStateInfo(format, guildUser, sourceVoiceState, targetVoiceState);
-    }
-
-    internal static string GetMoveVoiceChannelMessage(SocketGuildUser guildUser, SocketVoiceState sourceVoiceState, SocketVoiceState targetVoiceState)
-    {
-        var format = Settings.AsString("Format.DiscordMessage.MoveVoiceChannleMessage");
-        return ReplaceCommonVoiceStateInfo(format, guildUser, sourceVoiceState, targetVoiceState);
-    }
-
-    internal static string GetStartStreamingVoiceChannelMessage(SocketGuildUser guildUser, SocketVoiceState sourceVoiceState, SocketVoiceState targetVoiceState)
-    {
-        var format = Settings.AsString("Format.DiscordMessage.StartStreamingVoiceChannleMessage");
-        return ReplaceCommonVoiceStateInfo(format, guildUser, sourceVoiceState, targetVoiceState);
-    }
-
-    internal static string GetEndStreamingVoiceChannelMessage(SocketGuildUser guildUser, SocketVoiceState sourceVoiceState, SocketVoiceState targetVoiceState)
-    {
-        var format = Settings.AsString("Format.DiscordMessage.EndStreamingVoiceChannleMessage");
-        return ReplaceCommonVoiceStateInfo(format, guildUser, sourceVoiceState, targetVoiceState);
-    }
+    #endregion テキスト置換処理
 }
