@@ -20,5 +20,5 @@
       ## 各種検出用正規表現定義 ##
       ############################
   -->
-  <Item key="RegularExpression.URLShortener"         value="https?://[\w!?/+\-_~:;.,*&amp;@#$%()'[\]=]+" />
+  <Item key="Regex.URLShortener"         value="https?://[\w!?/+\-_~:;.,*&amp;@#$%()'[\]=]+" />
 </Settings>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Impl.Factory;
 using net.boilingwater.Application.DiSpeakBouyomiChanBridge.CommandSystem.Service;
@@ -12,7 +13,6 @@ using net.boilingwater.BusinessLogic.VoiceReadout.HttpClients;
 using net.boilingwater.BusinessLogic.VoiceReadout.HttpClients.Impl;
 using net.boilingwater.BusinessLogic.VoiceReadOut.Service;
 using net.boilingwater.BusinessLogic.VoiceReadOut.VoiceExecutor;
-using net.boilingwater.external.DiscordClient;
 using net.boilingwater.Framework.Common.Initialize;
 using net.boilingwater.Framework.Common.Setting;
 using net.boilingwater.Framework.Core;
@@ -23,8 +23,6 @@ namespace net.boilingwater.Application.DiSpeakBouyomiChanBridge;
 
 internal class ApplicationInitializer
 {
-    private static DiscordDotNetClient? _client;
-
     /// <summary>
     /// システムの初期化を行います
     /// </summary>
@@ -95,39 +93,18 @@ internal class ApplicationInitializer
     /// <exception cref="ApplicationException"></exception>
     private static void InitializeHttpServer()
     {
-        if (_client != null && _client.InnerClient != null)
-        {
-            _ = _client.StopAsync();
-        }
+        _ = InternalDiscordClientManager.Instance.StopAsync();
 
         if (Settings.AsBoolean("Use.InternalDiscordClient"))
         {
             MessageReadOutService.ReadOutMessage(Settings.AsString("Message.TryLoginToDiscord"));
 
-            _client = new();
-            _client.InitializeAsync().GetAwaiter().GetResult();
-
-            var discordEventHandler = new DiscordEventHandler(_client.InnerClient);
-
-            if (Settings.AsBoolean("Use.RedirectLogDiscord.Net"))
-            {
-                _client.Logging = discordEventHandler.Logging;
-            }
-
-            if (!Settings.AsMultiList("List.ReadOutTarget.Guild").CastMulti<ulong>().All(guild => guild > 0UL))
+            if (!Settings.AsMultiList("List.InternalDiscordClient.ReadOutTarget.Guild").CastMulti<ulong>().All(guild => guild > 0UL))
             {
                 throw new ApplicationException("DiscordサーバーIDが間違っています");
             }
 
-            if (Settings.AsBoolean("Use.ReadOut.GuildChannel.Text"))
-            {
-                _client.MessageReceived = discordEventHandler.MessageReceived;
-            }
-
-            if (Settings.AsBoolean("Use.ReadOut.GuildChannel.Voice"))
-            {
-                _client.UserVoiceStatusUpdated = discordEventHandler.UserVoiceStatusUpdated;
-            }
+            InternalDiscordClientManager.Instance.Initialize();
 
             MessageReadOutService.ReadOutMessage(Settings.AsString("Message.SuccessLoginToDiscord"));
         }
@@ -147,14 +124,9 @@ internal class ApplicationInitializer
     /// </summary>
     internal static void Start()
     {
-        TaskAwaiter? awaiter = null;
         if (Settings.AsBoolean("Use.InternalDiscordClient"))
         {
-            if (_client == null)
-            {
-                throw new InvalidOperationException("先にアプリケーションの初期化処理を行ってください。");
-            }
-            awaiter = _client.StartAsync(Settings.AsString("DiscordToken")).GetAwaiter();
+            _ = InternalDiscordClientManager.Instance.StartAsync();
         }
         else
         {
@@ -167,6 +139,7 @@ internal class ApplicationInitializer
         }
 
         MessageReadOutService.ReadOutMessage(Settings.AsString("Message.Welcome"));
-        awaiter?.GetResult();
+
+        Task.Delay(-1).GetAwaiter().GetResult(); // プログラムが終了しないように無限に待機する
     }
 }
